@@ -1,4 +1,4 @@
-import { Button, Center, Container, Input, Text } from '@chakra-ui/react';
+import { Button, Input, Text } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '../../firebase/clientApp';
