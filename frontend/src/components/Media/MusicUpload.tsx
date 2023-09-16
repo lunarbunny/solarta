@@ -1,5 +1,6 @@
-import { Box, Button, Card, CardBody, CardHeader, Heading, Input, VStack } from "@chakra-ui/react";
-import { useRef, useState } from "react";
+import { Box, Button, Card, CardBody, CardHeader, Heading, Input, VStack, Text, InputGroup, InputLeftAddon, Flex, Select } from "@chakra-ui/react";
+import { useCallback, useRef, useState } from "react";
+import { useDropzone } from "react-dropzone";
 
 const MusicUpload: React.FC = () => {
   const uploadInputRef = useRef<HTMLInputElement>(null);
@@ -10,14 +11,20 @@ const MusicUpload: React.FC = () => {
     album: '',
     genre: '',
     image: '',
+    file: null as File | null,
   });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files && e.target.files[0];
-    if (selectedFile) {
-      console.log(selectedFile);
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (acceptedFiles.length == 1) {
+      setUploadForm({ ...uploadForm, file: acceptedFiles[0] });
     }
-  };
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { allow: ['.mp3'] },
+    maxFiles: 1,
+  });
 
   return (
     <Card>
@@ -26,43 +33,56 @@ const MusicUpload: React.FC = () => {
       </CardHeader>
       <CardBody>
         <form>
-          <VStack align="flex-end">
-            <Input
-              type="text"
-              placeholder="Name of the song"
-              value={uploadForm.name}
-              onChange={(e) => setUploadForm({ ...uploadForm, name: e.target.value })}
-            />
+          <VStack spacing={2}>
+            <InputGroup>
+              <Input
+                type="text"
+                placeholder="Song name"
+                value={uploadForm.name}
+                onChange={(e) => setUploadForm({ ...uploadForm, name: e.target.value })}
+              />
+              <Input
+                ml={2}
+                type="text"
+                placeholder="Album name"
+                value={uploadForm.album}
+                onChange={(e) => setUploadForm({ ...uploadForm, album: e.target.value })}
+              />
+            </InputGroup>
             <Input
               type="text"
               placeholder="Artist 1, Artist 2, ..."
               value={uploadForm.artist}
-              onChange={(e) => setUploadForm({ ...uploadForm, artist: e.target.value.split(',') })}
+              onChange={(e) => setUploadForm({ ...uploadForm, artist: e.target.value.split(',').map(s => s.trim()) })}
             />
-            <Input
-              type="text"
-              placeholder="Album name"
-              value={uploadForm.album}
-              onChange={(e) => setUploadForm({ ...uploadForm, album: e.target.value })}
-            />
-            <Input
-              type="text"
-              placeholder="Music genre"
-              value={uploadForm.genre}
-              onChange={(e) => setUploadForm({ ...uploadForm, genre: e.target.value })}
-            />
+            <Select placeholder="--- select genre ---">
+              <option value="rock">Rock</option>
+              <option value="pop">Pop</option>
+              <option value="jazz">Jazz</option>
+            </Select>
 
-            <Box>
-              <Input
-                type="file"
-                ref={uploadInputRef}
-                onChange={handleFileChange}
-                display="none"
-              />
-              <Button onClick={() => uploadInputRef.current && uploadInputRef.current.click()} variant="outline">
-                Upload
-              </Button>
+            <Box {...getRootProps()}
+              w="100%" height="100px"
+              border="2px dashed"
+              borderColor="gray.300"
+              borderRadius="md"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              cursor="pointer">
+              <input {...getInputProps()} />
+              {!uploadForm.file && <Text>{isDragActive ? 'Drop the music file here ...' : 'Drop your music file here'}</Text>}
+              {uploadForm.file && <Text>{uploadForm.file.name}</Text>}
             </Box>
+
+            <Button
+              width="100%"
+              borderRadius={16}
+              mt={1}
+              type="submit"
+            >
+              Upload
+            </Button>
           </VStack>
         </form>
       </CardBody>
