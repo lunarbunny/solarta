@@ -13,3 +13,10 @@ class Album(Base):
     description: Mapped[str] = mapped_column(String(45), nullable=True)
 
     relationship('AlbumMusic', backref='Album')
+
+    def __init__(self, title, releaseDate, ownerId, imageUrl=None, description=None):
+        self.title = title
+        self.imageUrl = imageUrl
+        self.releaseDate = releaseDate
+        self.ownerId = ownerId
+        self.description = description

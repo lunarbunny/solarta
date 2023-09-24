@@ -9,3 +9,6 @@ class Genre(Base):
     name: Mapped[str] = mapped_column(String(45), nullable=False)
 
     relationship('Music', backref='Genre')
+
+    def __init__(self, name):
+        self.name = name
