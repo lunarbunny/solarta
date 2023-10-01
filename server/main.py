@@ -36,49 +36,71 @@ from models.User import User
 Base.metadata.create_all(engine)
 
 # MariaDB endpoints
-@app.route("/api/role/delete/<int:id>", methods=["DELETE"])
-def role_delete(id):
+@app.route("/api/genre", methods=["GET"])
+def genre_retrieve_all():
     with Session() as session:
-        role = session.get(Role, id)
-        if role:
-            session.delete(role)
+        genres = session.query(Genre).all()
+        return jsonify([{
+            "id": genre.id,
+            "name": genre.name
+        } for genre in genres]), 200
+    
+@app.route("/api/music/delete/<int:id>", methods=["DELETE"])
+def music_delete(id):
+    with Session() as session:
+        music = session.get(Music, id)
+        if music:
+            session.delete(music)
             session.commit()
             return '', 200
         else:
             session.rollback()
             return '', 400
 
-@app.route("/api/role/create", methods=["POST"])
-def role_create():
+@app.route("/api/music/create", methods=["POST"])
+def music_create():
     with Session() as session:
         try:
-            data = request.get_json()
-            session.add(Role(data["role"]))
-            session.commit()
-            return '', 200
+            data = request.form
+            music_file = request.files["music_file"]
+            if music_file:
+                from utils import music_get_duration, music_save
+                music_save(music_file)
+                duration = music_get_duration(music_file.filename)
+                session.add(Music(data["title"], music_file.filename, duration, data["genreId"]))
+                session.commit()
+                return '', 200
         except:
             session.rollback()
             return '', 400
             
-@app.route("/api/role/<string:role>", methods=["GET"])
-def role_retrieve_id(role):
+@app.route("/api/music/play/<int:id>", methods=["GET"])
+def music_play_id(id):
     with Session() as session:
-        role = session.query(Role).filter(Role.role==role).first()
-        if role:
-            return jsonify({"id": role.id}), 200
+        music = session.query(Music).filter(Music.id==id).first()
+        if music:
+            from flask import send_file
+            from utils import music_get_path
+            music = session.query(Music).filter(Music.id == id).first()
+            return send_file(music_get_path(music.filename), as_attachment=False), 200
         else:
             session.rollback()
             return '', 404
         
-@app.route("/api/role", methods=["GET"])
-def role_retrieve_all():
-    with Session() as session:
-        roles = session.query(Role).all()
-        return jsonify([{"role": role.role} for role in roles]), 200
-        
-# Firestore endpoints
 @app.route("/api/music", methods=["GET"])
 def music_retrieve_all():
+    with Session() as session:
+        musics = session.query(Music).all()
+        return jsonify([{
+            "id": music.id,
+            "title": music.title,
+            "duration": music.duration,
+            "genreId": music.genreId
+        } for music in musics]), 200
+        
+# Firestore endpoints
+@app.route("/api/music/history/<string:id>", methods=["GET"])
+def music_retrieve_id_history(id):
     try:
         music_ref = nosql.collection("music")
         musics = music_ref.stream()
