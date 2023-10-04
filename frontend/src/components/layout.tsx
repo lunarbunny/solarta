@@ -1,20 +1,22 @@
 import React from "react";
 import Navbar from "./NavBar/NavBar";
 import MusicPlayer from "./Media/MusicPlayer";
-import { Flex } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 
 interface Props {
   children: React.ReactNode;
 }
 
 const Layout: React.FC<Props> = ({ children }) => {
-  return <>
+  return <Flex h="100vh" direction="column">
     <Navbar />
-    <main>
-      {children}
-      <MusicPlayer name="THIS IS THE FIRE" artist="imagine fire" durationSec={150} />
-    </main>
-  </>;
+    <Box flexGrow={1}>
+      <main>
+        {children}
+      </main>
+    </Box>
+    <MusicPlayer name="THIS IS THE FIRE" artist="imagine fire" durationSec={150} />
+  </Flex>;
 }
 
 export default Layout;
