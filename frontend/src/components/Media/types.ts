@@ -8,4 +8,8 @@ type Song = {
     image: string;
 };
 
-export type { Song };
+type Playlist = {
+    name: string;
+};
+
+export type { Song, Playlist };

@@ -1,10 +1,9 @@
 import Auth from "@/components/Auth/Auth";
 import MusicList from "@/components/Media/MusicList";
-import MusicPlayer from "@/components/Media/MusicPlayer";
 import MusicUpload from "@/components/Media/MusicUpload";
 import { Song } from "@/components/Media/types";
 import { auth } from "@/firebase/clientApp";
-import { Box, Center, CircularProgress, Container, Flex, HStack, Text } from "@chakra-ui/react";
+import { Box, Center, CircularProgress, Flex, HStack } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -13,7 +12,7 @@ const Home: NextPage = () => {
 
   if (loading) {
     return (
-      <Center height="90vh">
+      <Center h="100%">
         <CircularProgress isIndeterminate color='blue.700' />
       </Center>
     )
@@ -21,9 +20,7 @@ const Home: NextPage = () => {
 
   if (!user) {
     return (
-      <>
-        <Auth />
-      </>
+      <Auth />
     )
   }
 
@@ -41,16 +38,12 @@ const Home: NextPage = () => {
   }
 
   return (
-    <Container maxW="container.lg" centerContent padding="16px" flexGrow={1}>
-      <Box mb={2}>
-        <Text>Logged in, this is the home page.</Text>
-      </Box>
-
-      <HStack spacing={4} align="stretch">
+    <Box>
+      <Flex>
         <MusicList songs={songs} />
         <MusicUpload />
-      </HStack>
-    </Container>
+      </Flex>
+    </Box>
   )
 }
 

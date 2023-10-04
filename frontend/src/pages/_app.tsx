@@ -1,6 +1,6 @@
 import { ChakraProvider, extendTheme, type ThemeConfig } from '@chakra-ui/react'
 import type { AppProps } from 'next/app'
-import Layout from '../components/layout'
+import Layout from '../components/Layout'
 import { RecoilRoot } from 'recoil'
 
 const config: ThemeConfig = {
