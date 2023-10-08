@@ -24,22 +24,9 @@ const HomePage: NextPage = () => {
     )
   }
 
-  const songs: Song[] = [];
-  for (let i = 1; i <= 5; i++) {
-    songs.push({
-      name: `Song ${i}`,
-      artist: [`Artist ${i}`],
-      genre: [`Genre ${i}`],
-      album: `Album ${i}`,
-      image: 'https://fakeimg.pl/64x64',
-      duration: 180,
-      year: 0
-    });
-  }
-
   return (
     <Box>
-      <MusicList songs={songs} />
+      <Text>Albums</Text>
     </Box>
   );
 }

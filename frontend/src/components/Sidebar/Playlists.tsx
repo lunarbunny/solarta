@@ -12,8 +12,8 @@ const playlists: Playlist[] = [
 const Playlists = () => {
   return (
     <>
-      {playlists.map((pl) => (
-        <SidebarItem name={pl.name}
+      {playlists.map((pl, i) => (
+        <SidebarItem key={i} name={pl.name}
           icon={pl.name == 'Favourites' ? <AiOutlineHeart size={20} /> : <TbPlaylist size={20} />}
         />
       ))}
