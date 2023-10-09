@@ -7,3 +7,7 @@ class AlbumMusic(Base):
 
     idAlbum: Mapped[int] = mapped_column(Integer, ForeignKey('Album.id'), primary_key=True, nullable=False)
     idMusic: Mapped[int] = mapped_column(Integer, ForeignKey('Music.id'), primary_key=True, nullable=False)
+
+    def __init__(self, idAlbum, idMusic):
+        self.idAlbum = idAlbum
+        self.idMusic = idMusic

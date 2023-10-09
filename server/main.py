@@ -1,34 +1,18 @@
 # Create Flask app
 from flask import Flask
+from flask_cors import CORS
+
 app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
-# Initialise Firestore
-from firebase_admin import credentials, firestore
-import firebase_admin
+# Register blueprints
+from blueprints.nosql.history_bp import history_bp
+from blueprints.sql.genre_bp import genre_bp
+from blueprints.sql.music_bp import music_bp
 
-firebase_admin.initialize_app(credentials.Certificate("serviceAccountKey.json"))
-nosql = firestore.client()
-
-# Initialise MariaDB
-from sqlalchemy import create_engine
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-engine = create_engine(os.getenv("SQLALCHEMY_DATABASE_URI"), echo=True)
-
-# Generate SQL schema
-from models.__init__ import Base
-from models.Album import Album
-from models.AlbumMusic import AlbumMusic
-from models.Genre import Genre
-from models.Music import Music
-from models.Playlist import Playlist
-from models.PlaylistMusic import PlaylistMusic
-from models.Role import Role
-from models.User import User
-
-Base.metadata.create_all(engine)
+app.register_blueprint(history_bp, url_prefix="/api/music/history")
+app.register_blueprint(genre_bp, url_prefix="/api/genre")
+app.register_blueprint(music_bp, url_prefix="/api/music")
 
 # Base endpoints
 @app.route("/")
