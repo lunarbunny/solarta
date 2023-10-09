@@ -1,9 +1,9 @@
 import Auth from "@/components/Auth/Auth";
 import MusicList from "@/components/Media/MusicList";
-import MusicUpload from "@/components/Media/MusicUpload";
-import { Song } from "@/components/Media/types";
+import SearchBar from "@/components/Search/SearchBar";
 import { auth } from "@/firebase/clientApp";
-import { Box, Center, CircularProgress, Flex, Text } from "@chakra-ui/react";
+import { Song } from "@/types";
+import { Box, Center, CircularProgress, Divider } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -12,7 +12,7 @@ const HomePage: NextPage = () => {
 
   if (loading) {
     return (
-      <Center h="100%">
+      <Center w="100%">
         <CircularProgress isIndeterminate color='blue.700' />
       </Center>
     )
@@ -27,19 +27,22 @@ const HomePage: NextPage = () => {
   const songs: Song[] = [];
   for (let i = 1; i <= 5; i++) {
     songs.push({
+      id: i.toString(),
       name: `Song ${i}`,
-      artist: [`Artist ${i}`],
+      artists: [{ id: i.toString(), name: `Artist ${i}` }],
       genre: [`Genre ${i}`],
       album: `Album ${i}`,
-      image: 'https://fakeimg.pl/64x64',
-      duration: 180,
-      year: 0
+      imageUrl: 'https://picsum.photos/42?random=' + i,
+      duration: Math.floor(Math.random() * (300 - 120 + 1) + 120), // 120 - 300 seconds
+      year: 2023,
     });
   }
 
   return (
-    <Box>
-      <MusicList songs={songs} />
+    <Box w='100%'>
+      <SearchBar />
+      <Divider />
+      <MusicList music={songs} />
     </Box>
   );
 }

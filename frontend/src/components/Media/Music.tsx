@@ -1,6 +1,7 @@
 import { Box, Flex, Image, Text } from '@chakra-ui/react';
 import React from 'react';
-import { Song } from './types';
+import { Song } from '../../types';
+import { FiHeart } from 'react-icons/fi';
 
 type MusicProps = {
   song: Song;
@@ -16,12 +17,13 @@ const Music: React.FC<MusicProps> = ({ song }) => {
   return (
     <Flex
       alignItems="center"
-      borderRadius="md"
       px={2}
       py={1}
       _hover={{ bg: 'blue.700' }}
     >
-      <Image boxSize='36px' src={song.image} />
+      <Image boxSize='42px' borderRadius='full'
+        src={song.imageUrl}
+      />
       <Box
         flex={1}
         minW="200px"
@@ -30,12 +32,13 @@ const Music: React.FC<MusicProps> = ({ song }) => {
           {song.name}
         </Text>
         <Text fontSize="sm" color="gray.500">
-          {song.artist}
+          {song.artists.map(a => a.name).join(', ')}
         </Text>
       </Box>
-      <Text fontSize="sm" color="gray.500">
+      <Text fontSize="sm" me={2}>
         {durationToTime(song.duration)}
       </Text>
+      <FiHeart color="gray" />
     </Flex>
   );
 };

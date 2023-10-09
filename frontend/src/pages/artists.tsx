@@ -1,5 +1,4 @@
 import Auth from "@/components/Auth/Auth";
-import { Song } from "@/components/Media/types";
 import { auth } from "@/firebase/clientApp";
 import { Box, Center, CircularProgress, Flex, Text } from "@chakra-ui/react";
 import { NextPage } from "next";
@@ -10,7 +9,7 @@ const ArtistsPage: NextPage = () => {
 
   if (loading) {
     return (
-      <Center h="100%">
+      <Center w="100%">
         <CircularProgress isIndeterminate color='blue.700' />
       </Center>
     )

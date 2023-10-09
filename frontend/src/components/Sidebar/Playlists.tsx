@@ -1,4 +1,4 @@
-import { Playlist } from '../Media/types'
+import { Playlist } from '../../types'
 import { TbPlaylist } from 'react-icons/tb'
 import { AiOutlineHeart } from 'react-icons/ai';
 import SidebarItem from './SidebarItem';
