@@ -5,12 +5,17 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
-# Register blueprints
+# Register NoSQL blueprints
 from blueprints.nosql.history_bp import history_bp
+
+app.register_blueprint(history_bp, url_prefix="/api/music/history")
+
+# Register SQL blueprints
+from blueprints.sql.album_bp import album_bp
 from blueprints.sql.genre_bp import genre_bp
 from blueprints.sql.music_bp import music_bp
 
-app.register_blueprint(history_bp, url_prefix="/api/music/history")
+app.register_blueprint(album_bp, url_prefix="/api/album")
 app.register_blueprint(genre_bp, url_prefix="/api/genre")
 app.register_blueprint(music_bp, url_prefix="/api/music")
 
