@@ -1,8 +1,9 @@
 from flask import Blueprint, jsonify
 from ..__init__ import Firestore
+import google.cloud.firestore_v1 as gcloudfirestore
 
 history_bp = Blueprint("history_bp", __name__)
-nosql = Firestore()
+nosql: gcloudfirestore.Client = Firestore()
 
 # Firestore endpoints
 @history_bp.route("/<string:id>", methods=["GET"])
