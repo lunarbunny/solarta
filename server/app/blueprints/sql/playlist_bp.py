@@ -4,7 +4,7 @@ from ..__init__ import Session, Playlist, PlaylistMusic, Music
 playlist_bp = Blueprint("playlist_bp", __name__)
 
 # Delete a playlist
-@playlist_bp.route("/delete/<int:id>", methods=["DELETE"])
+@playlist_bp.route("/<int:id>/delete", methods=["DELETE"])
 def playlist_delete(id):
     with Session() as session:
         try:
