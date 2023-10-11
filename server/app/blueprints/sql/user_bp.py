@@ -12,7 +12,7 @@ def user_retrieve_all():
             return jsonify([{
                 "id": user.id,
                 "name": user.name
-            } for user in users if user.roleId != 9]), 200
+            } for user in users if user.roleId != 1]), 200
         except:
             return '', 400
     
