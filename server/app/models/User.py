@@ -15,8 +15,7 @@ class User(Base):
     relationship('Album', backref='User')
     relationship('Playlist', backref='User')
 
-    def __init__(self, id, name, email, hashPwd, banStatus, roleId):
-        self.id = id
+    def __init__(self, name, email, hashPwd, banStatus, roleId):
         self.name = name
         self.email = email
         self.hashPwd = hashPwd
