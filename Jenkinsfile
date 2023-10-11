@@ -8,7 +8,27 @@ pipeline {
     }
 
     stages {
-        stage('Build and Push Docker Image') {
+        stage('OWASP Dependency-Check Vulnerabilities') {
+            steps {
+                // Install deps first
+                nodejs(nodeJSInstallationName: 'NodeJS 20') {
+                    sh 'npm install --prefix ./frontend'
+                }
+
+                // Run OWASP Dependency-Check
+                // https://jeremylong.github.io/DependencyCheck/dependency-check-cli/arguments.html
+                dependencyCheck additionalArguments: ''' 
+                            -o './'
+                            -s './frontend'
+                            -f 'ALL' 
+                            --prettyPrint''', odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
+
+                // Write report to specified file
+                dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+            }
+        }
+
+        stage('Build and Push Server Docker Image') {
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com/', 'd5ae8eba-d530-4355-acf8-9543b7d35887') {
