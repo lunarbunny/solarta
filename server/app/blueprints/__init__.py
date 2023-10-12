@@ -81,13 +81,14 @@ with Session() as session:
 
     # Seed music
     if session.query(Music).count() == 0:
-        music_data = {"title": "yo!", "filename": "yo!.mp3", "duration": 6, "genreId": 2}
+        music_data = {"title": "yo!", "filename": "yo!.mp3", "duration": 6, "genreId": 2, "ownerId": 2}
         music_obj = Music(**music_data)
         session.add(music_obj)
         session.commit()
 
     # Seed playlist
     if session.query(Playlist).count() == 0:
+        from datetime import date
         playlist_data = {"ownerId": 2, "creationDate": date(2023, 3, 1), "title": "Clown", "description": "Ni Hao"}
         playlist_obj = Playlist(**playlist_data)
         session.add(playlist_obj)
