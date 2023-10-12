@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from ..__init__ import Session, Music
+from ..__init__ import Session, Music, User
 
 music_bp = Blueprint("music_bp", __name__)
 
@@ -76,13 +76,14 @@ def music_play_id(id):
 def music_retrieve_all():
     with Session() as session:
         try:
-            musics = session.query(Music).all()
+            musics = session.query(Music, User.name).join(User, Music.ownerId == User.id).all()
             return jsonify([{
                 "id": music.id,
                 "title": music.title,
                 "duration": music.duration,
-                "genreId": music.genreId
-            } for music in musics]), 200
+                "genreId": music.genreId,
+                "ownerName": owner_name
+            } for music, owner_name in musics]), 200
         except:
             return '', 400
     

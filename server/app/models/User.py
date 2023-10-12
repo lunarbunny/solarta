@@ -13,6 +13,7 @@ class User(Base):
     roleId: Mapped[int] = mapped_column(Integer, ForeignKey('Role.id'), nullable=False)
 
     relationship('Album', backref='User')
+    relationship('Music', backref='User')
     relationship('Playlist', backref='User')
 
     def __init__(self, name, email, hashPwd, banStatus, roleId):
