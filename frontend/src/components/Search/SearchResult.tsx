@@ -1,5 +1,5 @@
 import useFetch from '@/hooks/useFetch';
-import { SearchRespose, Song } from '@/types';
+import { API_URL, SearchRespose, Song } from '@/types';
 import { Box } from '@chakra-ui/react';
 import SidebarItem from '../Sidebar/SidebarItem';
 
@@ -8,7 +8,7 @@ type Props = {
 };
 
 const SearchResults = ({ query }: Props) => {
-  const { data, loading, error } = useFetch<SearchRespose>(`/api/search?q=${query}`);
+  //const { data, loading, error } = useFetch<SearchRespose>(`${API_URL}}/search?q=${query}`);
 
   return (
     <>

@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 interface FetchState<T> {
   data: T | null;
   loading: boolean;
-  error: Error | null;
+  error: string | null;
 }
 
 const useFetch = <T>(url: string): FetchState<T> => {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -20,7 +20,7 @@ const useFetch = <T>(url: string): FetchState<T> => {
         setLoading(false);
       })
       .catch((error: Error) => {
-        setError(error);
+        setError(error.name);
         setLoading(false);
       });
   }, [url]);

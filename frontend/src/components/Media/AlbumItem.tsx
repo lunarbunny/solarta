@@ -1,46 +1,43 @@
 import { Box, Flex, Image, Text } from '@chakra-ui/react';
 import React from 'react';
-import { Song } from '../../types';
 import { FiHeart } from 'react-icons/fi';
+import { Album } from '../../types';
 
-type MusicProps = {
-  song: Song;
+type Props = {
+  data: Album;
 };
 
-function durationToTime(duration: number): string {
-  const minutes = Math.floor(duration / 60);
-  const seconds = duration % 60;
-  return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+function dateToYear(date: string): string {
+  // Sun, 01 Jan 2023 00:00:00 GMT
+  return date.split(' ')[3];
 }
 
-const Music: React.FC<MusicProps> = ({ song }) => {
+const AlbumItem: React.FC<Props> = ({ data }) => {
   return (
     <Flex
       alignItems="center"
-      px={2}
-      py={1}
+      px={2} py={1}
       _hover={{ bg: 'blue.700' }}
     >
       <Image boxSize='42px' borderRadius='full'
-        src={song.imageUrl}
+        src={data.imageUrl || 'https://picsum.photos/42?random=' + data.id}
       />
       <Box
         flex={1}
         minW="200px"
         ml={3}>
         <Text fontWeight="semibold">
-          {song.name}
+          {data.title && data.title}
         </Text>
         <Text fontSize="sm" color="gray.500">
-          {song.artists.map(a => a.name).join(', ')}
+          {data.description ? data.description : 'No description'}
         </Text>
       </Box>
       <Text fontSize="sm" me={2}>
-        {durationToTime(song.duration)}
+        {data.releaseDate ? dateToYear(data.releaseDate) : 'No release date'}
       </Text>
-      <FiHeart color="gray" />
     </Flex>
   );
 };
 
-export default Music;
+export default AlbumItem;

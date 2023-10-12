@@ -1,19 +1,20 @@
 import { Box, List, ListItem } from '@chakra-ui/react';
 import React from 'react';
-import { Song } from '../../types';
-import Music from './Music';
+import { API_URL, Music } from '../../types';
+import MusicItem from './MusicItem';
+import useFetch from '@/hooks/useFetch';
 
-type Props = {
-  music: Song[];
-};
+const MusicList: React.FC = () => {
+  const { data: musicList, loading, error } = useFetch<Music[]>(`${API_URL}/api/music`);
 
-const MusicList: React.FC<Props> = ({ music: songs }) => {
   return (
     <Box>
       <List spacing={1}>
-        {songs.map((song, index) => (
+        {loading && <p>Loading...</p>}
+        {error && <p>Error: {error}</p>}
+        {musicList && musicList.map((song, index) => (
           <ListItem key={index}>
-            <Music song={song} />
+            <MusicItem data={song} />
           </ListItem>
         ))}
       </List>
