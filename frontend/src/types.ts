@@ -1,4 +1,4 @@
-const API_URL = 'http://solarta.nisokkususu.com/api';
+const API_URL = 'https://solarta.nisokkususu.com/api';
 
 type Music = {
     id: number;
@@ -8,8 +8,6 @@ type Music = {
     genreId: number;
     imageUrl: string;
 
-    albumId: number[];
-    artistId: number[];
     albums: Album[] | null;
     artists: Artist[] | null;
 };
