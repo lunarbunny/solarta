@@ -1,7 +1,8 @@
 import { ChakraProvider, extendTheme, type ThemeConfig } from '@chakra-ui/react'
 import type { AppProps } from 'next/app'
-import Layout from '../components/Layout'
 import { RecoilRoot } from 'recoil'
+import Layout from '../components/Layout'
+import "../styles/rhap.scss"
 
 const config: ThemeConfig = {
   initialColorMode: 'dark',

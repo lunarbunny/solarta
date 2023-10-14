@@ -1,12 +1,21 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "name": "Next.js: debug server-side",
-        "type": "node-terminal",
-        "request": "launch",
-        "command": "npm run dev",
-        "cwd": "${workspaceFolder}/frontend"
-      },
-    ]
-  }
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Next.js: debug server-side",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/frontend"
+    },
+    {
+      "name": "Python: flask API",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/server/app/main.py",
+      "cwd": "${workspaceFolder}/server/app",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+  ]
+}

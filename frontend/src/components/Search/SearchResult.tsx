@@ -1,5 +1,4 @@
 import useFetch from '@/hooks/useFetch';
-import { API_URL, SearchRespose, Song } from '@/types';
 import { Box } from '@chakra-ui/react';
 import SidebarItem from '../Sidebar/SidebarItem';
 

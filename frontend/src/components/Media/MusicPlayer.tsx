@@ -1,38 +1,36 @@
-import { useState, useRef, useEffect } from "react";
-import { NextPage } from "next";
+import { API_URL } from "@/types";
 import {
-  Flex,
-  Text,
   Box,
-  VStack,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverArrow,
-  PopoverCloseButton,
-  PopoverHeader,
-  PopoverBody,
-  Image,
+  Flex,
   Icon,
+  Image,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
+  Text,
 } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import AudioPlayer, { RHAP_UI } from "react-h5-audio-player";
-import "react-h5-audio-player/lib/styles.css";
-import { PiListNumbersDuotone } from "react-icons/pi";
 import { MdDelete } from "react-icons/md";
+import { PiListNumbersDuotone, PiPlaylist } from "react-icons/pi";
+
+type PlaylistItem = {
+  src: string;
+  title: string;
+  artist: string;
+  cover: string;
+}
 
 const MusicPlayer = () => {
-  interface IPlaylist {
-    src: string;
-    title: string;
-    artist: string;
-    cover: string;
-  }
-
-  const playlist: IPlaylist[] = [
+  const playlist: PlaylistItem[] = [
     {
-      src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
-      title: "SoundHelix-Song-5",
-      artist: "nobody",
+      src: `${API_URL}/api/music/play/1`,
+      title: "Yo!",
+      artist: "Xandr",
       cover: "https://bit.ly/dan-abramov",
     },
     {
@@ -49,9 +47,8 @@ const MusicPlayer = () => {
     },
   ];
 
-  const [playListState, setPlaylist] = useState<IPlaylist[]>(playlist);
-
-  const [currentTrack, setTrackIndex] = useState(0);
+  const [playListState, setPlaylist] = useState<PlaylistItem[]>(playlist);
+  const [currentTrack, setTrackIndex] = useState<number>(0);
 
   // useEffect(() => {
   //   const currentTrackName = playListState[currentTrack].title;
@@ -87,7 +84,7 @@ const MusicPlayer = () => {
     <AudioPlayer
       layout="stacked-reverse"
       showSkipControls
-      volume={0.1}
+      showJumpControls={false}
       onClickNext={handleClickNext}
       src={
         playListState[currentTrack].src ? playListState[currentTrack].src : ""
@@ -124,9 +121,9 @@ const MusicPlayer = () => {
             <span>
               <Icon
                 mx="10px"
-                as={PiListNumbersDuotone}
+                as={PiPlaylist}
                 boxSize="30px"
-                color="blue.700"
+                color="#72c2e7"
               />
             </span>
           </PopoverTrigger>
@@ -144,7 +141,7 @@ const MusicPlayer = () => {
                   px="5px"
                   bg={
                     playListState[currentTrack].title == song.title
-                      ? "blue.400"
+                      ? "blue.500"
                       : "whiteAlpha.800"
                   }
                   borderRadius="5px"

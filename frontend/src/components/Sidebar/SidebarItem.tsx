@@ -1,4 +1,4 @@
-import { Flex, Text } from '@chakra-ui/react'
+import { Box, Flex, Text } from '@chakra-ui/react'
 
 interface Props {
   name: string,
@@ -9,9 +9,9 @@ const SidebarItem = ({ name, icon }: Props) => {
   return (
     <Flex alignItems="center" color="white" _hover={{ color: "gray.400" }} my={2}>
       {icon}
-      <Text ml={2} fontSize="md" color="gray.200">
+      <Flex ml={2} mb="-4px" fontSize="md" color="gray.200">
         {name}
-      </Text>
+      </Flex>
     </Flex>
   )
 }

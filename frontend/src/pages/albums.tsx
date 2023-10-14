@@ -5,7 +5,7 @@ import { Box, Center, CircularProgress, Text } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-const HomePage: NextPage = () => {
+const AlbumPage: NextPage = () => {
   const [user, loading, error] = useAuthState(auth);
 
   if (loading) {
@@ -29,4 +29,4 @@ const HomePage: NextPage = () => {
   );
 }
 
-export default HomePage;
+export default AlbumPage;
