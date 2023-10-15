@@ -30,12 +30,15 @@ pipeline {
 
         stage('Build and Push Server Docker Image') {
             steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com/', 'd5ae8eba-d530-4355-acf8-9543b7d35887') {
-                        // Build the Docker image
-                        def dockerImage = docker.build("lunarbunny/solarta-api:${BUILD_ID}", "-f ${DOCKERFILE} ${WORKDIR}")
-                        // Push the Docker image to Docker Hub
-                        dockerImage.push("latest")
+                docker.withRegistry('https://registry.hub.docker.com/', 'd5ae8eba-d530-4355-acf8-9543b7d35887') {
+                    // Build the Docker image
+                    def dockerImage = docker.build("lunarbunny/solarta-api:${BUILD_ID}", "-f ${DOCKERFILE} ${WORKDIR}")
+                    // Push the Docker image to Docker Hub
+                    dockerImage.push("latest")
+
+                    // Run the Docker image as a sibling container
+                    withCredentials([string(credentialsId: 'c72a4d71-0a6b-42ca-9098-a01b162ed22f', variable: 'DOCKERRUNARGS')]) {
+                        dockerImage.run('$DOCKERRUNARGS')
                     }
                 }
             }
