@@ -8,6 +8,26 @@ pipeline {
     }
 
     stages {
+        stage('Build and Deploy Server Docker Image') {
+            steps {
+                script {
+                    // Build the Docker image
+                    def dockerImage = docker.build("lunarbunny/solarta-api:${BUILD_ID}", "-f ${DOCKERFILE} ${WORKDIR}")
+
+                    // Stop and remove existing container with same name, container name is "solarta".
+                    sh 'docker stop solarta || true'
+                    sh 'docker rm solarta || true'
+
+                    // Run the newest image as a sibling container
+                    withCredentials([string(credentialsId: 'c72a4d71-0a6b-42ca-9098-a01b162ed22f', variable: 'DOCKERRUNARGS')]) {
+                        dockerImage.run('$DOCKERRUNARGS')
+                    }
+                }
+            }
+        }
+
+        // TODO: Add a stage to deploy frontend
+
         stage('OWASP Dependency-Check Vulnerabilities') {
             steps {
                 // Install deps first
@@ -20,32 +40,11 @@ pipeline {
                 dependencyCheck additionalArguments: ''' 
                             -o './'
                             -s './frontend'
-                            -f 'ALL' 
-                            --prettyPrint''', odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
+                            -f 'HTML' 
+                            ''', odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
 
                 // Write report to specified file
                 dependencyCheckPublisher pattern: 'dependency-check-report.xml'
-            }
-        }
-
-        stage('Build and Push Server Docker Image') {
-            steps {
-                script {
-                    // docker.withRegistry('https://registry.hub.docker.com/', 'd5ae8eba-d530-4355-acf8-9543b7d35887') {
-                    //     // Build the Docker image
-                    //     def dockerImage = docker.build("lunarbunny/solarta-api:${BUILD_ID}", "-f ${DOCKERFILE} ${WORKDIR}")
-                    //     // Push the Docker image to Docker Hub
-                    //     dockerImage.push("latest")
-                    // }
-                    
-                    // Build the Docker image
-                    def dockerImage = docker.build("lunarbunny/solarta-api:${BUILD_ID}", "-f ${DOCKERFILE} ${WORKDIR}")
-
-                    // Run the Docker image as a sibling container
-                    withCredentials([string(credentialsId: 'c72a4d71-0a6b-42ca-9098-a01b162ed22f', variable: 'DOCKERRUNARGS')]) {
-                        dockerImage.run('$DOCKERRUNARGS')
-                    }
-                }
             }
         }
     }
