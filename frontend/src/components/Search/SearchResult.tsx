@@ -16,7 +16,7 @@ const SearchResults = ({ query }: Props) => {
         <Box
           position='absolute'
           w='50%'
-          top='4%'
+          top='5%'
           background='rgba(5, 14, 150, 0.2)'
           backdropFilter='blur(80px)'
         >

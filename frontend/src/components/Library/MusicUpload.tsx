@@ -1,16 +1,17 @@
-import { Box, Button, Card, CardBody, CardHeader, Heading, Input, VStack, Text, InputGroup, InputLeftAddon, Flex, Select } from "@chakra-ui/react";
-import { useCallback, useRef, useState } from "react";
+import { Box, Button, Input, Text, InputGroup, Select } from "@chakra-ui/react";
+import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import LibrarySection from "./LibrarySection";
-import useFetch from "@/hooks/useFetch";
+import { Album } from "@/types";
 
-const MusicUpload: React.FC = () => {
-  const { data: albums } = useFetch('/api/music/album/artist=2');
-  const { data: artists } = useFetch('/api/music/artist');
+type Props = {
+  albums: Album[],
+}
 
+const MusicUpload: React.FC<Props> = () => {
   const [uploadForm, setUploadForm] = useState({
     name: '',
-    artist: [''],
+    artist: [] as string[],
     album: '',
     genre: '',
     imageUrl: '',
@@ -30,7 +31,7 @@ const MusicUpload: React.FC = () => {
   });
 
   return (
-    <LibrarySection title="Upload music">
+    <Box mt={4} px={4}>
       <form>
         <Box {...getRootProps()}
           height="auto" minHeight="80px" p={4}
@@ -81,7 +82,7 @@ const MusicUpload: React.FC = () => {
           Upload
         </Button>
       </form>
-    </LibrarySection>
+    </Box>
   );
 }
 

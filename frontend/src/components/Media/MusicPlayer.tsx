@@ -28,10 +28,10 @@ type PlaylistItem = {
 const MusicPlayer = () => {
   const playlist: PlaylistItem[] = [
     {
-      src: `${API_URL}/api/music/play/1`,
+      src: `${API_URL}/music/play/1`,
       title: "Yo!",
       artist: "Xandr",
-      cover: "https://bit.ly/dan-abramov",
+      cover: "https://picsum.photos/64?random=1",
     },
     {
       src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
@@ -57,17 +57,19 @@ const MusicPlayer = () => {
   //   );
   // }, [currentTrack]);
 
-  const handleClickNext = () => {
-    setTrackIndex((currentTrack) =>
-      currentTrack < playListState.length - 1 ? currentTrack + 1 : 0
-    );
+  const handleClickNextPrev = (isNext: boolean) => {
+    let newIndex = currentTrack + (isNext ? 1 : -1);
+    if (newIndex < 0) {
+      newIndex = playListState.length - 1;
+    } else if (newIndex >= playListState.length) {
+      newIndex = 0;
+    }
+    setTrackIndex(newIndex);
   };
 
   const handleEnd = () => {
     console.log("end");
-    setTrackIndex((currentTrack) =>
-      currentTrack < playListState.length - 1 ? currentTrack + 1 : 0
-    );
+    setTrackIndex(0);
   };
 
   const handleError = () => {
@@ -85,7 +87,8 @@ const MusicPlayer = () => {
       layout="stacked-reverse"
       showSkipControls
       showJumpControls={false}
-      onClickNext={handleClickNext}
+      onClickPrevious={() => handleClickNextPrev(false)}
+      onClickNext={() => handleClickNextPrev(true)}
       src={
         playListState[currentTrack].src ? playListState[currentTrack].src : ""
       }
@@ -100,8 +103,8 @@ const MusicPlayer = () => {
       customAdditionalControls={[
         <Flex w="auto" direction="row" align="center">
           <Image
-            boxSize="75px"
-            borderRadius="4px"
+            boxSize="64px"
+            borderRadius="full"
             borderColor="#040b24"
             border="2px"
             objectFit="cover"

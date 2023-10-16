@@ -5,7 +5,7 @@ import MusicItem from './MusicItem';
 import useFetch from '@/hooks/useFetch';
 
 const MusicList: React.FC = () => {
-  const { data: musicList, loading, error } = useFetch<Music[]>(`${API_URL}/api/music`);
+  const { data: musicList, loading, error } = useFetch<Music[]>(`${API_URL}/music`);
 
   return (
     <Box>
