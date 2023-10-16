@@ -1,6 +1,5 @@
-import { Box, Flex, Image, Text } from '@chakra-ui/react';
+import { Box, Image, Text } from '@chakra-ui/react';
 import React from 'react';
-import { FiHeart } from 'react-icons/fi';
 import { Album } from '../../types';
 
 type Props = {
@@ -14,29 +13,17 @@ function dateToYear(date: string): string {
 
 const AlbumItem: React.FC<Props> = ({ data }) => {
   return (
-    <Flex
-      alignItems="center"
-      px={2} py={1}
-      _hover={{ bg: 'blue.700' }}
-    >
-      <Image boxSize='42px' borderRadius='full'
-        src={data.imageUrl || 'https://picsum.photos/42?random=' + data.id}
-      />
-      <Box
-        flex={1}
-        minW="200px"
-        ml={3}>
-        <Text fontWeight="semibold">
-          {data.title && data.title}
+    <Box maxW="330px" borderWidth="1px" borderRadius="lg" overflow="hidden">
+      <Image src={data.imageUrl || 'https://picsum.photos/512?random=' + data.id} alt={data.title} />
+      <Box p="5">
+        <Text fontSize="xl" fontWeight="semibold">
+          {data.title}
         </Text>
-        <Text fontSize="sm" color="gray.500">
-          {data.description ? data.description : 'No description'}
+        <Text mt={2} color="gray.600">
+          {dateToYear(data.releaseDate)}
         </Text>
       </Box>
-      <Text fontSize="sm" me={2}>
-        {data.releaseDate ? dateToYear(data.releaseDate) : 'No release date'}
-      </Text>
-    </Flex>
+    </Box>
   );
 };
 
