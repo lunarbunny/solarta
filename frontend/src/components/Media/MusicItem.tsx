@@ -5,6 +5,7 @@ import { FiHeart } from 'react-icons/fi';
 
 type Props = {
   data: Music;
+  onClick?: (m: Music) => void | undefined;
 };
 
 function durationToTime(seconds: number): string {
@@ -13,12 +14,14 @@ function durationToTime(seconds: number): string {
   return `${mins}:${secs < 10 ? '0' + secs : secs}`;
 }
 
-const MusicItem: React.FC<Props> = ({ data }) => {
+const MusicItem: React.FC<Props> = ({ data, onClick }) => {
   return (
     <Flex
       alignItems="center"
       px={2} py={1}
       _hover={{ bg: 'blue.700' }}
+      cursor={onClick ? 'pointer' : 'default'}
+      onClick={onClick && (() => onClick(data))}
     >
       <Image boxSize='42px' borderRadius='full'
         src={data.imageUrl || 'https://picsum.photos/42?random=' + data.id}
@@ -31,8 +34,7 @@ const MusicItem: React.FC<Props> = ({ data }) => {
           {data.title && data.title}
         </Text>
         <Text fontSize="sm" color="gray.500">
-          {data.artists && data.artists.map(a => a.name).join(', ')}
-          {!data.artists && 'Unknown artist'}
+          {data.ownerName || 'Unknown artist'}
         </Text>
       </Box>
       <Text fontSize="sm" me={2}>
