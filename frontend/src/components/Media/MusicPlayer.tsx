@@ -23,7 +23,7 @@ type PlaylistItem = {
   title: string;
   artist: string;
   cover: string;
-}
+};
 
 const MusicPlayer = () => {
   const playlist: PlaylistItem[] = [
@@ -50,13 +50,6 @@ const MusicPlayer = () => {
   const [playListState, setPlaylist] = useState<PlaylistItem[]>(playlist);
   const [currentTrack, setTrackIndex] = useState<number>(0);
 
-  // useEffect(() => {
-  //   const currentTrackName = playListState[currentTrack].title;
-  //   setPlaylist(
-  //     playListState.filter((item) => item.title !== currentTrackName)
-  //   );
-  // }, [currentTrack]);
-
   const handleClickNextPrev = (isNext: boolean) => {
     let newIndex = currentTrack + (isNext ? 1 : -1);
     if (newIndex < 0) {
@@ -77,9 +70,10 @@ const MusicPlayer = () => {
   };
 
   const removeTrack = (title: string) => {
-    return (event: React.MouseEvent) => {
-      setPlaylist(playListState.filter((item) => item.title !== title));
-    };
+    setPlaylist(playListState.filter((item) => item.title !== title));
+    setTrackIndex((currentTrack) =>
+      currentTrack < playListState.length - 1 ? currentTrack : 0
+    );
   };
 
   return (
@@ -89,9 +83,7 @@ const MusicPlayer = () => {
       showJumpControls={false}
       onClickPrevious={() => handleClickNextPrev(false)}
       onClickNext={() => handleClickNextPrev(true)}
-      src={
-        playListState[currentTrack].src ? playListState[currentTrack].src : ""
-      }
+      src={playListState.length > 0 ? playListState[currentTrack].src : ""}
       onError={handleError}
       onPlayError={handleError}
       onEnded={handleEnd}
@@ -102,19 +94,30 @@ const MusicPlayer = () => {
       ]}
       customAdditionalControls={[
         <Flex w="auto" direction="row" align="center">
-          <Image
-            boxSize="64px"
-            borderRadius="full"
-            borderColor="#040b24"
-            border="2px"
-            objectFit="cover"
-            src={playListState[currentTrack].cover}
-          />
+          {playListState.length > 0 ? (
+            <Image
+              boxSize="64px"
+              borderRadius="full"
+              borderColor="#040b24"
+              border="2px"
+              objectFit="cover"
+              src={playListState[currentTrack].cover}
+            />
+          ) : (
+            ""
+          )}
+
           <Flex mx="5px" direction="column">
-            <Text my="5px" fontSize="lg">
-              {playListState[currentTrack].title}
+            <Text color="whiteAlpha.800" my="5px" fontSize="lg">
+              {playListState.length > 0
+                ? playListState[currentTrack].title
+                : ""}
             </Text>
-            <Text fontSize="md">{playListState[currentTrack].artist}</Text>
+            <Text color="whiteAlpha.800" fontSize="md">
+              {playListState.length > 0
+                ? playListState[currentTrack].artist
+                : ""}
+            </Text>
           </Flex>
         </Flex>,
       ]}
@@ -122,12 +125,7 @@ const MusicPlayer = () => {
         <Popover>
           <PopoverTrigger>
             <span>
-              <Icon
-                mx="10px"
-                as={PiPlaylist}
-                boxSize="30px"
-                color="#72c2e7"
-              />
+              <Icon mx="10px" as={PiPlaylist} boxSize="30px" color="#72c2e7" />
             </span>
           </PopoverTrigger>
           <PopoverContent>
@@ -167,7 +165,7 @@ const MusicPlayer = () => {
                       mt="10px"
                       boxSize="30px"
                       color="red.700"
-                      onClick={removeTrack(song.title)}
+                      onClick={(e) => removeTrack(song.title)}
                     />
                   </Flex>
                 </Box>

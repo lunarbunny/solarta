@@ -22,6 +22,6 @@ const Layout: React.FC<Props> = ({ children }) => {
       </Box>
     </Flex>
   );
-}
+};
 
 export default Layout;
