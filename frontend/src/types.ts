@@ -36,6 +36,7 @@ type SearchRespose = {
 };
 
 type PlayerPlaylistItem = {
+    id: number;
     src: string;
     title: string;
     artist: string;

@@ -12,18 +12,37 @@ const MusicList: React.FC = () => {
   const setMusicPlayer = useSetRecoilState(musicPlayerAtom);
 
   const handleClick = (m: Music) => {
-    let playlistItem: PlayerPlaylistItem = {
-      title: m.title,
-      artist: m.ownerName || 'Unknown artist',
-      src: `${API_URL}/music/play/${m.id}`,
-      imageUrl: m.imageUrl || 'https://picsum.photos/42?random=' + m.id,
-    };
+
     setMusicPlayer(
-      (prevState) => ({
-        ...prevState,
-        playlist: [playlistItem, ...prevState.playlist],
-        currentTrack: 0,
-      }),
+      (prevState) => {
+        // If the music is already in the playlist, don't add it again.
+        // Instead, move it to the top of the playlist.
+        const index = prevState.playlist.findIndex((i) => i.id == m.id);
+        if (index != -1) {
+          return {
+            ...prevState,
+            playlist: [
+              prevState.playlist[index],
+              ...prevState.playlist.slice(0, index),
+              ...prevState.playlist.slice(index + 1),
+            ],
+            currentTrack: index,
+          };
+        } else {
+          let newItem: PlayerPlaylistItem = {
+            id: m.id,
+            title: m.title,
+            artist: m.ownerName || 'Unknown artist',
+            src: `${API_URL}/music/play/${m.id}`,
+            imageUrl: m.imageUrl || 'https://picsum.photos/42?random=' + m.id,
+          };
+          return {
+            ...prevState,
+            playlist: [newItem, ...prevState.playlist],
+            currentTrack: 0,
+          };
+        }
+      },
     );
   };
 

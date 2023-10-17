@@ -3,6 +3,7 @@ import {
   Box,
   Flex,
   Icon,
+  IconButton,
   Image,
   Popover,
   PopoverArrow,
@@ -106,37 +107,21 @@ const MusicPlayer = () => {
             <PopoverHeader>
               <Text fontSize="xl">Queue</Text>
             </PopoverHeader>
-            <PopoverBody h="200%" w="100%">
-              {state.playlist.map((song, key) => (
-                <Box
-                  key={key}
-                  my="5px"
-                  px="5px"
-                  bg={
-                    state.playlist[state.currentTrack].title == song.title
-                      ? "blue.500"
-                      : "whiteAlpha.800"
-                  }
-                  borderRadius="5px"
-                >
-                  <Flex direction="row" justify="space-between">
-                    <Flex
-                      color={
-                        state.playlist[state.currentTrack].title == song.title
-                          ? "whiteAlpha.800"
-                          : "blackAlpha.800"
-                      }
-                      py={2}
-                      direction="column"
-                    >
-                      <Text fontSize="xl">{song.title}</Text>
-                      <Text fontSize="lg">{song.artist}</Text>
+            <PopoverBody>
+              {state.playlist.map((song, idx) => (
+                <Box key={idx} my="5px" px="5px" borderRadius="5px" bg={state.currentTrack == idx ? "blue.500" : "blue.700"}>
+                  <Flex direction="row" align="center">
+                    <Flex flexGrow={1} py={2} direction="column" color={state.currentTrack == idx ? "white" : "whiteAlpha.800"}>
+                      <Text fontWeight="bold">{song.title}</Text>
+                      <Text>{song.artist}</Text>
                     </Flex>
-                    <Icon
-                      as={MdDelete}
-                      mt="10px"
-                      boxSize="30px"
-                      color="red.700"
+
+                    <IconButton
+                      aria-label="Remove track"
+                      icon={<MdDelete />}
+                      size="sm"
+                      colorScheme="red"
+                      isRound={true}
                       onClick={(e) => removeTrack(song.title)}
                     />
                   </Flex>
