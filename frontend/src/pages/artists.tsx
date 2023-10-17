@@ -1,4 +1,5 @@
 import Auth from "@/components/Auth/Auth";
+import ArtistList from "@/components/Media/ArtistList";
 import { auth } from "@/firebase/clientApp";
 import { Box, Center, CircularProgress, Flex, Text } from "@chakra-ui/react";
 import { NextPage } from "next";
@@ -23,7 +24,7 @@ const ArtistsPage: NextPage = () => {
 
   return (
     <Box>
-      <Text>Artists</Text>
+      <ArtistList />
     </Box>
   )
 }
