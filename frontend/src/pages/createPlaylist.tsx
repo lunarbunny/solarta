@@ -230,15 +230,7 @@ const createPlayListPage: NextPage = () => {
           <SearchBar />
         </Box>
 
-        <Box
-          mx={5}
-          // border="2px"
-          // borderColor="green"
-          w="auto"
-          my={5}
-          h="450px"
-          overflowY="auto"
-        >
+        <Box w="auto" my={5} h="450px" overflowY="auto">
           <TableContainer>
             <Table size="md" colorScheme="facebook" variant="simple">
               <Thead>
@@ -253,7 +245,7 @@ const createPlayListPage: NextPage = () => {
               </Thead>
               <Tbody>
                 {playlistSongs.map((info, key) => (
-                  <Tr>
+                  <Tr _hover={{ bg: "blue.700" }}>
                     <Td>{key + 1}</Td>
                     <Td>
                       <Flex direction="row">
