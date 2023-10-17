@@ -30,6 +30,11 @@ type Artist = {
     name: string;
 };
 
+type Genre = {
+    id: number;
+    name: string;
+};
+
 type SearchRespose = {
     pieces: Music[];
     artists: Artist[];
@@ -44,4 +49,4 @@ type PlayerPlaylistItem = {
 };
 
 export { API_URL };
-export type { Music, Album, Playlist, Artist, SearchRespose, PlayerPlaylistItem };
+export type { Music, Album, Playlist, Artist, Genre, SearchRespose, PlayerPlaylistItem };

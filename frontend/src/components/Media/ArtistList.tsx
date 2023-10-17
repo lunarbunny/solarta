@@ -8,14 +8,13 @@ const ArtistList: React.FC = () => {
   const { data: artists, loading, error } = useFetch<ArtistList[]>(`${API_URL}/user`);
   console.log(artists);
   return (
-    <Box padding={10}>
-      <Heading as='h1' size='xl'>Explore All Talents</Heading>
+    <Box>
       {loading && <p>Loading...</p>}
-        {error && <p>Error: {error}</p>}
+      {error && <p>Error: {error}</p>}
       <Grid templateColumns="repeat(4, 1fr)" gap={4} paddingTop={10}>
-          {artists && artists.map((artist, index) => (
-            <ArtistItem key={index} data={artist} />
-          ))}
+        {artists && artists.map((artist, index) => (
+          <ArtistItem key={index} data={artist} />
+        ))}
       </Grid>
     </Box>
   );

@@ -1,8 +1,9 @@
-import { Box, Button, Input, Text, InputGroup, Select } from "@chakra-ui/react";
+import { Box, Button, Input, Text, Select, InputGroup, Flex, FormControl, FormLabel } from "@chakra-ui/react";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import LibrarySection from "./LibrarySection";
-import { Album } from "@/types";
+import { API_URL, Album, Genre } from "@/types";
+import useFetch from "@/hooks/useFetch";
+import { dateToYear } from "@/utils";
 
 type Props = {
   albums: Album[],
@@ -12,18 +13,22 @@ const MusicUpload: React.FC<Props> = () => {
   const [uploadForm, setUploadForm] = useState({
     name: '',
     artist: [] as string[],
-    album: '',
-    genre: '',
+    albumId: '',
+    genreId: '',
     imageUrl: '',
     file: null as File | null,
   });
 
+  // Fetch albums and genres to populate the dropdowns
+  const { data: genres } = useFetch<Genre[]>(`${API_URL}/genre`);
+  const { data: albums } = useFetch<Album[]>(`${API_URL}/album`);
+
+  // Dropzone for music file
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length == 1) {
       setUploadForm({ ...uploadForm, file: acceptedFiles[0] });
     }
   }, []);
-
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: { allow: ['.mp3'] },
@@ -31,8 +36,8 @@ const MusicUpload: React.FC<Props> = () => {
   });
 
   return (
-    <Box mt={4} px={4}>
-      <form>
+    <form>
+      <Flex>
         <Box {...getRootProps()}
           height="auto" minHeight="80px" p={4}
           border="2px dashed" borderColor="gray.300" borderRadius="md"
@@ -46,43 +51,41 @@ const MusicUpload: React.FC<Props> = () => {
           }
         </Box>
 
-        <InputGroup>
-          <Input
-            type="text"
-            placeholder="Song name"
-            value={uploadForm.name}
-            onChange={(e) => setUploadForm({ ...uploadForm, name: e.target.value })}
-          />
-          <Input
-            ml={2}
-            type="text"
-            placeholder="Album name"
-            value={uploadForm.album}
-            onChange={(e) => setUploadForm({ ...uploadForm, album: e.target.value })}
-          />
-        </InputGroup>
-        <Input
-          type="text"
-          placeholder="Artist 1, Artist 2, ..."
-          value={uploadForm.artist}
-          onChange={(e) => setUploadForm({ ...uploadForm, artist: e.target.value.split(',').map(s => s.trim()) })}
-        />
-        <Select placeholder="--- select genre ---">
-          <option value="rock">Rock</option>
-          <option value="pop">Pop</option>
-          <option value="jazz">Jazz</option>
-        </Select>
+        <Flex flexGrow={1} ms={4} direction="column" align="flex-end">
+          <FormControl>
+            <FormLabel>Song name</FormLabel>
+            <Input type="text" value={uploadForm.name}
+              onChange={(e) => setUploadForm({ ...uploadForm, name: e.target.value })}
+            />
+          </FormControl>
 
-        <Button
-          width="100%"
-          borderRadius={16}
-          mt={1}
-          type="submit"
-        >
-          Upload
-        </Button>
-      </form>
-    </Box>
+          <InputGroup mt={2} >
+            <FormControl>
+              <FormLabel>Artist</FormLabel>
+              <Select value={uploadForm.albumId} onChange={(e) => setUploadForm({ ...uploadForm, albumId: e.target.value })}>
+                <option value="none">--- select album ---</option>
+                {albums && albums.map((album, idx) => (
+                  <option key={idx} value={album.id}>{album.title} ({dateToYear(album.releaseDate)})</option>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl ms={4}>
+              <FormLabel>Genre</FormLabel>
+              <Select value={uploadForm.genreId} onChange={(e) => setUploadForm({ ...uploadForm, genreId: e.target.value })}>
+                <option value="none">--- select genre ---</option>
+                {genres && genres.map((genre, idx) => (
+                  <option key={idx} value={genre.id}>{genre.name}</option>
+                ))}
+              </Select>
+            </FormControl>
+          </InputGroup>
+
+          <Button mt={4} colorScheme="blue" type="submit">
+            Upload
+          </Button>
+        </Flex>
+      </Flex>
+    </form>
   );
 }
 

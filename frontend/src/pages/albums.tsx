@@ -1,7 +1,7 @@
 import Auth from "@/components/Auth/Auth";
 import AlbumList from "@/components/Media/AlbumList";
 import { auth } from "@/firebase/clientApp";
-import { Box, Center, CircularProgress, Text } from "@chakra-ui/react";
+import { Box, Center, CircularProgress, Heading } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -23,7 +23,8 @@ const AlbumPage: NextPage = () => {
   }
 
   return (
-    <Box w='100%'>
+    <Box w='100%' p={8}>
+      <Heading size='md'>Explore All Talents</Heading>
       <AlbumList />
     </Box>
   );
