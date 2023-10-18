@@ -95,7 +95,7 @@ const MusicPlayer = () => {
         </Flex>,
       ]}
       customVolumeControls={[
-        <Popover key={1}>
+        <Popover key={3}>
           <PopoverTrigger>
             <span>
               <Icon mx="10px" as={PiPlaylist} boxSize="30px" color="#72c2e7" />

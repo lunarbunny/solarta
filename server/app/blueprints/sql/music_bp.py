@@ -1,5 +1,8 @@
+import math
+import os
 from flask import Blueprint, jsonify, request
 from ..__init__ import Session, Music, User, AlbumMusic
+from utils import music_get_path, music_get_duration
 
 music_bp = Blueprint("music_bp", __name__)
 
@@ -28,20 +31,35 @@ def music_create():
     with Session() as session:
         try:
             data = request.form
+            title = data["title"]
+            genreId = int(data["genreId"])
+            ownerId = int(data["ownerId"])
+            albumId = int(data["albumId"])
             music_file = request.files["music_file"]
-            if music_file:
-                from utils import music_get_path, music_get_duration
-                music_file.save(music_get_path(music_file.filename))
-                duration = music_get_duration(music_file.filename)
-                if duration is None:
-                    return '', 422
-                new_music = Music(data["title"], music_file.filename, duration, data["genreId"], data["ownerId"])
-                session.add(new_music)
-                session.flush()
-                session.add(AlbumMusic(data["albumId"], new_music.id))
-                session.commit()
-                return '', 201
-        except:
+
+            if title == "" or genreId == "" or ownerId == "" or albumId == "" or music_file == "":
+                return 'Missing parameters', 400
+            
+            ext = os.path.splitext(music_file.filename)[1]
+            if ext.lower() != '.mp3':
+                return 'Invalid file type', 400
+            
+            # Limit title to 28 characters, leave 6 characters for owner ID prefix, and 5 characters for extension
+            # XXXXXX-<title>.mp3
+            music_file.filename = f"{ownerId:06}-{music_file.filename[:28]}.mp3"
+            music_file.save(music_get_path(music_file.filename))
+            duration = music_get_duration(music_file.filename)
+            if duration is None:
+                return 'Cannot get duration', 422
+            
+            duration = math.ceil(duration)
+            new_music = Music(title, music_file.filename, duration, genreId, ownerId)
+            session.add(new_music)
+            session.flush()
+            session.add(AlbumMusic(albumId, new_music.id))
+            session.commit()
+            return 'Created', 201
+        except Exception as e:
             session.rollback()
             return '', 400
 
