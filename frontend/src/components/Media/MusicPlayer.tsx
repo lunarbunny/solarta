@@ -66,7 +66,7 @@ const MusicPlayer = () => {
         RHAP_UI.CURRENT_LEFT_TIME,
       ]}
       customAdditionalControls={[
-        <Flex w="auto" direction="row" align="center">
+        <Flex key={1} w="auto" direction="row" align="center">
           {state.playlist.length > 0 ? (
             <Image
               boxSize="64px"
@@ -80,7 +80,7 @@ const MusicPlayer = () => {
             ""
           )}
 
-          <Flex mx="5px" direction="column">
+          <Flex key={2} mx="5px" direction="column">
             <Text color="whiteAlpha.800" my="5px" fontSize="lg">
               {state.playlist.length > 0
                 ? state.playlist[state.currentTrack].title
@@ -95,7 +95,7 @@ const MusicPlayer = () => {
         </Flex>,
       ]}
       customVolumeControls={[
-        <Popover>
+        <Popover key={1}>
           <PopoverTrigger>
             <span>
               <Icon mx="10px" as={PiPlaylist} boxSize="30px" color="#72c2e7" />

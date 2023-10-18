@@ -2,17 +2,18 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "solarta-api:latest"
-        WORKDIR = "${WORKSPACE}/server"
-        DOCKERFILE = "${WORKSPACE}/server/Dockerfile"
+        SERVER_WORKDIR = "${WORKSPACE}/server"
+        CLIENT_WORKDIR = "${WORKSPACE}/frontend"
+        SERVER_DOCKERFILE = "${WORKSPACE}/server/Dockerfile"
+        FRONTEND_DOCKERFILE = "${WORKSPACE}/frontend/Dockerfile"
     }
 
     stages {
-        stage('Build and Deploy Server Docker Image') {
+        stage('Build and Deploy Server') {
             steps {
                 script {
                     // Build the Docker image
-                    def dockerImage = docker.build("lunarbunny/solarta-api:${BUILD_ID}", "-f ${DOCKERFILE} ${WORKDIR}")
+                    def dockerImage = docker.build("solarta-api:${BUILD_ID}", "-f ${SERVER_DOCKERFILE} ${SERVER_WORKDIR}")
 
                     // Stop and remove existing container with same name, container name is "solarta".
                     sh 'docker stop solarta || true'
@@ -27,6 +28,21 @@ pipeline {
         }
 
         // TODO: Add a stage to deploy frontend
+        stage('Build and Deploy Frontend') {
+            steps{
+                script {
+                    // Build the Docker image
+                    def dockerImage = docker.build("solarta-web:${BUILD_ID}", "-f ${FRONTEND_DOCKERFILE} ${CLIENT_WORKDIR}")
+
+                    // Stop and remove existing container with same name, container name is "solarta-web".
+                    sh 'docker stop solarta-web || true'
+                    sh 'docker rm solarta-web || true'
+
+                    // Run the newest image as a sibling container
+                    dockerImage.run()
+                }
+            }
+        }
 
         stage('OWASP Dependency-Check Vulnerabilities') {
             steps {

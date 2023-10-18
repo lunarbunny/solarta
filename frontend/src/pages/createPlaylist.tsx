@@ -37,7 +37,7 @@ import { BiTime } from "react-icons/bi";
 import { MdEdit } from "react-icons/md";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-const createPlayListPage: NextPage = () => {
+const CreatePlayListPage: NextPage = () => {
   type PlaylistItem = {
     src: string;
     title: string;
@@ -117,6 +117,8 @@ const createPlayListPage: NextPage = () => {
   const [user, loading, error] = useAuthState(auth);
   const [playlistSongs, setPlayListSongs] = useState(playlist);
 
+  const bgColour = useColorModeValue("gray.600", "gray.700");
+
   if (loading) {
     return (
       <Center w="100%">
@@ -186,7 +188,7 @@ const createPlayListPage: NextPage = () => {
               <EditablePreview
                 px={4}
                 _hover={{
-                  background: useColorModeValue("gray.600", "gray.700"),
+                  background: bgColour,
                 }}
               />
             </Tooltip>
@@ -209,7 +211,7 @@ const createPlayListPage: NextPage = () => {
               <EditablePreview
                 px={4}
                 _hover={{
-                  background: useColorModeValue("gray.600", "gray.700"),
+                  background: bgColour,
                 }}
               />
             </Tooltip>
@@ -245,11 +247,11 @@ const createPlayListPage: NextPage = () => {
               </Thead>
               <Tbody>
                 {playlistSongs.map((info, key) => (
-                  <Tr _hover={{ bg: "blue.700" }}>
+                  <Tr key={key} _hover={{ bg: "blue.700" }}>
                     <Td>{key + 1}</Td>
                     <Td>
                       <Flex direction="row">
-                        <Image boxSize="64px" src={info.cover} mr={2} />
+                        <Image boxSize="64px" src={info.cover} mr={2} alt="cover" />
                         <Flex justify="center" direction="column">
                           <Box>{info.title}</Box>
                           {info.artist}
@@ -272,4 +274,4 @@ const createPlayListPage: NextPage = () => {
   );
 };
 
-export default createPlayListPage;
+export default CreatePlayListPage;

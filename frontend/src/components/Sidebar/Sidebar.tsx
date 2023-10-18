@@ -21,7 +21,7 @@ const Sidebar = () => {
       direction="column" align="space-between">
       <Link href="/">
         <Flex direction="row" cursor="pointer" px={5} py={8}>
-          <Image src="/favicon.ico" height="32px" />
+          <Image src="/favicon.ico" height="32px" alt="solarta" />
           <Text ml={2} fontWeight="bold" fontSize="2xl" mb="-4px">
             Solarta
           </Text>
