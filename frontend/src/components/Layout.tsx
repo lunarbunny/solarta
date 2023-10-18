@@ -17,7 +17,7 @@ const Layout: React.FC<Props> = ({ children }) => {
           {children}
         </Flex>
       </Box>
-      <Box boxShadow="0px 0px 5px 0px rgba(0,0,0,0.75)" w="100%">
+      <Box boxShadow="0px 0px 5px 0px rgba(0,0,0,0.75)" w="100%" h="auto">
         <MusicPlayer />
       </Box>
     </Flex>

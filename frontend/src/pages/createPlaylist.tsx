@@ -251,7 +251,12 @@ const CreatePlayListPage: NextPage = () => {
                     <Td>{key + 1}</Td>
                     <Td>
                       <Flex direction="row">
-                        <Image boxSize="64px" src={info.cover} mr={2} alt="cover" />
+                        <Image
+                          boxSize="64px"
+                          src={info.cover}
+                          mr={2}
+                          alt="cover"
+                        />
                         <Flex justify="center" direction="column">
                           <Box>{info.title}</Box>
                           {info.artist}
