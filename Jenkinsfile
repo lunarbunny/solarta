@@ -39,7 +39,7 @@ pipeline {
                     sh 'docker rm solarta-web || true'
 
                     // Run the newest image as a sibling container
-                    dockerImage.run()
+                    dockerImage.run('-p 3000:3000 --name solarta-web')
                 }
             }
         }
