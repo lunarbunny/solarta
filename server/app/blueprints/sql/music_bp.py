@@ -6,10 +6,13 @@ music_bp = Blueprint("music_bp", __name__)
 # Delete a music entry
 @music_bp.route("/<int:id>/delete", methods=["DELETE"])
 def music_delete(id):
+    from ..__init__ import AlbumMusic, PlaylistMusic
     with Session() as session:
         try:
             music = session.get(Music, id)
             if music:
+                session.query(AlbumMusic).filter(AlbumMusic.idMusic == id).delete()
+                session.query(PlaylistMusic).filter(PlaylistMusic.idMusic == id).delete()
                 session.delete(music)
                 session.commit()
                 return '', 200
@@ -27,15 +30,17 @@ def music_create():
             data = request.form
             music_file = request.files["music_file"]
             if music_file:
-                from utils import music_get_duration, music_save
-                music_save(music_file)
+                from utils import music_get_path, music_get_duration
+                music_file.save(music_get_path(music_file.filename))
                 duration = music_get_duration(music_file.filename)
+                if duration is None:
+                    return '', 422
                 new_music = Music(data["title"], music_file.filename, duration, data["genreId"], data["ownerId"])
                 session.add(new_music)
                 session.flush()
                 session.add(AlbumMusic(data["albumId"], new_music.id))
                 session.commit()
-                return '', 200
+                return '', 201
         except:
             session.rollback()
             return '', 400
