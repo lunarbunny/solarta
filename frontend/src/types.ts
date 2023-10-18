@@ -1,5 +1,5 @@
-// const API_URL = 'https://solarta.nisokkususu.com/api';
-const API_URL = 'http://localhost:5000';
+const API_URL = 'https://solarta.nisokkususu.com/api';
+// const API_URL = 'http://localhost:5000';
 
 type Music = {
     id: number;
