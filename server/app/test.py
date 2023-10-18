@@ -78,3 +78,21 @@ def test_playlist_retrieve_user(client):
 def test_user_retrieve_all(client):
     response = client.get('/user', follow_redirects=True)
     assert response.status_code == 200
+
+# Refer to utils.py
+def test_music_get_path():
+    from utils import music_get_path
+    import sys
+
+    filename = 'test.mp3'
+    if sys.platform.startswith('win'):
+        assert music_get_path(filename) == 'assets\\music\\test.mp3'
+    else:
+        assert music_get_path(filename) == 'assets/music/test.mp3'
+
+def test_music_get_duration():
+    import os
+    if os.path.exists('assets/music/yo!.mp3'):
+        from utils import music_get_duration
+        assert music_get_duration("yo!.mp3") == 6.99
+    

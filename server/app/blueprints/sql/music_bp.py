@@ -27,10 +27,10 @@ def music_create():
             data = request.form
             music_file = request.files["music_file"]
             if music_file:
-                from utils import music_get_duration, music_save
-                music_save(music_file)
+                from utils import music_get_path, music_get_duration
+                music_file.save(music_get_path(music_file.filename))
                 duration = music_get_duration(music_file.filename)
-                session.add(Music(data["title"], music_file.filename, duration, data["genreId"]))
+                session.add(Music(data["title"], music_file.filename, duration, data["genreId"])) # TODO: ownerId
                 session.commit()
                 return '', 200
         except:
