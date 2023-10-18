@@ -1,7 +1,7 @@
 import { Box, Button, Input, Text, Select, InputGroup, Flex, FormControl, FormLabel } from "@chakra-ui/react";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { API_URL, Album, Genre } from "@/types";
+import { API_URL, Album, Genre, Music } from "@/types";
 import useFetch from "@/hooks/useFetch";
 import { dateToYear } from "@/utils";
 
@@ -9,24 +9,30 @@ type Props = {
   albums: Album[],
 }
 
-const MusicUpload: React.FC<Props> = () => {
-  const [uploadForm, setUploadForm] = useState({
-    name: '',
-    artist: [] as string[],
+type UploadFormData = {
+  title: string,
+  ownerID: string,
+  genreId: string,
+  albumId: string,
+  music_file: File | null,
+}
+
+const MusicUpload: React.FC<Props> = ({ albums }) => {
+  const [uploadForm, setUploadForm] = useState<UploadFormData>({
+    title: '',
+    ownerID: '',
     albumId: '',
     genreId: '',
-    imageUrl: '',
-    file: null as File | null,
+    music_file: null as File | null,
   });
 
   // Fetch albums and genres to populate the dropdowns
   const { data: genres } = useFetch<Genre[]>(`${API_URL}/genre`);
-  const { data: albums } = useFetch<Album[]>(`${API_URL}/album`);
 
   // Dropzone for music file
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length == 1) {
-      setUploadForm({ ...uploadForm, file: acceptedFiles[0] });
+      setUploadForm({ ...uploadForm, music_file: acceptedFiles[0] });
     }
   }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -35,8 +41,26 @@ const MusicUpload: React.FC<Props> = () => {
     maxFiles: 1,
   });
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append('title', uploadForm.title);
+    formData.append('ownerID', uploadForm.ownerID);
+    formData.append('genreId', uploadForm.genreId);
+    formData.append('albumId', uploadForm.albumId);
+    formData.append('music_file', uploadForm.music_file as File);
+
+    const response = await fetch(`${API_URL}/music/create`, {
+      method: 'POST',
+      body: formData
+    });
+
+    console.log(response);
+  }
+
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <Flex>
         <Box {...getRootProps()}
           height="auto" minHeight="80px" p={4}
@@ -45,8 +69,8 @@ const MusicUpload: React.FC<Props> = () => {
           cursor="pointer">
           <input {...getInputProps()} />
           {
-            uploadForm.file
-              ? <Text>{uploadForm.file.name}</Text>
+            uploadForm.music_file
+              ? <Text>{uploadForm.music_file.name}</Text>
               : <Text>{isDragActive ? 'Drop the music file here ...' : 'Drop your music file here'}</Text>
           }
         </Box>
@@ -54,8 +78,8 @@ const MusicUpload: React.FC<Props> = () => {
         <Flex flexGrow={1} ms={4} direction="column" align="flex-end">
           <FormControl>
             <FormLabel>Song name</FormLabel>
-            <Input type="text" value={uploadForm.name}
-              onChange={(e) => setUploadForm({ ...uploadForm, name: e.target.value })}
+            <Input type="text" value={uploadForm.title}
+              onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
             />
           </FormControl>
 
