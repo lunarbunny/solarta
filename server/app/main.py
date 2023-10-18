@@ -3,7 +3,7 @@ from flask import Flask
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app, resources={r"*": {"origins": "https://solarta.nisokkususu.com"}})
+CORS(app, resources={r"*": {"origins": ["https://solarta.nisokkususu.com", "http://localhost:3000"]}})
 
 # Register NoSQL blueprints
 from blueprints.nosql.history_bp import history_bp
