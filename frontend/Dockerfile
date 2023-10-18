@@ -27,6 +27,13 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED 1
 
+ENV NEXT_PUBLIC_FIREBASE_API_KEY AIzaSyBh71pMuDhbAFLhU36N8QsIoH4j0Szp7NM
+ENV NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN solarta-db5cd.firebaseapp.com
+ENV NEXT_PUBLIC_FIREBASE_PROJECT_ID solarta-db5cd
+ENV NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET solarta-db5cd.appspot.com
+ENV NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID 780523267179
+ENV NEXT_PUBLIC_FIREBASE_APP_ID 1:780523267179:web:44cd27cf34a9875e863d2e
+
 RUN npm run build
 
 # Production image, copy all the files and run next
