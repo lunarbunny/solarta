@@ -1,8 +1,9 @@
-import { API_URL } from "@/types";
+import { musicPlayerAtom } from "@/atoms/musicPlayer";
 import {
   Box,
   Flex,
   Icon,
+  IconButton,
   Image,
   Popover,
   PopoverArrow,
@@ -13,56 +14,27 @@ import {
   PopoverTrigger,
   Text,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
 import AudioPlayer, { RHAP_UI } from "react-h5-audio-player";
 import { MdDelete } from "react-icons/md";
-import { PiListNumbersDuotone, PiPlaylist } from "react-icons/pi";
-
-type PlaylistItem = {
-  src: string;
-  title: string;
-  artist: string;
-  cover: string;
-};
+import { PiPlaylist } from "react-icons/pi";
+import { useRecoilState } from "recoil";
 
 const MusicPlayer = () => {
-  const playlist: PlaylistItem[] = [
-    {
-      src: `${API_URL}/music/play/1`,
-      title: "Yo!",
-      artist: "Xandr",
-      cover: "https://picsum.photos/64?random=1",
-    },
-    {
-      src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
-      title: "SoundHelix-Song-9",
-      artist: "somebody",
-      cover: "https://bit.ly/dan-abramov",
-    },
-    {
-      src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
-      title: "SoundHelix-Song-2",
-      artist: "anybody",
-      cover: "https://bit.ly/dan-abramov",
-    },
-  ];
-
-  const [playListState, setPlaylist] = useState<PlaylistItem[]>(playlist);
-  const [currentTrack, setTrackIndex] = useState<number>(0);
+  const [state, setState] = useRecoilState(musicPlayerAtom);
 
   const handleClickNextPrev = (isNext: boolean) => {
-    let newIndex = currentTrack + (isNext ? 1 : -1);
+    let newIndex = state.currentTrack + (isNext ? 1 : -1);
     if (newIndex < 0) {
-      newIndex = playListState.length - 1;
-    } else if (newIndex >= playListState.length) {
+      newIndex = state.playlist.length - 1;
+    } else if (newIndex >= state.playlist.length) {
       newIndex = 0;
     }
-    setTrackIndex(newIndex);
+    setState({ ...state, currentTrack: newIndex });
   };
 
   const handleEnd = () => {
-    console.log("end");
-    setTrackIndex(0);
+    // Wrap around to the beginning
+    setState({ ...state, currentTrack: 0 });
   };
 
   const handleError = () => {
@@ -70,10 +42,11 @@ const MusicPlayer = () => {
   };
 
   const removeTrack = (title: string) => {
-    setPlaylist(playListState.filter((item) => item.title !== title));
-    setTrackIndex((currentTrack) =>
-      currentTrack < playListState.length - 1 ? currentTrack : 0
-    );
+    setState({
+      ...state,
+      playlist: state.playlist.filter((item) => item.title !== title),
+      currentTrack: state.currentTrack < state.playlist.length - 1 ? state.currentTrack : 0,
+    });
   };
 
   return (
@@ -83,7 +56,7 @@ const MusicPlayer = () => {
       showJumpControls={false}
       onClickPrevious={() => handleClickNextPrev(false)}
       onClickNext={() => handleClickNextPrev(true)}
-      src={playListState.length > 0 ? playListState[currentTrack].src : ""}
+      src={state.playlist.length > 0 ? state.playlist[state.currentTrack].src : ""}
       onError={handleError}
       onPlayError={handleError}
       onEnded={handleEnd}
@@ -93,36 +66,36 @@ const MusicPlayer = () => {
         RHAP_UI.CURRENT_LEFT_TIME,
       ]}
       customAdditionalControls={[
-        <Flex w="auto" direction="row" align="center">
-          {playListState.length > 0 ? (
+        <Flex key={1} w="auto" direction="row" align="center">
+          {state.playlist.length > 0 ? (
             <Image
               boxSize="64px"
               borderRadius="full"
               borderColor="#040b24"
               border="2px"
               objectFit="cover"
-              src={playListState[currentTrack].cover}
+              src={state.playlist[state.currentTrack].imageUrl}
             />
           ) : (
             ""
           )}
 
-          <Flex mx="5px" direction="column">
+          <Flex key={2} mx="5px" direction="column">
             <Text color="whiteAlpha.800" my="5px" fontSize="lg">
-              {playListState.length > 0
-                ? playListState[currentTrack].title
+              {state.playlist.length > 0
+                ? state.playlist[state.currentTrack].title
                 : ""}
             </Text>
             <Text color="whiteAlpha.800" fontSize="md">
-              {playListState.length > 0
-                ? playListState[currentTrack].artist
+              {state.playlist.length > 0
+                ? state.playlist[state.currentTrack].artist
                 : ""}
             </Text>
           </Flex>
         </Flex>,
       ]}
       customVolumeControls={[
-        <Popover>
+        <Popover key={1}>
           <PopoverTrigger>
             <span>
               <Icon mx="10px" as={PiPlaylist} boxSize="30px" color="#72c2e7" />
@@ -134,37 +107,21 @@ const MusicPlayer = () => {
             <PopoverHeader>
               <Text fontSize="xl">Queue</Text>
             </PopoverHeader>
-            <PopoverBody h="200%" w="100%">
-              {playListState.map((song, key) => (
-                <Box
-                  key={key}
-                  my="5px"
-                  px="5px"
-                  bg={
-                    playListState[currentTrack].title == song.title
-                      ? "blue.500"
-                      : "whiteAlpha.800"
-                  }
-                  borderRadius="5px"
-                >
-                  <Flex direction="row" justify="space-between">
-                    <Flex
-                      color={
-                        playListState[currentTrack].title == song.title
-                          ? "whiteAlpha.800"
-                          : "blackAlpha.800"
-                      }
-                      py={2}
-                      direction="column"
-                    >
-                      <Text fontSize="xl">{song.title}</Text>
-                      <Text fontSize="lg">{song.artist}</Text>
+            <PopoverBody>
+              {state.playlist.map((song, idx) => (
+                <Box key={idx} my="5px" px="5px" borderRadius="5px" bg={state.currentTrack == idx ? "blue.500" : "blue.700"}>
+                  <Flex direction="row" align="center">
+                    <Flex flexGrow={1} py={2} direction="column" color={state.currentTrack == idx ? "white" : "whiteAlpha.800"}>
+                      <Text fontWeight="bold">{song.title}</Text>
+                      <Text>{song.artist}</Text>
                     </Flex>
-                    <Icon
-                      as={MdDelete}
-                      mt="10px"
-                      boxSize="30px"
-                      color="red.700"
+
+                    <IconButton
+                      aria-label="Remove track"
+                      icon={<MdDelete />}
+                      size="sm"
+                      colorScheme="red"
+                      isRound={true}
                       onClick={(e) => removeTrack(song.title)}
                     />
                   </Flex>

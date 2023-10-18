@@ -3,13 +3,10 @@ const API_URL = 'https://solarta.nisokkususu.com/api';
 type Music = {
     id: number;
     title: string;
-    filename: string;
     duration: number;
+    ownerName: string; // Artist name
     genreId: number;
-    imageUrl: string;
-
-    albums: Album[] | null;
-    artists: Artist[] | null;
+    imageUrl: string | null;
 };
 
 type Album = {
@@ -25,10 +22,16 @@ type Album = {
 
 type Playlist = {
     name: string;
+
 };
 
 type Artist = {
     id: string;
+    name: string;
+};
+
+type Genre = {
+    id: number;
     name: string;
 };
 
@@ -37,5 +40,13 @@ type SearchRespose = {
     artists: Artist[];
 };
 
+type PlayerPlaylistItem = {
+    id: number;
+    src: string;
+    title: string;
+    artist: string;
+    imageUrl: string;
+};
+
 export { API_URL };
-export type { Music, Album, Playlist, Artist, SearchRespose };
+export type { Music, Album, Playlist, Artist, Genre, SearchRespose, PlayerPlaylistItem };

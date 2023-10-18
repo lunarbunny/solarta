@@ -7,14 +7,13 @@ import AlbumItem from './AlbumItem';
 const AlbumList: React.FC = () => {
   const { data: albums, loading, error } = useFetch<AlbumList[]>(`${API_URL}/album`);
   return (
-    <Box padding={10}>
-      <Heading as='h1' size='xl'>Recently Added Albums</Heading>
+    <Box>
       {loading && <p>Loading...</p>}
-        {error && <p>Error: {error}</p>}
-      <Grid templateColumns="repeat(4, 1fr)" gap={4} paddingTop={10}>
-          {albums && albums.map((album, index) => (
-            <AlbumItem key={index} data={album} />
-          ))}
+      {error && <p>Error: {error}</p>}
+      <Grid templateColumns="repeat(4, 1fr)" gap={4}>
+        {albums && albums.map((album, index) => (
+          <AlbumItem key={index} data={album} />
+        ))}
       </Grid>
     </Box>
   );

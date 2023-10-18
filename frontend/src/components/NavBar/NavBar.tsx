@@ -11,7 +11,7 @@ const Navbar: React.FC = () => {
     <Flex bgGradient="linear(to-l, blue.700, blue.900)" height='50px' paddingX={2} justifyContent="space-between">
       {/* Icon and app name */}
       <Flex alignItems="center">
-        <Image src="/favicon.ico" height="32px" mr={2} />
+        <Image src="/favicon.ico" height="32px" mr={2} alt="solarta" />
         <Text fontSize="16pt" mt={1}>Solarta</Text>
       </Flex>
 

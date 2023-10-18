@@ -1,25 +1,25 @@
 import Auth from "@/components/Auth/Auth";
 import LibrarySection from "@/components/Library/LibrarySection";
 import MusicUpload from "@/components/Library/MusicUpload";
-import SidebarItem from "@/components/Sidebar/SidebarItem";
+import AlbumList from "@/components/Media/AlbumList";
 import { auth } from "@/firebase/clientApp";
 import useFetch from "@/hooks/useFetch";
 import { API_URL, Album } from "@/types";
-import { Box, Button, Center, CircularProgress, Divider, Heading, IconButton, Input, InputGroup, InputLeftAddon, InputLeftElement, InputRightAddon, InputRightElement, Spacer } from "@chakra-ui/react";
+import { Box, Button, Center, CircularProgress, FormControl, FormLabel, Heading, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spacer, useDisclosure } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useCallback } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { TbAlbum, TbPlus } from "react-icons/tb";
 
 const LibraryPage: NextPage = () => {
   const [user, loading, error] = useAuthState(auth);
 
   const { data: albums } = useFetch<Album[]>(`${API_URL}/album`);
 
-  const onCreateAlbum = useCallback(() => {
+  const handleCreateAlbum = () => {
     console.log('create album');
 
-  }, []);
+  };
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   if (loading) {
     return (
@@ -36,30 +36,47 @@ const LibraryPage: NextPage = () => {
   }
 
   return (
-    <Box w='100%' p={8}>
-      <Heading size='md'>Library</Heading>
+    <>
+      <Box w='100%' p={8}>
+        <Heading size='md'>Library</Heading>
 
-      <LibrarySection title="My Albums">
-        <Box mt={4} px={4}>
-          <InputGroup>
-            <InputLeftElement children={<TbAlbum />} pointerEvents='none' />
-            <Input type="text" placeholder="Album name" />
-            <InputRightElement>
-              <IconButton aria-label="Add album" icon={<TbPlus />} onClick={onCreateAlbum} />
-            </InputRightElement>
-          </InputGroup>
-          {albums && albums.map((album, index) => (
-            <SidebarItem key={index} name={album.title} icon={<TbAlbum />} />
-          ))}
-        </Box>
-      </LibrarySection>
+        <LibrarySection title="My Albums">
+          <Box mt={4} px={4}>
+            <AlbumList />
+            <Button mt={2} onClick={onOpen} colorScheme="blue">Create album</Button>
+          </Box>
+        </LibrarySection>
 
-      <Spacer h={2} />
+        <Spacer h={2} />
 
-      <LibrarySection title="Upload music">
-        <MusicUpload albums={albums || []} />
-      </LibrarySection>
-    </Box>
+        <LibrarySection title="Upload music">
+          <Box mt={4} px={4}>
+            <MusicUpload albums={albums || []} />
+          </Box>
+        </LibrarySection>
+      </Box>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>New Album</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel>Album Name</FormLabel>
+              <Input placeholder="Provide a name for the new album" />
+            </FormControl>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme='blue' mr={3} onClick={handleCreateAlbum}>
+              Create
+            </Button>
+            <Button variant='ghost' onClick={onClose}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 }
 

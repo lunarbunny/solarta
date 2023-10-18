@@ -1,15 +1,11 @@
 import { Box, Image, Text } from '@chakra-ui/react';
 import React from 'react';
 import { Album } from '../../types';
+import { dateToYear } from '@/utils';
 
 type Props = {
   data: Album;
 };
-
-function dateToYear(date: string): string {
-  // Sun, 01 Jan 2023 00:00:00 GMT
-  return date.split(' ')[3];
-}
 
 const AlbumItem: React.FC<Props> = ({ data }) => {
   return (

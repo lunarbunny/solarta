@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from ..__init__ import Session, Music, User
+from ..__init__ import Session, Music, User, AlbumMusic
 
 music_bp = Blueprint("music_bp", __name__)
 
@@ -35,7 +35,10 @@ def music_create():
                 duration = music_get_duration(music_file.filename)
                 if duration is None:
                     return '', 422
-                session.add(Music(data["title"], music_file.filename, duration, data["genreId"], 2)) # TODO: ownerId
+                new_music = Music(data["title"], music_file.filename, duration, data["genreId"], data["ownerId"])
+                session.add(new_music)
+                session.flush()
+                session.add(AlbumMusic(data["albumId"], new_music.id))
                 session.commit()
                 return '', 201
         except:
