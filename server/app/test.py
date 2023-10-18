@@ -1,12 +1,25 @@
 import pytest
 from main import app
 
+#######################################
+# 1. GET: test all scenarios          #
+# 2. POST: only testing failure cases #
+# 3. DELETE: not testing              #
+#######################################
+
 # Set up test client
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
     with app.test_client() as client:
         yield client
+
+# Functions to aid tests
+def get_music_fp_platform(filename):
+    import sys
+    if sys.platform.startswith('win'):
+        return f'assets\\music\\{filename}'
+    return f'assets/music/{filename}'
 
 # Refer to blueprints/nosql/history_bp.py
 def test_music_retrieve_id_history(client):
@@ -38,11 +51,24 @@ def test_genre_retrieve_all(client):
     assert response.status_code == 200
 
 # Refer to blueprints/sql/music_bp.py
-def test_music_delete(client):
-    pass
-
 def test_music_create(client):
-    pass
+    from io import BytesIO
+    import os
+
+    data = {
+        'title': 'test',
+        'music_file': (BytesIO(b'mock'), 'test.mp3'),
+        'genreId': 3,
+        'ownerId': 2
+    }
+
+    response = client.post('/music/create', data=data, content_type='multipart/form-data')
+    assert response.status_code == 422
+    assert os.path.exists(get_music_fp_platform('test.mp3'))
+    os.remove(get_music_fp_platform('test.mp3'))
+
+    response = client.post('/music/create', data={})
+    assert response.status_code == 400
 
 def test_music_search_string(client):
     response = client.get('music/search=YO!', follow_redirects=True)
@@ -60,9 +86,6 @@ def test_music_retrieve_all(client):
     assert response.status_code == 200
 
 # Refer to blueprints/sql/playlist_bp
-def test_playlist_delete(client):
-    pass
-
 def test_playlist_retrieve_all_music(client):
     response = client.get('/playlist/1/music', follow_redirects=True)
     assert response.status_code == 200
@@ -82,13 +105,7 @@ def test_user_retrieve_all(client):
 # Refer to utils.py
 def test_music_get_path():
     from utils import music_get_path
-    import sys
-
-    filename = 'test.mp3'
-    if sys.platform.startswith('win'):
-        assert music_get_path(filename) == 'assets\\music\\test.mp3'
-    else:
-        assert music_get_path(filename) == 'assets/music/test.mp3'
+    assert music_get_path('test.mp3') == get_music_fp_platform('test.mp3')
 
 def test_music_get_duration():
     import os
