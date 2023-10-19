@@ -23,7 +23,7 @@ const MusicItem: React.FC<Props> = ({ data, onClick }) => {
       cursor={onClick ? 'pointer' : 'default'}
       onClick={onClick && (() => onClick(data))}
     >
-      <Image boxSize='42px' borderRadius='full'
+      <Image alt='cover' boxSize='42px' borderRadius='full'
         src={data.imageUrl || 'https://picsum.photos/42?random=' + data.id}
       />
       <Box

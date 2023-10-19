@@ -69,6 +69,7 @@ const MusicPlayer = () => {
         <Flex key={1} w="auto" direction="row" align="center">
           {state.playlist.length > 0 ? (
             <Image
+              alt="cover"
               boxSize="64px"
               borderRadius="full"
               borderColor="#040b24"

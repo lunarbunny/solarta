@@ -9,7 +9,7 @@ type Props = {
 const ArtistItem: React.FC<Props> = ({ data }) => {
     return (
         <Box textAlign="center">
-            <Image borderRadius='full'
+            <Image alt='artist image' borderRadius='full'
                 src={'https://picsum.photos/512?random=' + data.id}
             />
             <Box paddingTop={3}>

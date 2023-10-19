@@ -14,7 +14,7 @@ const Playlists = () => {
   return (
     <>
       {playlists.map((pl, i) => (
-        <Link href="/playlist">
+        <Link key={i} href="/playlist">
           <SidebarItem
             key={i}
             name={pl.name}
