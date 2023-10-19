@@ -1,15 +1,15 @@
 import math
 import os
 from flask import Blueprint, jsonify, request
-from ..__init__ import Session, Music, User, AlbumMusic
+from ..__init__ import Session, Music, User, AlbumMusic, PlaylistMusic
 from utils import music_get_path, music_get_duration
+from werkzeug.utils import secure_filename
 
 music_bp = Blueprint("music_bp", __name__)
 
 # Delete a music entry
 @music_bp.route("/<int:id>/delete", methods=["DELETE"])
 def music_delete(id):
-    from ..__init__ import AlbumMusic, PlaylistMusic
     with Session() as session:
         try:
             music = session.get(Music, id)
@@ -33,22 +33,26 @@ def music_create():
             data = request.form
             title = data["title"]
             genreId = int(data["genreId"])
-            ownerId = int(data["ownerId"])
+            ownerId = int(data["ownerId"]) # TODO: Should take from session instead
             albumId = int(data["albumId"])
             music_file = request.files["music_file"]
 
             if title == "" or genreId == "" or ownerId == "" or albumId == "" or music_file == "":
                 return 'Missing parameters', 400
             
-            ext = os.path.splitext(music_file.filename)[1]
+            filename, ext = os.path.splitext(music_file.filename)
             if ext.lower() != '.mp3':
                 return 'Invalid file type', 400
             
+            # Clean filename
             # Limit title to 28 characters, leave 6 characters for owner ID prefix, and 5 characters for extension
             # XXXXXX-<title>.mp3
-            music_file.filename = f"{ownerId:06}-{music_file.filename[:28]}.mp3"
-            music_file.save(music_get_path(music_file.filename))
-            duration = music_get_duration(music_file.filename)
+            filename = f"{ownerId:06}-{secure_filename(filename)[:28]}{ext}"
+            save_dir = music_get_path()
+            save_path = os.path.join(save_dir, filename)
+            
+            music_file.save(save_path)
+            duration = music_get_duration(save_path)
             if duration is None:
                 return 'Cannot get duration', 422
             
