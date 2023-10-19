@@ -18,5 +18,10 @@ docker run -d --name solarta --network solarta --ip 172.19.0.2 -p 5000:5000 \
   --volume /var/lib/solarta/assets/music:/assets/music \
   solarta-api:latest
 
+# Frontend server
+docker run -d --name solarta-web -p 3000:3000 \
+  --env SOLARTA_API_URL=https://solarta.nisokkususu.com/api \
+  solarta-web:latest
+
 # Single line version for jenkins docker run argument (omits --detach and image+container name)
 --network solarta --ip 172.19.0.2 -p 5000:5000 --env SQLALCHEMY_DATABASE_URI=mysql+pymysql://user:pass@mariadb:3306/solarta --volume /var/lib/solarta/keys:/creds --volume /var/lib/solarta/assets/music:/assets/music

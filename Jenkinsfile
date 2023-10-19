@@ -13,7 +13,7 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image
-                    def dockerImage = docker.build("solarta-api:${BUILD_ID}", "-f ${SERVER_DOCKERFILE} ${SERVER_WORKDIR}")
+                    def dockerImage = docker.build("solarta-api:latest", "-f ${SERVER_DOCKERFILE} ${SERVER_WORKDIR}")
 
                     // Stop and remove existing container with same name, container name is "solarta".
                     sh 'docker stop solarta || true'
@@ -32,7 +32,7 @@ pipeline {
             steps{
                 script {
                     // Build the Docker image
-                    def dockerImage = docker.build("solarta-web:${BUILD_ID}", "-f ${FRONTEND_DOCKERFILE} ${CLIENT_WORKDIR}")
+                    def dockerImage = docker.build("solarta-web:latest", "-f ${FRONTEND_DOCKERFILE} ${CLIENT_WORKDIR}")
 
                     // Stop and remove existing container with same name, container name is "solarta-web".
                     sh 'docker stop solarta-web || true'
@@ -68,6 +68,11 @@ pipeline {
     post {
         success {
             echo 'Success!'
+        }
+        
+        always {
+            // Remove all intermediate images and containers
+            sh 'docker system prune -f'
         }
     }
 }
