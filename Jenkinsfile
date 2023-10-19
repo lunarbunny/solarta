@@ -60,7 +60,7 @@ pipeline {
                             ''', odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
 
                 // Write report to specified file
-                dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+                dependencyCheckPublisher pattern: 'dependency-check-report.html'
             }
         }
     }
