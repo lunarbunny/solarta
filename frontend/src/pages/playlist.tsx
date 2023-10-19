@@ -2,6 +2,8 @@ import Auth from "@/components/Auth/Auth";
 import MusicList from "@/components/Media/MusicList";
 
 import { auth } from "@/firebase/clientApp";
+import useFetch from "@/hooks/useFetch";
+import { Music, API_URL } from "@/types";
 import {
   Box,
   Center,
@@ -17,6 +19,9 @@ import { BsPlayCircleFill } from "react-icons/bs";
 
 const PlaylistPage: NextPage = () => {
   const [user, loading, error] = useAuthState(auth);
+
+  // TODO: Change this to fetch the playlist music instead
+  const { data: playlistMusic } = useFetch<Music[]>(`${API_URL}/music`);
 
   if (loading) {
     return (
@@ -80,7 +85,7 @@ const PlaylistPage: NextPage = () => {
         </Flex>
       </Box>
       <Box w="100%" h="75%">
-        <MusicList />
+        <MusicList items={playlistMusic} />
       </Box>
     </Box>
   );
