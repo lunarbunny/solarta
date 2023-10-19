@@ -44,9 +44,30 @@ def register():
             
             # Fields are valid, proceed to generate user
             hashPwd = utils.hash_password(password)
-            print(len(hashPwd))
             newUser = User(username, email, hashPwd, banStatus=2, roleId=2, mfaSecret="")
             session.add(newUser)
+            session.commit()
+            utils.send_onboarding_email(username, email)
+            return "ok!", 200
+        except Exception as e:
+            session.rollback()
+            if utils.is_debug_mode:
+                return str(e), 400
+            else:
+                return "rip something went wrong (#x_x)", 400
+            
+@user_bp.route("/onboarding/<token>", methods=["GET"])
+def onboarding(token):
+    with Session() as session:
+        try:
+            verifying_email = utils.verify_onboarding_email(token)
+            if verifying_email is None:
+                return "bruh you tampered with the token (#x_x)", 400
+            user = session.query(User).filter(User.email==verifying_email).first()
+            if user.banStatus != 2:
+                return "bruh you already registered (#x_x)", 400
+            user.banStatus = 0
+            session.add(user)
             session.commit()
             return "ok!", 200
         except Exception as e:
@@ -54,8 +75,5 @@ def register():
             if utils.is_debug_mode:
                 return str(e), 400
             else:
-                return "rip something went wrong (#×_×)", 400
+                return "rip something went wrong (#x_x)", 400
             
-@user_bp.route("/onboarding", methods=["POST"])
-def onboarding():
-    return
