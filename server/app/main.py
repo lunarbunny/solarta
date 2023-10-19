@@ -1,6 +1,7 @@
 # Create Flask app
 from flask import Flask
 from flask_cors import CORS
+from utils import is_debug_mode
 
 app = Flask(__name__)
 CORS(app) # Allow CORS for all endpoints
@@ -30,4 +31,4 @@ def default():
 
 # Run Flask app
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=is_debug_mode, host="0.0.0.0")

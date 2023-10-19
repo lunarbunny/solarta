@@ -6,3 +6,9 @@ PyMySQL==1.1.0
 pytest==7.4.2
 python-dotenv==1.0.0
 SQLAlchemy==2.0.20
+markupsafe
+argon2-cffi
+pyotp
+qrcode
+sendgrid
+itsdangerous

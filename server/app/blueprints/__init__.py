@@ -49,8 +49,8 @@ with Session() as session:
     # Seed user
     if session.query(User).count() == 0:
         user_data = [
-            {"name": "Wang Tingwei", "email": "admin@example.com", "hashPwd": "admin", "banStatus": False, "roleId": 1},
-            {"name": "Prata Master", "email": "user@example.com", "hashPwd": "user", "banStatus": False, "roleId": 2}    
+            {"name": "Wang Tingwei", "email": "admin@example.com", "hashPwd": "admin", "banStatus": 0, "roleId": 1, "mfaSecret": ""},
+            {"name": "Prata Master", "email": "user@example.com", "hashPwd": "user", "banStatus": 0, "roleId": 2, "mfaSecret": ""}    
         ]
 
         for user in user_data:
