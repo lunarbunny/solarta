@@ -2,7 +2,7 @@ import math
 import os
 from flask import Blueprint, jsonify, request
 from ..__init__ import Session, Music, User, AlbumMusic, PlaylistMusic
-from utils import music_get_path, music_get_duration
+from utils import music_get_save_dir, music_get_duration
 from werkzeug.utils import secure_filename
 
 music_bp = Blueprint("music_bp", __name__)
@@ -48,7 +48,7 @@ def music_create():
             # Limit title to 28 characters, leave 6 characters for owner ID prefix, and 5 characters for extension
             # XXXXXX-<title>.mp3
             filename = f"{ownerId:06}-{secure_filename(filename)[:28]}{ext}"
-            save_dir = music_get_path()
+            save_dir = music_get_save_dir()
             save_path = os.path.join(save_dir, filename)
             
             music_file.save(save_path)
@@ -93,9 +93,9 @@ def music_play_id(id):
             music = session.query(Music).filter(Music.id==id).first()
             if music:
                 from flask import send_file
-                from utils import music_get_path
+                from utils import music_get_save_dir
                 music = session.query(Music).filter(Music.id == id).first()
-                return send_file(music_get_path(music.filename), as_attachment=False), 200
+                return send_file(music_get_save_dir(music.filename), as_attachment=False), 200
             else:
                 return '', 404
         except:

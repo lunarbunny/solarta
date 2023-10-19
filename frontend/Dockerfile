@@ -66,4 +66,6 @@ ENV PORT 3000
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
+ENV SOLARTA_API_URL "https://solarta.nisokkususu.com/api"
+
 CMD ["node", "server.js"]

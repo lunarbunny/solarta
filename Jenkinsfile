@@ -21,7 +21,7 @@ pipeline {
 
                     // Run the newest image as a sibling container
                     withCredentials([string(credentialsId: 'c72a4d71-0a6b-42ca-9098-a01b162ed22f', variable: 'DOCKERRUNARGS')]) {
-                        dockerImage.run('$DOCKERRUNARGS')
+                        dockerImage.run('--name solarta $DOCKERRUNARGS')
                     }
                 }
             }

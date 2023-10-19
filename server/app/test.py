@@ -104,8 +104,8 @@ def test_user_retrieve_all(client):
 
 # Refer to utils.py
 def test_music_get_path():
-    from utils import music_get_path
-    assert music_get_path('test.mp3') == get_music_fp_platform('test.mp3')
+    from utils import music_get_save_dir
+    assert music_get_save_dir('test.mp3') == get_music_fp_platform('test.mp3')
 
 def test_music_get_duration():
     import os

@@ -14,9 +14,9 @@ docker run -d --name mariadb --network solarta --ip 172.19.0.1 -p 3306:3306 \
 # SQLAlchemy Format: "mysql+pymysql://<username>:<password>@<host>/<db>"
 docker run -d --name solarta --network solarta --ip 172.19.0.2 -p 5000:5000 \
   --env SQLALCHEMY_DATABASE_URI=mysql+pymysql://user:pass@mariadb:3306/solarta \
-  --env GOOGLE_APPLICATION_CREDENTIALS=/creds/serviceAccountKey.json \
-  --volume /home/student51/keys:/creds \
+  --volume /var/lib/solarta/keys:/creds \
+  --volume /var/lib/solarta/assets/music:/assets/music \
   solarta-api:latest
 
-# Single line version for jenkins docker run argument (omits --detach and image name)
---name solarta --network solarta --ip 172.19.0.2 -p 5000:5000 --env SQLALCHEMY_DATABASE_URI=mysql+pymysql://user:pass@mariadb:3306/solarta --env GOOGLE_APPLICATION_CREDENTIALS=/creds/serviceAccountKey.json --volume /home/student51/keys:/creds
+# Single line version for jenkins docker run argument (omits --detach and image+container name)
+--network solarta --ip 172.19.0.2 -p 5000:5000 --env SQLALCHEMY_DATABASE_URI=mysql+pymysql://user:pass@mariadb:3306/solarta --volume /var/lib/solarta/keys:/creds --volume /var/lib/solarta/assets/music:/assets/music
