@@ -1,9 +1,7 @@
 # Create Flask app
-from flask import Flask, request
+from flask import Flask
 from flask_cors import CORS
-from markupsafe import escape
-from models.User import User
-import utils
+from utils import is_debug_mode
 
 app = Flask(__name__)
 CORS(app, resources={r"*": {"origins": "http://localhost:3000"}})
@@ -31,30 +29,6 @@ app.register_blueprint(user_bp, url_prefix="/user")
 def default():
     return "ICT3103 Secured Software Development"
 
-@app.route("/register", methods=["POST"])
-def register():
-    username = request.form.get("username")
-    email = request.form.get("email")
-    password = request.form.get("password")
-    confirmPassword = request.form.get("confirmPassword")
-    if username is None:
-        return "Username is required.", 400
-    
-    if email is None:
-        return "Email is required.", 400
-    
-    if len(username) > 64:
-        return escape("Username is too long, must be < 64 characters."), 400
-    
-    if not utils.is_email_valid(email):
-        return "Email is invalid.", 400
-    
-    if confirmPassword != password:
-        return "Check that you entered both passwords correctly.", 400
-    hashPwd = utils.hash_password(password)
-    user = User(username, email, hashPwd, 2, 2)
-    return "ok!", 200
-
 # Run Flask app
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=is_debug_mode, host="0.0.0.0")

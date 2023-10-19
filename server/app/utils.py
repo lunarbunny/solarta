@@ -2,6 +2,7 @@ from argon2 import PasswordHasher
 import os
 import re
 
+is_debug_mode = True
 email_regex = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
 argon_hasher = PasswordHasher()
 

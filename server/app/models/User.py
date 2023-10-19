@@ -9,16 +9,18 @@ class User(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     hashPwd: Mapped[str] = mapped_column(String(128), nullable=False)
-    banStatus: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    banStatus: Mapped[bool] = mapped_column(Integer, nullable=False)
     roleId: Mapped[int] = mapped_column(Integer, ForeignKey('Role.id'), nullable=False)
+    mfaSecret: Mapped[str] = mapped_column(String(255), nullable=True)
 
     relationship('Album', backref='User')
     relationship('Music', backref='User')
     relationship('Playlist', backref='User')
 
-    def __init__(self, name, email, hashPwd, banStatus, roleId):
+    def __init__(self, name, email, hashPwd, banStatus, roleId, mfaSecret):
         self.name = name
         self.email = email
         self.hashPwd = hashPwd
         self.banStatus = banStatus
         self.roleId = roleId
+        self.mfaSecret = mfaSecret
