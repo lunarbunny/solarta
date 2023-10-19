@@ -17,6 +17,7 @@ function durationToTime(seconds: number): string {
 const MusicItem: React.FC<Props> = ({ data, onClick }) => {
   return (
     <Flex
+      minW="300px"
       alignItems="center"
       px={2} py={1}
       _hover={{ bg: 'blue.700' }}
@@ -28,7 +29,6 @@ const MusicItem: React.FC<Props> = ({ data, onClick }) => {
       />
       <Box
         flex={1}
-        minW="200px"
         ml={3}>
         <Text fontWeight="semibold">
           {data.title && data.title}
