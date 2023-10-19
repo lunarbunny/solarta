@@ -14,6 +14,7 @@ import {
   PopoverTrigger,
   Text,
 } from "@chakra-ui/react";
+import { useEffect, useRef } from "react";
 import AudioPlayer, { RHAP_UI } from "react-h5-audio-player";
 import { MdDelete } from "react-icons/md";
 import { PiPlaylist } from "react-icons/pi";
@@ -21,6 +22,12 @@ import { useRecoilState } from "recoil";
 
 const MusicPlayer = () => {
   const [state, setState] = useRecoilState(musicPlayerAtom);
+
+  const playerRef = useRef<AudioPlayer>(null);
+
+  if (state.playlist.length == 0) {
+    return <></>;
+  }
 
   const handleClickNextPrev = (isNext: boolean) => {
     let newIndex = state.currentTrack + (isNext ? 1 : -1);
@@ -51,6 +58,7 @@ const MusicPlayer = () => {
 
   return (
     <AudioPlayer
+      ref={playerRef}
       layout="stacked-reverse"
       showSkipControls
       showJumpControls={false}

@@ -12,8 +12,8 @@ def music_get_save_dir():
         sys.exit(1)
     return dir
 
-def music_get_duration(music_filename):
-    file = eyed3.load(music_get_save_dir(music_filename))
+def music_get_duration(path):
+    file = eyed3.load(path)
     if file is not None:
         duration = file.info.time_secs
         return duration

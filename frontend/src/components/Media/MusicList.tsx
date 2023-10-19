@@ -6,8 +6,11 @@ import useFetch from '@/hooks/useFetch';
 import { useSetRecoilState } from 'recoil';
 import { musicPlayerAtom } from '@/atoms/musicPlayer';
 
-const MusicList: React.FC = () => {
-  const { data: musicList, loading, error } = useFetch<Music[]>(`${API_URL}/music`);
+type Props = {
+  items: Music[] | null;
+};
+
+const MusicList: React.FC<Props> = ({ items }) => {
 
   const setMusicPlayer = useSetRecoilState(musicPlayerAtom);
 
@@ -49,9 +52,7 @@ const MusicList: React.FC = () => {
   return (
     <Box>
       <List spacing={1}>
-        {loading && <p>Loading...</p>}
-        {error && <p>Error: {error}</p>}
-        {musicList && musicList.map((song, index) => (
+        {items && items.map((song, index) => (
           <ListItem key={index}>
             <MusicItem data={song} onClick={handleClick} />
           </ListItem>

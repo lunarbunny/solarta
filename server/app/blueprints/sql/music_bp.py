@@ -1,6 +1,6 @@
 import math
 import os
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, send_file
 from ..__init__ import Session, Music, User, AlbumMusic, PlaylistMusic
 from utils import music_get_save_dir, music_get_duration
 from werkzeug.utils import secure_filename
@@ -57,7 +57,7 @@ def music_create():
                 return 'Cannot get duration', 422
             
             duration = math.ceil(duration)
-            new_music = Music(title, music_file.filename, duration, genreId, ownerId)
+            new_music = Music(title, filename, duration, genreId, ownerId)
             session.add(new_music)
             session.flush()
             session.add(AlbumMusic(albumId, new_music.id))
@@ -65,7 +65,7 @@ def music_create():
             return 'Created', 201
         except Exception as e:
             session.rollback()
-            return '', 400
+            return str(e), 400
 
 # Retrieve all music that matches (substring of) search
 @music_bp.route("/search=<string:title>", methods=["GET"])
@@ -92,14 +92,11 @@ def music_play_id(id):
         try:
             music = session.query(Music).filter(Music.id==id).first()
             if music:
-                from flask import send_file
-                from utils import music_get_save_dir
-                music = session.query(Music).filter(Music.id == id).first()
-                return send_file(music_get_save_dir(music.filename), as_attachment=False), 200
+                return send_file(os.path.join(music_get_save_dir(), music.filename), as_attachment=False), 200
             else:
-                return '', 404
-        except:
-            return '', 400
+                return 'Not found', 404
+        except Exception as e:
+            return str(e), 400
 
 # Retrieve all music
 @music_bp.route("/", methods=["GET"])

@@ -2,12 +2,15 @@ import Auth from "@/components/Auth/Auth";
 import MusicList from "@/components/Media/MusicList";
 import SearchBar from "@/components/Search/SearchBar";
 import { auth } from "@/firebase/clientApp";
+import useFetch from "@/hooks/useFetch";
+import { API_URL, Music } from "@/types";
 import { Box, Center, CircularProgress, Heading, Flex, Spacer } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 const HomePage: NextPage = () => {
   const [user, loading, error] = useAuthState(auth);
+  const { data: musicList } = useFetch<Music[]>(`${API_URL}/music`);
 
   if (loading) {
     return (
@@ -30,13 +33,13 @@ const HomePage: NextPage = () => {
       </Box>
 
       <Heading size='md'>Trending today</Heading>
-      <MusicList />
+      <MusicList items={musicList} />
 
       <Spacer h={8} />
 
       <Heading size='md'>Listen again</Heading>
       <Flex direction='row' alignItems='center'>
-        <MusicList />
+        <MusicList items={musicList} />
       </Flex>
     </Box>
   );
