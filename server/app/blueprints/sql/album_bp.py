@@ -1,7 +1,30 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from ..__init__ import Session, Album, AlbumMusic, Music
 
 album_bp = Blueprint("album_bp", __name__)
+
+# Create a new album entry
+@album_bp.route("/create", methods=["POST"])
+def album_create():
+    with Session() as session:
+        try:
+            data = request.form
+            title = data["title"]
+            imageUrl = data["imageUrl"]
+            releaseDate = data["releaseDate"]
+            ownerId = int(data["ownerId"]) # TODO: Should take from session instead
+            description = data["description"]
+
+            if title == "" or releaseDate == "" or ownerId == "":
+                return "Missing parameters", 400
+
+            new_album = Album(title, imageUrl, releaseDate, ownerId, description)
+            session.add(new_album)
+            session.commit()
+            return "Created", 201
+        except Exception as e:
+            session.rollback()
+            return str(e), 400
 
 # Retrieve all music based on Album ID
 @album_bp.route("/<int:idAlbum>/music", methods=["GET"])
