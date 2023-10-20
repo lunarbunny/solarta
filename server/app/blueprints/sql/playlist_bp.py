@@ -11,6 +11,7 @@ def playlist_delete(id):
         try:
             playlist = session.get(Playlist, id)
             if playlist:
+                session.query(PlaylistMusic).filter(PlaylistMusic.idPlaylist == id).delete()
                 session.delete(playlist)
                 session.commit()
                 return '', 200
