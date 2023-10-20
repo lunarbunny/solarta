@@ -1,7 +1,6 @@
-import { Button, Divider, Image, Input, Text } from '@chakra-ui/react';
+import { Button, Input, Text } from '@chakra-ui/react';
 import React, { useState } from 'react';
-import { useSignInWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
-import { auth } from '../../firebase/clientApp';
+import useSignIn from '@/hooks/useSignIn';
 
 type LoginProps = {
   onRegisterClick: () => void;
@@ -14,10 +13,7 @@ const Login: React.FC<LoginProps> = ({ onRegisterClick }) => {
   });
   const [error, setError] = useState('');
 
-  const [signInEmailPwd, _, loading, loginError] =
-    useSignInWithEmailAndPassword(auth);
-
-  const [signInOAuthGoogle, __, oaLoading, oauthError] = useSignInWithGoogle(auth);
+  const { signIn, loading, error: loginError } = useSignIn();
 
   const handleLoginSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -28,7 +24,7 @@ const Login: React.FC<LoginProps> = ({ onRegisterClick }) => {
       return;
     }
 
-    signInEmailPwd(loginForm.email, loginForm.password);
+    signIn(loginForm.email, loginForm.password);
   }
 
   return (
@@ -51,7 +47,7 @@ const Login: React.FC<LoginProps> = ({ onRegisterClick }) => {
         />
 
         <Text textAlign="center" mt={2} fontSize="12pt" color="red.300">
-          {error || loginError?.message}
+          {error || loginError}
         </Text>
 
         <Button
@@ -72,19 +68,6 @@ const Login: React.FC<LoginProps> = ({ onRegisterClick }) => {
         mt={4}
       >
         No account yet? Click here to sign up.
-      </Button>
-
-      <Divider mt={2} />
-
-      <Button
-        variant={'outline'}
-        width="100%"
-        onClick={() => signInOAuthGoogle()}
-        mt={4}
-        isLoading={oaLoading}
-      >
-        <Image src="/images/googlelogo.png" alt="Google" boxSize={6} mr={2} />
-        Log in with Google
       </Button>
     </>
   )

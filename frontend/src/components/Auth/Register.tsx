@@ -1,7 +1,6 @@
-import { Button, Input, Text } from '@chakra-ui/react';
+import { Button, Input, InputGroup, Text } from '@chakra-ui/react';
 import React, { useState } from 'react';
-import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
-import { auth } from '../../firebase/clientApp';
+import useRegister from '@/hooks/useRegister';
 
 type RegisterProps = {
   onLoginClick: () => void;
@@ -9,20 +8,23 @@ type RegisterProps = {
 
 const Register: React.FC<RegisterProps> = ({ onLoginClick }) => {
   const [registerForm, setRegisterForm] = useState({
+    name: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
   const [error, setError] = useState('');
 
-  const [registerEmailPwd, _, loading, registerError] =
-    useCreateUserWithEmailAndPassword(auth);
+  const { register, loading, error: registerError } = useRegister();
 
   function onRegisterSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (error) setError(''); // Reset error message
 
-    if (!registerForm.email || !registerForm.password || !registerForm.confirmPassword) {
+    if (!registerForm.name ||
+      !registerForm.email ||
+      !registerForm.password ||
+      !registerForm.confirmPassword) {
       setError('Please fill in all fields.');
       return;
     }
@@ -32,7 +34,7 @@ const Register: React.FC<RegisterProps> = ({ onLoginClick }) => {
       return;
     }
 
-    registerEmailPwd(registerForm.email, registerForm.password);
+    register(registerForm.name, registerForm.email, registerForm.password);
   }
 
   return (
@@ -41,28 +43,37 @@ const Register: React.FC<RegisterProps> = ({ onLoginClick }) => {
 
       <form onSubmit={onRegisterSubmit}>
         <Input
+          type="text"
+          placeholder="Name"
+          value={registerForm.name}
+          onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
+        />
+        <Input
           type="email"
           placeholder="Email"
           value={registerForm.email}
           onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
-        />
-        <Input
-          type="password"
-          placeholder="Password"
-          value={registerForm.password}
-          onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
-          mt={2}
-        />
-        <Input
-          type="password"
-          placeholder="Confirm password"
-          value={registerForm.confirmPassword}
-          onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
           mt={2}
         />
 
+        <InputGroup mt={2}>
+          <Input
+            type="password"
+            placeholder="Password"
+            value={registerForm.password}
+            onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
+          />
+          <Input
+            type="password"
+            placeholder="Confirm password"
+            value={registerForm.confirmPassword}
+            onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
+            ms={2}
+          />
+        </InputGroup>
+
         <Text textAlign="center" mt={2} fontSize="12pt" color="red.300">
-          {error || registerError?.message}
+          {error || registerError}
         </Text>
 
         <Button

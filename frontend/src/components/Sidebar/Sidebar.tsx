@@ -1,20 +1,20 @@
-import { Box, Flex, Text, Image, Avatar, Button } from "@chakra-ui/react";
+import { Box, Flex, Text, Image, Button } from "@chakra-ui/react";
 import Playlists from "./Playlists";
-import { TbAlbum, TbMusic } from "react-icons/tb";
-import { FiUsers } from "react-icons/fi";
+import { TbMusic } from "react-icons/tb";
 import { IoLibraryOutline } from "react-icons/io5";
 import SidebarGroup from "./SidebarGroup";
 import SidebarItem from "./SidebarItem";
 import Link from "next/link";
 import { useState } from "react";
-import { auth } from "@/firebase/clientApp";
-import { useAuthState, useSignOut } from "react-firebase-hooks/auth";
+import { useRecoilState } from "recoil";
+import { authAtom } from "@/atoms/auth";
+import useSignOut from "@/hooks/useSignOut";
 
 const Sidebar = () => {
   const [page, setPage] = useState("");
 
-  const [user] = useAuthState(auth);
-  const [signOut, loading, error] = useSignOut(auth);
+  const [auth] = useRecoilState(authAtom);
+  const { signOut, loading, error } = useSignOut();
 
   return (
     <Flex minW="250px" h="100%" bgGradient="linear(to-l, blue.700, blue.900)"
@@ -31,13 +31,7 @@ const Sidebar = () => {
       <Box flexGrow={1}>
         <SidebarGroup title="DISCOVER" hasButton={false}>
           <Link href="/" onClick={() => setPage("home")}>
-            <SidebarItem name="Songs" icon={<TbMusic size={20} />} />
-          </Link>
-          <Link href="/artists" onClick={() => setPage("artists")}>
-            <SidebarItem name="Artists" icon={<FiUsers size={20} />} />
-          </Link>
-          <Link href="/albums" onClick={() => setPage("albums")}>
-            <SidebarItem name="Albums" icon={<TbAlbum size={20} />} />
+            <SidebarItem name="Home" icon={<TbMusic size={20} />} />
           </Link>
           <Link href="/library" onClick={() => setPage("library")}>
             <SidebarItem
@@ -52,12 +46,18 @@ const Sidebar = () => {
         </SidebarGroup>
       </Box>
 
-      {user && (
-        <Flex direction="row" align="flex-end" p={4}>
-          <Text fontSize="md" noOfLines={1}>{user.email}</Text>
-          <Button size="sm" onClick={signOut} isLoading={loading}>Logout</Button>
-        </Flex>
-      )}
+      <Flex direction="row" align="flex-end" p={4}>
+        {auth.accessToken ? (
+          <>
+            <Text fontSize="md" noOfLines={1}>{auth.email}</Text>
+            <Button size="sm" onClick={signOut}>Logout</Button>
+          </>
+        ) : (
+          <Link href="/auth">
+            <Button size="sm">Sign In</Button>
+          </Link>
+        )}
+      </Flex>
     </Flex>
   );
 };

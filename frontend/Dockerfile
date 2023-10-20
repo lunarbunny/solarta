@@ -33,6 +33,7 @@ ENV NEXT_PUBLIC_FIREBASE_PROJECT_ID solarta-db5cd
 ENV NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET solarta-db5cd.appspot.com
 ENV NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID 780523267179
 ENV NEXT_PUBLIC_FIREBASE_APP_ID 1:780523267179:web:44cd27cf34a9875e863d2e
+ENV SOLARTA_API_URL "https://solarta.nisokkususu.com/api"
 
 RUN npm run build
 
@@ -65,7 +66,5 @@ EXPOSE 3000
 ENV PORT 3000
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
-
-ENV SOLARTA_API_URL "https://solarta.nisokkususu.com/api"
 
 CMD ["node", "server.js"]

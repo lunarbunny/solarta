@@ -23,18 +23,18 @@ def register():
     with Session() as session:
         try:
             data = request.form
-            username = data.get("username")
+            name = data.get("name")
             email = data.get("email")
             password = data.get("password")
             confirmPassword = data.get("confirmPassword")
-            if username is None:
-                return "Username is required.", 400
+            if name is None:
+                return "Name is required.", 400
             
             if email is None:
                 return "Email is required.", 400
             
-            if len(username) > 64:
-                return escape("Username is too long, must be < 64 characters."), 400
+            if len(name) > 64:
+                return escape("Name is too long, must be < 64 characters."), 400
             
             if not utils.is_email_valid(email):
                 return "Email is invalid.", 400
@@ -44,10 +44,10 @@ def register():
             
             # Fields are valid, proceed to generate user
             hashPwd = utils.hash_password(password)
-            newUser = User(username, email, hashPwd, banStatus=2, roleId=2, mfaSecret="")
+            newUser = User(name, email, hashPwd, banStatus=2, roleId=2, mfaSecret="")
             session.add(newUser)
             session.commit()
-            utils.send_onboarding_email(username, email)
+            utils.send_onboarding_email(name, email)
             return "ok!", 200
         except Exception as e:
             session.rollback()
