@@ -1,16 +1,16 @@
+import { authAtom } from "@/atoms/auth";
 import Auth from "@/components/Auth/Auth";
 import LibrarySection from "@/components/Library/LibrarySection";
 import MusicUpload from "@/components/Library/MusicUpload";
 import AlbumList from "@/components/Media/AlbumList";
-import { auth } from "@/firebase/clientApp";
 import useFetch from "@/hooks/useFetch";
 import { API_URL, Album } from "@/types";
 import { Box, Button, Center, CircularProgress, FormControl, FormLabel, Heading, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spacer, useDisclosure } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { useRecoilState } from "recoil";
 
 const LibraryPage: NextPage = () => {
-  const [user, loading, error] = useAuthState(auth);
+  const [auth, setAuth] = useRecoilState(authAtom);
 
   const { data: albums } = useFetch<Album[]>(`${API_URL}/album`);
 
@@ -21,17 +21,11 @@ const LibraryPage: NextPage = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  if (loading) {
+  if (!auth.accessToken) {
     return (
-      <Center w="100%">
-        <CircularProgress isIndeterminate color='blue.700' />
-      </Center>
-    )
-  }
-
-  if (!user) {
-    return (
-      <Auth />
+      <Box w='100%' p={8}>
+        <Auth />
+      </Box>
     )
   }
 
