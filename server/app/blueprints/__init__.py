@@ -50,7 +50,7 @@ with Session() as session:
     if session.query(User).count() == 0:
         user_data = [
             {"name": "Wang Tingwei", "email": "admin@example.com", "hashPwd": "admin", "banStatus": 0, "roleId": 1, "mfaSecret": ""},
-            {"name": "Prata Master", "email": "user@example.com", "hashPwd": "user", "banStatus": 0, "roleId": 2, "mfaSecret": ""}    
+            {"name": "Pixabay", "email": "user@example.com", "hashPwd": "user", "banStatus": 0, "roleId": 2, "mfaSecret": ""}    
         ]
 
         for user in user_data:
@@ -63,7 +63,14 @@ with Session() as session:
         genre_data = [
             {"name": "Rock"},
             {"name": "Pop"},
-            {"name": "Hip-Hop"}
+            {"name": "Hip-Hop"},
+            {"name": "Jazz"},
+            {"name": "Country"},
+            {"name": "EDM"},
+            {"name": "R&B"},
+            {"name": "Classical"},
+            {"name": "Indie"},
+            {"name": "Reggae"}
         ]
 
         for genre in genre_data:
@@ -74,17 +81,35 @@ with Session() as session:
     # Seed album
     if session.query(Album).count() == 0:
         from datetime import date
-        album_data =  {"title": "The Power of Yo!", "releaseDate": date(2023, 1, 1), "ownerId": 2}
-        album_obj = Album(**album_data)
-        session.add(album_obj)
-        session.commit()
+        album_data =  [
+            {"title": "The Power of Yo!", "releaseDate": date(2023, 1, 1), "ownerId": 2},
+            {"title": "Depression Strikes", "releaseDate": date(2023, 2, 2), "ownerId": 2}
+        ]
+
+        for album in album_data:
+            album_obj = Album(**album)
+            session.add(album_obj)
+            session.commit()
 
     # Seed music
     if session.query(Music).count() == 0:
-        music_data = {"title": "yo!", "filename": "yo!.mp3", "duration": 6, "genreId": 2, "ownerId": 2}
-        music_obj = Music(**music_data)
-        session.add(music_obj)
-        session.commit()
+        music_data = [
+            {"title": "yo!", "filename": "yo!.mp3", "duration": 6, "genreId": 2, "ownerId": 2},
+            {"title": "Titanium by Alisha_Studio", "filename": "titanium-170190.mp3", "duration": 106, "genreId": 2, "ownerId": 2},
+            {"title": "Science Documentary by Lexin_Music", "filename": "science-documentary-169621.mp3", "duration": 127, "genreId": 2, "ownerId": 2},
+            {"title": "Baby Mandala by prazkhanal", "filename": "baby-mandala-169039.mp3", "duration": 191, "genreId": 2, "ownerId": 2},
+            {"title": "Once In Paris by Pumpupthemind", "filename": "once-in-paris-168895.mp3", "duration": 132, "genreId": 2, "ownerId": 2},
+            {"title": "Glossy by Coma-Media", "filename": "glossy-168156.mp3", "duration": 93, "genreId": 2, "ownerId": 2},
+            {"title": "Abstract Future Bass by QubeSounds", "filename": "abstract-future-bass-162604.mp3", "duration": 91, "genreId": 2, "ownerId": 2},
+            {"title": "A Long Way by SergePavkinMusic", "filename": "a-long-way-166385.mp3", "duration": 273, "genreId": 2, "ownerId": 2},
+            {"title": "Good Night by FASSounds", "filename": "good-night-160166.mp3", "duration": 147, "genreId": 2, "ownerId": 2},
+            {"title": "Inside You by lemonmusicstudio", "filename": "inside-you-162760.mp3", "duration": 129, "genreId": 2, "ownerId": 2}
+        ]
+
+        for music in music_data:
+            music_obj = Music(**music)
+            session.add(music_obj)
+            session.commit()
 
     # Seed playlist
     if session.query(Playlist).count() == 0:
@@ -96,10 +121,23 @@ with Session() as session:
 
     # Seed album music
     if session.query(AlbumMusic).count() == 0:
-        album_music_data = {"idAlbum": 1, "idMusic": 1}
-        album_music_obj = AlbumMusic(**album_music_data)
-        session.add(album_music_obj)
-        session.commit()
+        album_music_data = [
+            {"idAlbum": 1, "idMusic": 1},
+            {"idAlbum": 1, "idMusic": 2},
+            {"idAlbum": 1, "idMusic": 3},
+            {"idAlbum": 1, "idMusic": 4},
+            {"idAlbum": 1, "idMusic": 5},
+            {"idAlbum": 2, "idMusic": 6},
+            {"idAlbum": 2, "idMusic": 7},
+            {"idAlbum": 2, "idMusic": 8},
+            {"idAlbum": 2, "idMusic": 9},
+            {"idAlbum": 2, "idMusic": 10}
+        ]
+
+        for album_music in album_music_data:
+            album_music_obj = AlbumMusic(**album_music)
+            session.add(album_music_obj)
+            session.commit()
 
     # Seed playlist music
     if session.query(PlaylistMusic).count() == 0:
