@@ -1,4 +1,4 @@
-import { Button, Input, Text } from '@chakra-ui/react';
+import { Button, Input, InputGroup, Text } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import useRegister from '@/hooks/useRegister';
 
@@ -53,21 +53,24 @@ const Register: React.FC<RegisterProps> = ({ onLoginClick }) => {
           placeholder="Email"
           value={registerForm.email}
           onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
-        />
-        <Input
-          type="password"
-          placeholder="Password"
-          value={registerForm.password}
-          onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
           mt={2}
         />
-        <Input
-          type="password"
-          placeholder="Confirm password"
-          value={registerForm.confirmPassword}
-          onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
-          mt={2}
-        />
+
+        <InputGroup mt={2}>
+          <Input
+            type="password"
+            placeholder="Password"
+            value={registerForm.password}
+            onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
+          />
+          <Input
+            type="password"
+            placeholder="Confirm password"
+            value={registerForm.confirmPassword}
+            onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
+            ms={2}
+          />
+        </InputGroup>
 
         <Text textAlign="center" mt={2} fontSize="12pt" color="red.300">
           {error || registerError}
