@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Blueprint, jsonify, request
 from ..__init__ import Session, Album, AlbumMusic, Music
 
@@ -9,22 +10,24 @@ def album_create():
     with Session() as session:
         try:
             data = request.form
-            title = data["title"]
-            imageUrl = data["imageUrl"]
-            releaseDate = data["releaseDate"]
-            ownerId = int(data["ownerId"]) # TODO: Should take from session instead
-            description = data["description"]
+            title = data.get("title", "")
+            releaseDateStr = data.get("releaseDate", "") # Format: YYYY-MM-DD
+            description = data.get("description", None) # Optional
+            imageUrl = data.get("imageUrl", None) # Optional
+            ownerId = data.get("ownerId", '2') # TODO: Should take from session instead
 
-            if title == "" or releaseDate == "" or ownerId == "":
+            if title == "" or releaseDateStr == "":
                 return "Missing parameters", 400
 
-            new_album = Album(title, imageUrl, releaseDate, ownerId, description)
+            releaseDate = datetime.strptime(releaseDateStr, "%Y-%m-%d")
+
+            new_album = Album(title, releaseDate, ownerId, imageUrl, description)
             session.add(new_album)
             session.commit()
             return "Created", 201
         except Exception as e:
             session.rollback()
-            return str(e), 400
+            return str(e), 500
 
 # Retrieve all music based on Album ID
 @album_bp.route("/<int:idAlbum>/music", methods=["GET"])
@@ -65,6 +68,26 @@ def album_by_artist(ownerId):
         except:
             return '', 400
 
+# Retrieve a specific album        
+@album_bp.route("/<int:idAlbum>", methods=["GET"])
+def album_retrieve(idAlbum):
+    with Session() as session:
+        try:
+            album = session.get(Album, idAlbum)
+            if album:
+                return jsonify({
+                    "id": album.id,
+                    "title": album.title,
+                    "imageUrl": album.imageUrl,
+                    "releaseDate": album.releaseDate,
+                    "ownerId": album.ownerId,
+                    "description": album.description
+                }), 200
+            else:
+                return 'Album not found.', 404
+        except:
+            return 'Error occured when retrieving album.', 400
+
 # Retrieve all albums
 @album_bp.route("/", methods=["GET"])
 def album_retrieve_all():
@@ -80,5 +103,5 @@ def album_retrieve_all():
                 "description": album.description
             } for album in albums]), 200
         except:
-            return '', 400
+            return 'Error occured when retrieving album.', 400
     

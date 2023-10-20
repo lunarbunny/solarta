@@ -9,11 +9,9 @@ const LibrarySection: React.FC<Props> = ({ title, children }) => {
   return (
     <Box bg={'gray.800'} py={4}>
       <Heading size='sm' textAlign='center'>{title}</Heading>
-      <Flex alignItems='center'>
-        <Box flexGrow={1} >
-          {children}
-        </Box>
-      </Flex>
+      <Box mt={4} px={4} >
+        {children}
+      </Box>
     </Box>
   );
 }
