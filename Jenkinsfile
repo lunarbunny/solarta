@@ -6,6 +6,11 @@ pipeline {
         CLIENT_WORKDIR = "${WORKSPACE}/frontend"
         SERVER_DOCKERFILE = "${WORKSPACE}/server/Dockerfile"
         FRONTEND_DOCKERFILE = "${WORKSPACE}/frontend/Dockerfile"
+
+        SQLALCHEMY_DATABASE_URI = credentials('6ca4fbe5-cdfb-41df-91a3-2cf743994071')
+        SENDGRID_API_KEY = credentials('b7a83492-696b-4c37-8b31-3f1d469dd2f7')
+        URL_SIGN_SECRET = credentials('a0a605eb-9890-48b8-9e9a-affe921ce9cc')
+        ONBOARDING_SALT = credentials('e886f93b-8132-445e-b44f-52c8ff540637')
     }
 
     stages {
@@ -20,9 +25,17 @@ pipeline {
                     sh 'docker rm solarta || true'
 
                     // Run the newest image as a sibling container
-                    withCredentials([string(credentialsId: 'c72a4d71-0a6b-42ca-9098-a01b162ed22f', variable: 'DOCKERRUNARGS')]) {
-                        dockerImage.run('--name solarta $DOCKERRUNARGS')
-                    }
+                    dockerImage.run('''
+                        --name solarta
+                        --network solarta --ip 172.19.0.2 --publish 5000:5000
+                        --env SQLALCHEMY_DATABASE_URI=$SQLALCHEMY_DATABASE_URI
+                        --env SENDGRID_API_KEY=$SENDGRID_API_KEY
+                        --env URL_SIGN_SECRET=$URL_SIGN_SECRET
+                        --env ONBOARDING_SALT=$ONBOARDING_SALT
+                        --volume /var/lib/solarta/keys:/creds
+                        --volume /var/lib/solarta/assets/music:/assets/music
+                    '''
+                    )
                 }
             }
         }
@@ -39,7 +52,7 @@ pipeline {
                     sh 'docker rm solarta-web || true'
 
                     // Run the newest image as a sibling container
-                    dockerImage.run('-p 3000:3000 --name solarta-web')
+                    dockerImage.run('--name solarta-web -p 3000:3000')
                 }
             }
         }
