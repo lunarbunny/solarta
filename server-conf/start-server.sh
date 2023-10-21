@@ -20,7 +20,7 @@ docker run -d --name solarta --network solarta --ip 172.19.0.2 -p 5000:5000 \
 
 # Frontend server
 docker run -d --name solarta-web -p 3000:3000 \
-  --env SOLARTA_API_URL=https://solarta.nisokkususu.com/api \
+  --env NEXT_PUBLIC_SOLARTA_API_URL=https://solarta.nisokkususu.com/api \
   solarta-web:latest
 
 # Single line version for jenkins docker run argument (omits --detach and image+container name)

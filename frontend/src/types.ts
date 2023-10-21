@@ -1,5 +1,5 @@
 // Use localhost for development, check env variable for production
-const API_URL = process.env.SOLARTA_API_URL || 'http://localhost:5000';
+const API_URL = process.env.NEXT_PUBLIC_SOLARTA_API_URL || 'http://localhost:5000';
 
 type Music = {
     id: number;
