@@ -1,39 +1,21 @@
-import Auth from "@/components/Auth/Auth";
 import MusicList from "@/components/Media/MusicList";
 
-import { auth } from "@/firebase/clientApp";
 import useFetch from "@/hooks/useFetch";
 import { Music, API_URL } from "@/types";
 import {
   Box,
-  Center,
-  CircularProgress,
   Flex,
   Link,
   Text,
   Icon,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useAuthState } from "react-firebase-hooks/auth";
 import { BsPlayCircleFill } from "react-icons/bs";
 
 const PlaylistPage: NextPage = () => {
-  const [user, loading, error] = useAuthState(auth);
 
   // TODO: Change this to fetch the playlist music instead
   const { data: playlistMusic } = useFetch<Music[]>(`${API_URL}/music`);
-
-  if (loading) {
-    return (
-      <Center w="100%">
-        <CircularProgress isIndeterminate color="blue.700" />
-      </Center>
-    );
-  }
-
-  if (!user) {
-    return <Auth />;
-  }
 
   return (
     <Box

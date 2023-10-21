@@ -1,6 +1,6 @@
 import { authAtom } from "@/atoms/auth";
 import Auth from "@/components/Auth/Auth";
-import ArtistWrap from "@/components/Media/ArtistGrid";
+import ArtistWrap from "@/components/Media/ArtistWrap";
 import useFetch from "@/hooks/useFetch";
 import { API_URL, Artist } from "@/types";
 import { Box, Heading } from "@chakra-ui/react";

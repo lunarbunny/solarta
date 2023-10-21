@@ -1,5 +1,3 @@
-import Auth from "@/components/Auth/Auth";
-import { auth } from "@/firebase/clientApp";
 import { API_URL } from "@/types";
 import {
   Box,
@@ -35,7 +33,6 @@ import SearchBar from "@/components/Search/SearchBar";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { BiTime } from "react-icons/bi";
 import { MdEdit } from "react-icons/md";
-import { useAuthState } from "react-firebase-hooks/auth";
 
 const CreatePlayListPage: NextPage = () => {
   type PlaylistItem = {
@@ -113,23 +110,9 @@ const CreatePlayListPage: NextPage = () => {
       cover: "https://bit.ly/dan-abramov",
     },
   ];
-
-  const [user, loading, error] = useAuthState(auth);
   const [playlistSongs, setPlayListSongs] = useState(playlist);
 
   const bgColour = useColorModeValue("gray.600", "gray.700");
-
-  if (loading) {
-    return (
-      <Center w="100%">
-        <CircularProgress isIndeterminate color="blue.700" />
-      </Center>
-    );
-  }
-
-  if (!user) {
-    return <Auth />;
-  }
 
   function convertToMinutes(duration: number): string {
     const minutes = Math.floor(duration / 60);

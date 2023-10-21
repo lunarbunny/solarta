@@ -1,6 +1,6 @@
 import { authAtom } from "@/atoms/auth";
 import Auth from "@/components/Auth/Auth";
-import AlbumGrid from "@/components/Media/AlbumGrid";
+import AlbumGrid from "@/components/Media/AlbumWrap";
 import useFetch from "@/hooks/useFetch";
 import { Album, API_URL } from "@/types";
 import { Box, Heading } from "@chakra-ui/react";
