@@ -111,8 +111,17 @@ const CreatePlayListPage: NextPage = () => {
     },
   ];
   const [playlistSongs, setPlayListSongs] = useState(playlist);
+  const [playlistTitle, setPlaylistTitle] = useState("Rasengan ⚡️");
+  const [playlistDesc, setPlaylistDesc] = useState(
+    "A short description of the playlist can be written here!"
+  );
 
   const bgColour = useColorModeValue("gray.600", "gray.700");
+
+  function handleSubmit() {
+    console.log("playlisttitle:" + playlistTitle);
+    console.log("playlistdesc:" + playlistDesc);
+  }
 
   function convertToMinutes(duration: number): string {
     const minutes = Math.floor(duration / 60);
@@ -156,109 +165,120 @@ const CreatePlayListPage: NextPage = () => {
   }
 
   return (
-    <Flex color="whiteAlpha.800" w="100%" justify="center" h="auto">
-      <Box my="15px" borderRadius="5px" bg="blackAlpha.700" w="70%" h="auto">
-        <Box my={8}>
-          <Editable
-            px="5px"
-            fontSize="50px"
-            size="lg"
-            defaultValue="Rasengan ⚡️"
-            isPreviewFocusable={true}
-            selectAllOnFocus={false}
-          >
-            <Tooltip label="Click to edit">
-              <EditablePreview
-                px={4}
-                _hover={{
-                  background: bgColour,
-                }}
-              />
-            </Tooltip>
-            <Flex direction="row">
-              <Input my={8} px={4} as={EditableInput} />
-              <Spacer />
-              <EditableControls />
-            </Flex>
-          </Editable>
-
-          <Editable
-            px="5px"
-            fontSize="xl"
-            size="lg"
-            defaultValue="A short description of the playlist can be written here!"
-            isPreviewFocusable={true}
-            selectAllOnFocus={false}
-          >
-            <Tooltip label="Click to edit">
-              <EditablePreview
-                px={4}
-                _hover={{
-                  background: bgColour,
-                }}
-              />
-            </Tooltip>
-            <Flex direction="row">
-              <Textarea my={2} px={4} as={EditableInput} />
-              <EditableControls />
-            </Flex>
-          </Editable>
-        </Box>
-        <Box
-          color="whiteAlpha.900"
-          bg="purple.500"
-          borderRadius="full"
-          px={5}
-          py={5}
-          mx={4}
+    <Box
+      // color="whiteAlpha.800"
+      w="100%"
+      h="100%"
+      borderColor="pink.100"
+      justifyContent="space-evenly"
+      border="2px"
+    >
+      <Box my={5} mx={5} border="2px">
+        <Editable
+          px="5px"
+          fontSize="50px"
+          size="lg"
+          defaultValue="Rasengan ⚡️"
+          isPreviewFocusable={true}
+          selectAllOnFocus={false}
+          onChange={(newValue) => setPlaylistTitle(newValue)}
         >
-          <SearchBar />
-        </Box>
+          <Tooltip label="Click to edit">
+            <EditablePreview
+              px={4}
+              _hover={{
+                background: bgColour,
+              }}
+            />
+          </Tooltip>
+          <Flex direction="row">
+            <Input my={8} px={4} as={EditableInput} />
+            <Spacer />
+            <EditableControls />
+          </Flex>
+        </Editable>
 
-        <Box w="auto" my={5} h="450px" overflowY="auto">
-          <TableContainer>
-            <Table size="md" colorScheme="facebook" variant="simple">
-              <Thead>
-                <Tr>
-                  <Th>#</Th>
-                  <Th>Title</Th>
-                  <Th>Album</Th>
-                  <Th>
-                    <Icon boxSize="20px" as={BiTime} />
-                  </Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {playlistSongs.map((info, key) => (
-                  <Tr key={key} _hover={{ bg: "blue.700" }}>
-                    <Td>{key + 1}</Td>
-                    <Td>
-                      <Flex direction="row">
-                        <Image
-                          boxSize="64px"
-                          src={info.cover}
-                          mr={2}
-                          alt="cover"
-                        />
-                        <Flex justify="center" direction="column">
-                          <Box>{info.title}</Box>
-                          {info.artist}
-                        </Flex>
-                      </Flex>
-                    </Td>
-                    <Td>{info.album}</Td>
-                    <Td>{convertToMinutes(info.duration)}</Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
-        </Box>
-        <Flex w="100%" justify="end" px={5}>
-          <Button colorScheme="messenger">Save Playlist</Button>
-        </Flex>
+        <Editable
+          px="5px"
+          fontSize="xl"
+          size="lg"
+          defaultValue="A short description of the playlist can be written here!"
+          isPreviewFocusable={true}
+          selectAllOnFocus={false}
+          onChange={(newValue) => setPlaylistDesc(newValue)}
+        >
+          <Tooltip label="Click to edit">
+            <EditablePreview
+              px={4}
+              _hover={{
+                background: bgColour,
+              }}
+            />
+          </Tooltip>
+          <Flex direction="row">
+            <Input px={4} as={EditableInput} />
+            <EditableControls />
+          </Flex>
+        </Editable>
       </Box>
-    </Flex>
+      {/* Search bar*/}
+      <Box
+        border="2px"
+        color="whiteAlpha.900"
+        bg="purple.600"
+        borderRadius="full"
+        px={5}
+        py={5}
+        mx={7}
+      >
+        <SearchBar />
+      </Box>
+
+      {/* Music list */}
+      <Box
+        h="container.sm"
+        // border="2px"
+        // borderColor="red.500"
+        overflowY="auto"
+      >
+        <Table size="md" colorScheme="facebook" variant="simple">
+          <Thead>
+            <Tr>
+              <Th>#</Th>
+              <Th>Title</Th>
+              <Th>Album</Th>
+              <Th>
+                <Icon boxSize="20px" as={BiTime} />
+              </Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {playlistSongs.map((info, key) => (
+              <Tr key={key} _hover={{ bg: "blue.700" }}>
+                <Td>{key + 1}</Td>
+                <Td>
+                  <Flex direction="row">
+                    <Image boxSize="64px" src={info.cover} mr={2} alt="cover" />
+                    <Flex justify="center" direction="column">
+                      <Box>{info.title}</Box>
+                      {info.artist}
+                    </Flex>
+                  </Flex>
+                </Td>
+                <Td>{info.album}</Td>
+                <Td>{convertToMinutes(info.duration)}</Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </Box>
+      {/* Button */}
+      <Flex w="100%" justify="end" px={5}>
+        <Button alignItems="end" colorScheme="telegram" onClick={handleSubmit}>
+          Save Playlist
+        </Button>
+      </Flex>
+    </Box>
   );
 };
 

@@ -26,6 +26,10 @@ const SidebarGroup = ({ title, children, hasButton }: Props) => {
                 isRound={true}
                 fontSize="13px"
                 size="xs"
+                _hover={{ transform: "scale(1.05)" }}
+                _active={{
+                  transform: "scale(1)",
+                }}
               />
             </Link>
           </Tooltip>

@@ -17,8 +17,14 @@ const Sidebar = () => {
   const { signOut, loading, error } = useSignOut();
 
   return (
-    <Flex minW="250px" h="100%" bgGradient="linear(to-l, blue.700, blue.900)"
-      direction="column" align="space-between">
+    <Flex
+      color="whiteAlpha.500"
+      minW="250px"
+      h="100%"
+      bg="blue.900"
+      direction="column"
+      align="space-between"
+    >
       <Link href="/">
         <Flex direction="row" cursor="pointer" px={5} py={8}>
           <Image src="/favicon.ico" height="32px" alt="solarta" />
@@ -49,8 +55,12 @@ const Sidebar = () => {
       <Flex direction="row" align="flex-end" p={4}>
         {auth.accessToken ? (
           <>
-            <Text fontSize="md" noOfLines={1}>{auth.email}</Text>
-            <Button size="sm" onClick={signOut}>Logout</Button>
+            <Text fontSize="md" noOfLines={1}>
+              {auth.email}
+            </Text>
+            <Button size="sm" onClick={signOut}>
+              Logout
+            </Button>
           </>
         ) : (
           <Link href="/auth">
