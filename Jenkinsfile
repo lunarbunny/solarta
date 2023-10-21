@@ -25,17 +25,7 @@ pipeline {
                     sh 'docker rm solarta || true'
 
                     // Run the newest image as a sibling container
-                    dockerImage.run('''
-                        --name solarta
-                        --network solarta --ip 172.19.0.2 --publish 5000:5000
-                        --env SQLALCHEMY_DATABASE_URI=$SQLALCHEMY_DATABASE_URI
-                        --env SENDGRID_API_KEY=$SENDGRID_API_KEY
-                        --env URL_SIGN_SECRET=$URL_SIGN_SECRET
-                        --env ONBOARDING_SALT=$ONBOARDING_SALT
-                        --volume /var/lib/solarta/keys:/creds
-                        --volume /var/lib/solarta/assets/music:/assets/music
-                    '''
-                    )
+                    dockerImage.run('--name solarta --network solarta --ip 172.19.0.2 --publish 5000:5000 --env SQLALCHEMY_DATABASE_URI=$SQLALCHEMY_DATABASE_URI --env SENDGRID_API_KEY=$SENDGRID_API_KEY --env URL_SIGN_SECRET=$URL_SIGN_SECRET --env ONBOARDING_SALT=$ONBOARDING_SALT --volume /var/lib/solarta/keys:/creds --volume /var/lib/solarta/assets/music:/assets/music')
                 }
             }
         }
@@ -52,7 +42,7 @@ pipeline {
                     sh 'docker rm solarta-web || true'
 
                     // Run the newest image as a sibling container
-                    dockerImage.run('--name solarta-web -p 3000:3000')
+                    dockerImage.run('--name solarta-web --publish 3000:3000')
                 }
             }
         }
