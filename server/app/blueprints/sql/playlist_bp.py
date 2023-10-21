@@ -1,4 +1,5 @@
-from flask import Blueprint, jsonify
+from datetime import datetime
+from flask import Blueprint, jsonify, request
 from ..__init__ import Session, Playlist, PlaylistMusic, Music
 
 playlist_bp = Blueprint("playlist_bp", __name__)
@@ -20,6 +21,49 @@ def playlist_delete(id):
         except:
             session.rollback()
             return '', 400
+
+# Create a playlist
+@playlist_bp.route("/create", methods=["POST"])
+def playlist_create():
+    with Session() as session:
+        try:
+            data = request.form
+            ownerId = int(data["ownerId"]) # TODO: Should take from session instead
+            creationDateStr = data.get("creationDate", datetime.now().strftime("%Y-%m-%d")) # Format: YYYY-MM-DD
+            title = data["title"]
+            description = data.get("description", None)
+
+            if ownerId == "" or title == "":
+                return "Missing parameters", 400
+
+            creationDate = datetime.strptime(creationDateStr, "%Y-%m-%d")
+            new_playlist = Playlist(ownerId, creationDate, title, description)
+            session.add(new_playlist)
+            session.commit()
+            return "Created", 201
+        except Exception as e:
+            session.rollback()
+            return str(e), 400
+
+# Update a playlist (title and/or description)
+@playlist_bp.route("/<int:id>/update", methods=["PUT"])
+def playlist_update(id):
+    with Session() as session:
+        try:
+            music = session.get(Playlist, id)
+            if music:
+                data = request.form
+                title = data.get("title", music.title)
+                description = data.get("description", music.description)
+                music.title = title
+                music.description = description
+                session.commit()
+                return 'OK', 200
+            else:
+                return '', 404
+        except Exception as e:
+            session.rollback()
+            return str(e), 400
 
 # Retrieve all music based on Playlist ID
 @playlist_bp.route("/<int:idPlaylist>/music", methods=["GET"])
