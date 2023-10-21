@@ -87,6 +87,13 @@ def test_playlist_create(client):
     response = client.post('/playlist/create', data=data, content_type='multipart/form-data')
     assert response.status_code == 400
 
+def test_playlist_add_song(client):
+    response = client.post('/playlist/playlist=1/music=-1')
+    assert response.status_code == 404
+
+    response = client.post('/playlist/playlist=-1/music=3')
+    assert response.status_code == 404
+
 def test_playlist_update(client):
     data = {
         'title': 'Yo!',

@@ -44,6 +44,27 @@ def playlist_create():
         except Exception as e:
             session.rollback()
             return str(e), 400
+        
+# Add song to playlist
+@playlist_bp.route("/playlist=<int:idPlaylist>/music=<int:idMusic>", methods=["POST"])
+def playlist_add_song(idPlaylist, idMusic):
+    with Session() as session:
+        try:
+            idPlaylist = int(idPlaylist)
+            idMusic = int(idMusic)
+            playlist = session.get(Playlist, idPlaylist)
+            music = session.get(Music, idMusic)
+
+            if playlist and music:
+                new_playlist_music = PlaylistMusic(idPlaylist, idMusic)
+                session.add(new_playlist_music)
+                session.commit()
+                return 'Created', 201
+            else:
+                return '', 404
+        except Exception as e:
+            session.rollback()
+            return str(e), 400
 
 # Update a playlist (title and/or description)
 @playlist_bp.route("/<int:id>/update", methods=["PUT"])
