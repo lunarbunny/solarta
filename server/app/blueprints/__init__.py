@@ -49,8 +49,9 @@ with Session() as session:
     # Seed user
     if session.query(User).count() == 0:
         user_data = [
-            {"name": "Wang Tingwei", "email": "admin@example.com", "hashPwd": "admin", "banStatus": 0, "roleId": 1, "mfaSecret": ""},
-            {"name": "Pixabay", "email": "user@example.com", "hashPwd": "user", "banStatus": 0, "roleId": 2, "mfaSecret": ""}    
+            {"name": "Admin", "email": "admin@example.com", "hashPwd": "admin", "status": 0, "roleId": 1, "mfaSecret": ""},
+            {"name": "Pixabay", "email": "user@example.com", "hashPwd": "user", "status": 0, "roleId": 2, "mfaSecret": ""}, 
+            {"name": "Pixabay", "email": "user2@example.com", "hashPwd": "user2", "status": 0, "roleId": 2, "mfaSecret": ""}, 
         ]
 
         for user in user_data:
@@ -100,10 +101,10 @@ with Session() as session:
             {"title": "Baby Mandala by prazkhanal", "filename": "baby-mandala-169039.mp3", "duration": 191, "genreId": 2, "ownerId": 2},
             {"title": "Once In Paris by Pumpupthemind", "filename": "once-in-paris-168895.mp3", "duration": 132, "genreId": 2, "ownerId": 2},
             {"title": "Glossy by Coma-Media", "filename": "glossy-168156.mp3", "duration": 93, "genreId": 2, "ownerId": 2},
-            {"title": "Abstract Future Bass by QubeSounds", "filename": "abstract-future-bass-162604.mp3", "duration": 91, "genreId": 2, "ownerId": 2},
-            {"title": "A Long Way by SergePavkinMusic", "filename": "a-long-way-166385.mp3", "duration": 273, "genreId": 2, "ownerId": 2},
-            {"title": "Good Night by FASSounds", "filename": "good-night-160166.mp3", "duration": 147, "genreId": 2, "ownerId": 2},
-            {"title": "Inside You by lemonmusicstudio", "filename": "inside-you-162760.mp3", "duration": 129, "genreId": 2, "ownerId": 2}
+            {"title": "Abstract Future Bass by QubeSounds", "filename": "abstract-future-bass-162604.mp3", "duration": 91, "genreId": 2, "ownerId": 3},
+            {"title": "A Long Way by SergePavkinMusic", "filename": "a-long-way-166385.mp3", "duration": 273, "genreId": 2, "ownerId": 3},
+            {"title": "Good Night by FASSounds", "filename": "good-night-160166.mp3", "duration": 147, "genreId": 2, "ownerId": 3},
+            {"title": "Inside You by lemonmusicstudio", "filename": "inside-you-162760.mp3", "duration": 129, "genreId": 2, "ownerId": 3}
         ]
 
         for music in music_data:

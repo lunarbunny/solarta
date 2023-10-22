@@ -97,6 +97,27 @@ def music_play_id(id):
                 return 'Not found', 404
         except Exception as e:
             return str(e), 400
+        
+# Retrieve music owner by caller
+@music_bp.route("/mine", methods=["GET"])
+def music_retrieve_mine():
+    with Session() as session:
+        try:
+            ownerId = 2 # TODO: Should take from session instead
+            musics = session.query(Music, User.name, Album.title).filter(Music.ownerId == ownerId).join(User, Music.ownerId == User.id).join(AlbumMusic, Music.id == AlbumMusic.idMusic).join(Album, AlbumMusic.idAlbum == Album.id).all()
+            if musics:
+                return jsonify([{
+                    "id": music.id,
+                    "title": music.title,
+                    "duration": music.duration,
+                    "genreId": music.genreId,
+                    "ownerName": owner_name,
+                    "albumName": album_name
+                } for music, owner_name, album_name in musics]), 200
+            else:
+                return '', 404
+        except:
+            return '', 400
 
 # Retrieve all music
 @music_bp.route("/", methods=["GET"])

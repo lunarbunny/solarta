@@ -44,7 +44,7 @@ def register():
             
             # Fields are valid, proceed to generate user
             hashPwd = utils.hash_password(password)
-            newUser = User(name, email, hashPwd, banStatus=2, roleId=2, mfaSecret="")
+            newUser = User(name, email, hashPwd, status=2, roleId=2, mfaSecret="")
             session.add(newUser)
             session.commit()
             utils.send_onboarding_email(name, email)
@@ -64,9 +64,9 @@ def onboarding(token):
             if verifying_email is None:
                 return "bruh you tampered with the token (#x_x)", 400
             user = session.query(User).filter(User.email==verifying_email).first()
-            if user.banStatus != 2:
+            if user.status != 2:
                 return "bruh you already registered (#x_x)", 400
-            user.banStatus = 0
+            user.status = 0
             session.add(user)
             session.commit()
             return "ok!", 200
