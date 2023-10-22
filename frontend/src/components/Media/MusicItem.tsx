@@ -34,8 +34,8 @@ const MusicItem: React.FC<Props> = ({ data, onClick, index }) => {
         borderRadius="full"
         src={data.imageUrl || "https://picsum.photos/42?random=" + data.id}
       />
-      <Box flex={1} ml={3}>
-        <Text fontWeight="semibold">{data.title && data.title}</Text>
+      <Box flex={1} ml={3} mr={3}>
+        <Text fontWeight="semibold" noOfLines={1}>{data.title}</Text>
         <Text fontSize="sm" color="gray.500">
           {data.ownerName || "Unknown artist"}
         </Text>

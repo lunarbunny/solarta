@@ -14,7 +14,7 @@ def album_create():
             releaseDateStr = data.get("releaseDate", "") # Format: YYYY-MM-DD
             description = data.get("description", None) # Optional
             imageUrl = data.get("imageUrl", None) # Optional
-            ownerId = data.get("ownerId", '2') # TODO: Should take from session instead
+            ownerId = data.get("ownerId", '3') # TODO: Should take from session instead
 
             if title == "" or releaseDateStr == "":
                 return "Missing parameters", 400
@@ -87,6 +87,44 @@ def album_retrieve(idAlbum):
                 return 'Album not found.', 404
         except:
             return 'Error occured when retrieving album.', 400
+        
+# Retrive top 3 albums based on number of music
+@album_bp.route("/top3", methods=["GET"])
+def album_retrieve_top3():
+    with Session() as session:
+        try:
+            albums = session.query(Album).limit(3).all()
+            return jsonify([{
+                "id": album.id,
+                "title": album.title,
+                "imageUrl": album.imageUrl,
+                "releaseDate": album.releaseDate,
+                "ownerId": album.ownerId,
+                "description": album.description
+            } for album in albums]), 200
+        except:
+            return 'Error occured when retrieving album.', 400
+
+# Retrieve albums owned by caller
+@album_bp.route("/mine", methods=["GET"])
+def album_retrieve_mine():
+    with Session() as session:
+        try:
+            ownerId = 3 # TODO: Should take from session instead
+            albums = session.query(Album).filter(Album.ownerId == ownerId)
+            if albums:
+                return jsonify([{
+                    "id": album.id,
+                    "title": album.title,
+                    "imageUrl": album.imageUrl,
+                    "releaseDate": album.releaseDate,
+                    "ownerId": album.ownerId,
+                    "description": album.description
+                } for album in albums]), 200
+            else:
+                return '', 404
+        except:
+            return '', 400
 
 # Retrieve all albums
 @album_bp.route("/", methods=["GET"])

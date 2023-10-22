@@ -2,18 +2,16 @@ import { authAtom } from "@/atoms/auth";
 import AlbumManagement from "@/components/Library/AlbumManagement";
 import LibrarySection from "@/components/Library/LibrarySection";
 import MusicUpload from "@/components/Library/MusicUpload";
-import AlbumWrap from "@/components/Media/AlbumWrap";
 import useFetch from "@/hooks/useFetch";
 import { API_URL, Album } from "@/types";
-import { Box, Button, FormControl, FormLabel, Heading, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spacer, useDisclosure } from "@chakra-ui/react";
+import { Box, Heading, Spacer } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useState } from "react";
 import { useRecoilState } from "recoil";
 
 const LibraryPage: NextPage = () => {
   const [auth, setAuth] = useRecoilState(authAtom);
 
-  const { data: albums } = useFetch<Album[]>(`${API_URL}/album`);
+  const { data: albums } = useFetch<Album[]>(`${API_URL}/album/mine`);
 
   // if (!auth.accessToken) {
   //   return (

@@ -98,12 +98,32 @@ def music_play_id(id):
         except Exception as e:
             return str(e), 400
         
-# Retrieve music owner by caller
+# Retrieve top 10 music
+@music_bp.route("/trending", methods=["GET"])
+def music_retrieve_trending():
+    with Session() as session:
+        try:
+            musics = session.query(Music, User.name, Album.title).join(User, Music.ownerId == User.id).join(AlbumMusic, Music.id == AlbumMusic.idMusic).join(Album, AlbumMusic.idAlbum == Album.id).order_by(Music.id.desc()).limit(10).all()
+            if musics:
+                return jsonify([{
+                    "id": music.id,
+                    "title": music.title,
+                    "duration": music.duration,
+                    "genreId": music.genreId,
+                    "ownerName": owner_name,
+                    "albumName": album_name
+                } for music, owner_name, album_name in musics]), 200
+            else:
+                return '', 404
+        except:
+            return '', 400
+        
+# Retrieve music owned by caller
 @music_bp.route("/mine", methods=["GET"])
 def music_retrieve_mine():
     with Session() as session:
         try:
-            ownerId = 2 # TODO: Should take from session instead
+            ownerId = 3 # TODO: Should take from session instead
             musics = session.query(Music, User.name, Album.title).filter(Music.ownerId == ownerId).join(User, Music.ownerId == User.id).join(AlbumMusic, Music.id == AlbumMusic.idMusic).join(Album, AlbumMusic.idAlbum == Album.id).all()
             if musics:
                 return jsonify([{

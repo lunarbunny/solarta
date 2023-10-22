@@ -11,7 +11,6 @@ type Props = {
 
 type UploadFormData = {
   title: string,
-  ownerId: string,
   genreId: string,
   albumId: string,
   music_file: File | null,
@@ -20,7 +19,6 @@ type UploadFormData = {
 const MusicUpload: React.FC<Props> = ({ albums }) => {
   const [uploadForm, setUploadForm] = useState<UploadFormData>({
     title: '',
-    ownerId: '1',
     albumId: '',
     genreId: '',
     music_file: null as File | null,
@@ -34,6 +32,7 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
     if (acceptedFiles.length == 1) {
       setUploadForm({ ...uploadForm, music_file: acceptedFiles[0] });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -46,7 +45,6 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
 
     const formData = new FormData();
     formData.append('title', uploadForm.title);
-    formData.append('ownerId', uploadForm.ownerId);
     formData.append('genreId', uploadForm.genreId);
     formData.append('albumId', uploadForm.albumId);
     formData.append('music_file', uploadForm.music_file as File);

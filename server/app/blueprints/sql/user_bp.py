@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from markupsafe import escape
-from .. import Session, User
+
+from .. import Session, User, Role
 import utils
 
 user_bp = Blueprint("user_bp", __name__)
@@ -10,11 +11,24 @@ user_bp = Blueprint("user_bp", __name__)
 def user_retrieve_all():
     with Session() as session:
         try:
-            users = session.query(User).all()
+            users = session.query(User).join(Role).filter(User.roleId != 1).all()
             return jsonify([{
                 "id": user.id,
                 "name": user.name
-            } for user in users if user.roleId != 1]), 200
+            } for user in users]), 200
+        except:
+            return '', 400
+        
+# Retrive top 3 users
+@user_bp.route("/top3", methods=["GET"])
+def user_retrieve_top3():
+    with Session() as session:
+        try:
+            users = session.query(User).filter(User.roleId != 1).limit(3).all()
+            return jsonify([{
+                "id": user.id,
+                "name": user.name
+            } for user in users[:3]]), 200
         except:
             return '', 400
         

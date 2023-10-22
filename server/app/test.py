@@ -50,7 +50,7 @@ def test_music_create(client):
         'title': 'test',
         'music_file': (BytesIO(b'mock'), 'test.mp3'),
         'genreId': 3,
-        'ownerId': 2,
+        'ownerId': 3,
         'albumId': 1
     }
 

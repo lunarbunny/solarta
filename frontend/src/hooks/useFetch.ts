@@ -26,7 +26,7 @@ const useFetch = <T>(url: string, usesRouter?: boolean): FetchState<T> => {
         setError(error.name);
         setLoading(false);
       });
-  }, [url]);
+  }, [url, usesRouter]);
 
   return { data, loading, error };
 };

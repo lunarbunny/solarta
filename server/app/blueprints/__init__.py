@@ -49,9 +49,18 @@ with Session() as session:
     # Seed user
     if session.query(User).count() == 0:
         user_data = [
-            {"name": "Admin", "email": "admin@example.com", "hashPwd": "admin", "status": 0, "roleId": 1, "mfaSecret": ""},
-            {"name": "Pixabay", "email": "user@example.com", "hashPwd": "user", "status": 0, "roleId": 2, "mfaSecret": ""}, 
-            {"name": "Pixabay", "email": "user2@example.com", "hashPwd": "user2", "status": 0, "roleId": 2, "mfaSecret": ""}, 
+            {"name": "Admin1", "email": "admin1@example.com", "hashPwd": "admin1", "status": 0, "roleId": 1, "mfaSecret": "", "about": "I am the admin"},
+            {"name": "Admin2", "email": "admin2@example.com", "hashPwd": "admin2", "status": 0, "roleId": 1, "mfaSecret": "", "about": "I am the admin"},
+            {"name": "Pixabay", "email": "user1@example.com", "hashPwd": "user1", "status": 0, "roleId": 2, "mfaSecret": "", "about": "Hi, I am Pixabay!"},
+            {"name": "Jazz Collective", "email": "user2@example.com", "hashPwd": "user2", "status": 0, "roleId": 2, "mfaSecret": "", "about": "Hi, I am Jazz Collective!"},
+            {"name": "Old School Cool", "email": "user3@example.com", "hashPwd": "user3", "status": 0, "roleId": 2, "mfaSecret": "", "about": "Hi, I am Old School Cool!"},
+            {"name": "Neon Nights", "email": "user4@example.com", "hashPwd": "user4", "status": 0, "roleId": 2, "mfaSecret": "", "about": "Hi, I am Neon Nights!"},
+            {"name": "Velvet", "email": "user5@example.com", "hashPwd": "user5", "status": 0, "roleId": 2, "mfaSecret": "", "about": "Hi, I am Velvet!"},
+            {"name": "Angry Octopus", "email": "user6@example.com", "hashPwd": "user6", "status": 0, "roleId": 2, "mfaSecret": "", "about": "Hi, I am Angry Octopus!"},
+            {"name": "Midnight Muses", "email": "user7@example.com", "hashPwd": "user7", "status": 0, "roleId": 2, "mfaSecret": "", "about": "Hi, I am Midnight Muses!"},
+            {"name": "Velocity", "email": "user8@example.com", "hashPwd": "user8", "status": 0, "roleId": 2, "mfaSecret": "", "about": "Hi, I am Velocity!"},
+            {"name": "Nightcore", "email": "user9@example.com", "hashPwd": "user9", "status": 0, "roleId": 2, "mfaSecret": "", "about": "Hi, I am Nightcore!"},
+            {"name": "Take 3", "email": "user10@example.com", "hashPwd": "user10", "status": 0, "roleId": 2, "mfaSecret": "", "about": "Hi, I am Take 3!"},
         ]
 
         for user in user_data:
@@ -83,8 +92,16 @@ with Session() as session:
     if session.query(Album).count() == 0:
         from datetime import date
         album_data =  [
-            {"title": "The Power of Yo!", "releaseDate": date(2023, 1, 1), "ownerId": 2},
-            {"title": "Depression Strikes", "releaseDate": date(2023, 2, 2), "ownerId": 2}
+            {"title": "Best Of 2023", "releaseDate": date(2023, 1, 1), "ownerId": 3},
+            {"title": "Rock Solid", "releaseDate": date(2023, 2, 2), "ownerId": 3},
+            {"title": "Calm dreams", "releaseDate": date(2023, 2, 2), "ownerId": 3},
+            {"title": "Infinite Sea", "releaseDate": date(2023, 2, 2), "ownerId": 3},
+            {"title": "The Power of Yo!", "releaseDate": date(2023, 2, 2), "ownerId": 4},
+            {"title": "智慧树上智慧果", "releaseDate": date(2023, 2, 2), "ownerId": 4},
+            {"title": "智慧树下你和我", "releaseDate": date(2023, 2, 2), "ownerId": 4},
+            {"title": "我们都有苹果吃", "releaseDate": date(2023, 2, 2), "ownerId": 5},
+            {"title": "我们一起喵喵喵", "releaseDate": date(2023, 2, 2), "ownerId": 5},
+            {"title": "峨眉山的黑毒蛇", "releaseDate": date(2023, 2, 2), "ownerId": 6},
         ]
 
         for album in album_data:
@@ -95,16 +112,16 @@ with Session() as session:
     # Seed music
     if session.query(Music).count() == 0:
         music_data = [
-            {"title": "yo!", "filename": "yo!.mp3", "duration": 6, "genreId": 2, "ownerId": 2},
-            {"title": "Titanium by Alisha_Studio", "filename": "titanium-170190.mp3", "duration": 106, "genreId": 2, "ownerId": 2},
-            {"title": "Science Documentary by Lexin_Music", "filename": "science-documentary-169621.mp3", "duration": 127, "genreId": 2, "ownerId": 2},
-            {"title": "Baby Mandala by prazkhanal", "filename": "baby-mandala-169039.mp3", "duration": 191, "genreId": 2, "ownerId": 2},
-            {"title": "Once In Paris by Pumpupthemind", "filename": "once-in-paris-168895.mp3", "duration": 132, "genreId": 2, "ownerId": 2},
-            {"title": "Glossy by Coma-Media", "filename": "glossy-168156.mp3", "duration": 93, "genreId": 2, "ownerId": 2},
-            {"title": "Abstract Future Bass by QubeSounds", "filename": "abstract-future-bass-162604.mp3", "duration": 91, "genreId": 2, "ownerId": 3},
-            {"title": "A Long Way by SergePavkinMusic", "filename": "a-long-way-166385.mp3", "duration": 273, "genreId": 2, "ownerId": 3},
-            {"title": "Good Night by FASSounds", "filename": "good-night-160166.mp3", "duration": 147, "genreId": 2, "ownerId": 3},
-            {"title": "Inside You by lemonmusicstudio", "filename": "inside-you-162760.mp3", "duration": 129, "genreId": 2, "ownerId": 3}
+            {"title": "yo!", "filename": "yo!.mp3", "duration": 6, "genreId": 2, "ownerId": 3},
+            {"title": "Titanium by Alisha_Studio", "filename": "titanium-170190.mp3", "duration": 106, "genreId": 2, "ownerId": 3},
+            {"title": "Science Documentary by Lexin_Music", "filename": "science-documentary-169621.mp3", "duration": 127, "genreId": 2, "ownerId": 3},
+            {"title": "Baby Mandala by prazkhanal", "filename": "baby-mandala-169039.mp3", "duration": 191, "genreId": 2, "ownerId": 3},
+            {"title": "Once In Paris by Pumpupthemind", "filename": "once-in-paris-168895.mp3", "duration": 132, "genreId": 2, "ownerId": 3},
+            {"title": "Glossy by Coma-Media", "filename": "glossy-168156.mp3", "duration": 93, "genreId": 2, "ownerId": 3},
+            {"title": "Abstract Future Bass by QubeSounds", "filename": "abstract-future-bass-162604.mp3", "duration": 91, "genreId": 2, "ownerId": 4},
+            {"title": "A Long Way by SergePavkinMusic", "filename": "a-long-way-166385.mp3", "duration": 273, "genreId": 2, "ownerId": 4},
+            {"title": "Good Night by FASSounds", "filename": "good-night-160166.mp3", "duration": 147, "genreId": 2, "ownerId": 4},
+            {"title": "Inside You by lemonmusicstudio", "filename": "inside-you-162760.mp3", "duration": 129, "genreId": 2, "ownerId": 4}
         ]
 
         for music in music_data:

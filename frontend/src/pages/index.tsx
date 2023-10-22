@@ -8,9 +8,9 @@ import { Box, Heading, Skeleton, Grid, GridItem } from "@chakra-ui/react";
 import { NextPage } from "next";
 
 const HomePage: NextPage = () => {
-  const { data: musicList, loading: musicLoading } = useFetch<Music[]>(`${API_URL}/music`);
-  const { data: artists, loading: artistLoading } = useFetch<Artist[]>(`${API_URL}/user`);
-  const { data: albums, loading: albumLoading } = useFetch<Album[]>(`${API_URL}/album`);
+  const { data: musicTrending, loading: musicLoading } = useFetch<Music[]>(`${API_URL}/music/trending`);
+  const { data: top3Artists, loading: artistLoading } = useFetch<Artist[]>(`${API_URL}/user/top3`);
+  const { data: top3Albums, loading: albumLoading } = useFetch<Album[]>(`${API_URL}/album/top3`);
   return (
     <Box w='100%' p={8}>
       <Grid columnGap={16}
@@ -32,7 +32,7 @@ const HomePage: NextPage = () => {
           <Heading size='md'>Trending today</Heading>
           <Box mt={4}>
             <Skeleton isLoaded={!musicLoading}>
-              <MusicList items={musicList} />
+              <MusicList items={musicTrending} />
             </Skeleton>
           </Box>
         </GridItem>
@@ -41,7 +41,7 @@ const HomePage: NextPage = () => {
           <Heading size='md'>Top Artists</Heading>
           <Box mt={4}>
             <Skeleton isLoaded={!artistLoading}>
-              <ArtistWrap items={artists} clickable />
+              <ArtistWrap items={top3Artists} clickable />
             </Skeleton>
           </Box>
         </GridItem>
@@ -50,7 +50,7 @@ const HomePage: NextPage = () => {
           <Heading size='md'>Top Albums</Heading>
           <Box mt={4}>
             <Skeleton isLoaded={!albumLoading}>
-              <AlbumWrap items={albums} clickable />
+              <AlbumWrap items={top3Albums} clickable />
             </Skeleton>
           </Box>
         </GridItem>
