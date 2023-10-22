@@ -1,7 +1,7 @@
 import math
 import os
 from flask import Blueprint, jsonify, request, send_file
-from ..__init__ import Session, Music, User, AlbumMusic, PlaylistMusic
+from ..__init__ import Session, Music, User, AlbumMusic, PlaylistMusic, Album
 from utils import music_get_save_dir, music_get_duration
 from werkzeug.utils import secure_filename
 
@@ -103,14 +103,15 @@ def music_play_id(id):
 def music_retrieve_all():
     with Session() as session:
         try:
-            musics = session.query(Music, User.name).join(User, Music.ownerId == User.id).all()
+            musics = session.query(Music, User.name, Album.title).join(User, Music.ownerId == User.id).join(AlbumMusic, Music.id == AlbumMusic.idMusic).join(Album, AlbumMusic.idAlbum == Album.id).all()
             return jsonify([{
                 "id": music.id,
                 "title": music.title,
                 "duration": music.duration,
                 "genreId": music.genreId,
-                "ownerName": owner_name
-            } for music, owner_name in musics]), 200
+                "ownerName": owner_name,
+                "albumName": album_name
+            } for music, owner_name, album_name in musics]), 200
         except:
             return '', 400
     

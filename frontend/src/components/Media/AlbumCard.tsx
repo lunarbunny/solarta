@@ -10,16 +10,16 @@ type Props = {
 
 const AlbumCard: React.FC<Props> = ({ data, onClick }) => {
   return (
-    <Flex direction='column' maxW='150px' borderWidth='1px' borderRadius='lg' overflow='hidden' onClick={(_) => onClick}>
+    <Flex h='100%' direction='column' maxW='150px' borderWidth='1px' borderRadius='lg' overflow='hidden' onClick={(_) => onClick}>
       <Image src={data.imageUrl || 'https://picsum.photos/512?random=' + data.id} alt={data.title} />
-      <Box p={4}>
-        <Text fontSize='sm' fontWeight='semibold'>
+      <Flex p={4} direction='column' flexGrow={1}>
+        <Text fontSize='sm' fontWeight='semibold' flexGrow={1}>
           {data.title}
         </Text>
         <Text mt={2} color='gray.600'>
           {dateToYear(data.releaseDate)}
         </Text>
-      </Box>
+      </Flex>
     </Flex>
   );
 };

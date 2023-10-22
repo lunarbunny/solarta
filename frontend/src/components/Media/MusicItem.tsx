@@ -25,16 +25,18 @@ const MusicItem: React.FC<Props> = ({ data, onClick, index }) => {
           <Image
             boxSize="64px"
             src={data.imageUrl || "https://picsum.photos/42?random=" + data.id}
-            mr={2}
+            mr={4}
             alt="cover"
           />
           <Flex justify="center" direction="column">
-            <Box>{data.title && data.title}</Box>
-            {data.ownerName || "Unknown artist"}
+            <Text fontSize="md" fontWeight="semibold">{data.title}</Text>
+            <Text fontSize="sm" color="gray.500">
+              {data.ownerName || "Unknown artist"}
+            </Text>
           </Flex>
         </Flex>
       </Td>
-      <Td>"Power of Yo!"</Td>
+      <Td>{data.albumName}</Td>
       <Td>{durationToTime(data.duration)}</Td>
     </>
     // <Flex

@@ -1,5 +1,6 @@
 import AlbumCard from "@/components/Media/AlbumCard";
 import MusicItem from "@/components/Media/MusicItem";
+import MusicList from "@/components/Media/MusicList";
 import useFetch from "@/hooks/useFetch";
 import { Album, API_URL, Music } from "@/types";
 import { CircularProgress, Flex } from "@chakra-ui/react";
@@ -20,11 +21,7 @@ const AlbumDetailPage: NextPage = () => {
     <Flex direction='row'>
       <AlbumCard data={album} />
 
-      <Flex direction='column' ml={8}>
-        {musicList && musicList.map((music, index) => (
-          <MusicItem key={index} data={music} />
-        ))}
-      </Flex>
+      <MusicList items={musicList} />
     </Flex>
   );
 };
