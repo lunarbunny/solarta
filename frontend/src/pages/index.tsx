@@ -1,6 +1,7 @@
 import AlbumGrid from "@/components/Media/AlbumWrap";
 import ArtistWrap from "@/components/Media/ArtistWrap";
 import MusicList from "@/components/Media/MusicList";
+import MusicTable from "@/components/Media/MusicTable";
 import SearchBar from "@/components/Search/SearchBar";
 import useFetch from "@/hooks/useFetch";
 import { API_URL, Album, Artist, Music } from "@/types";
@@ -32,7 +33,7 @@ const HomePage: NextPage = () => {
           <Heading size='md'>Trending today</Heading>
           <Box flexGrow={4} mt={4}>
             <Skeleton isLoaded={!musicLoading}>
-              <MusicList items={musicList} />
+              <MusicTable items={musicList} />
             </Skeleton>
           </Box>
         </GridItem>

@@ -1,29 +1,25 @@
 import {
   Box,
-  List,
-  ListItem,
   Table,
   Thead,
   Tbody,
   Tr,
   Th,
-  Td,
   TableContainer,
   Icon,
 } from "@chakra-ui/react";
-import React, { useCallback } from "react";
+import React from "react";
 import { API_URL, Music, PlayerPlaylistItem } from "../../types";
-import MusicItem from "./MusicItem";
-import useFetch from "@/hooks/useFetch";
 import { useSetRecoilState } from "recoil";
 import { musicPlayerAtom } from "@/atoms/musicPlayer";
 import { BiTime } from "react-icons/bi";
+import MusicTableRow from "./MusicTableRow";
 
 type Props = {
   items: Music[] | null;
 };
 
-const MusicList: React.FC<Props> = ({ items }) => {
+const MusicTable: React.FC<Props> = ({ items }) => {
   const setMusicPlayer = useSetRecoilState(musicPlayerAtom);
 
   const handleClick = (m: Music) => {
@@ -59,17 +55,33 @@ const MusicList: React.FC<Props> = ({ items }) => {
   };
 
   return (
-    <Box>
-      <List spacing={1}>
-        {items &&
-          items.map((song, index) => (
-            <ListItem key={index}>
-              <MusicItem index={index} data={song} onClick={handleClick} />
-            </ListItem>
-          ))}
-      </List>
-    </Box>
+    <TableContainer>
+      <Table size="md" colorScheme="facebook" variant="simple">
+        <Thead>
+          <Tr>
+            <Th>#</Th>
+            <Th>Title</Th>
+            <Th>Album</Th>
+            <Th>
+              <Icon boxSize="20px" as={BiTime} />
+            </Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {items &&
+            items.map((song, index) => (
+              <Tr
+                key={index}
+                borderRadius="2xl"
+                _hover={{ bg: "blue.700", cursor: "pointer" }}
+              >
+                <MusicTableRow index={index} data={song} onClick={handleClick} />
+              </Tr>
+            ))}
+        </Tbody>
+      </Table>
+    </TableContainer>
   );
 };
 
-export default MusicList;
+export default MusicTable;

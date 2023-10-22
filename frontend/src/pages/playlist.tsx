@@ -1,4 +1,3 @@
-import MusicList from "@/components/Media/MusicList";
 import { useState } from "react";
 import useFetch from "@/hooks/useFetch";
 import { Music, API_URL } from "@/types";
@@ -21,13 +20,12 @@ import {
   Input,
   FormControl,
   FormLabel,
-  FormErrorMessage,
-  FormHelperText,
   Textarea,
   Spacer,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { BsFillPlayFill } from "react-icons/bs";
+import MusicTable from "@/components/Media/MusicTable";
 
 const PlaylistPage: NextPage = () => {
   const [playlistName, setPlaylistName] = useState("");
@@ -120,7 +118,7 @@ const PlaylistPage: NextPage = () => {
         </Flex>
       </Box>
       <Box w="100%" h="70%">
-        <MusicList items={playlistMusic} />
+        <MusicTable items={playlistMusic} />
       </Box>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
