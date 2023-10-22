@@ -14,7 +14,7 @@ function durationToTime(seconds: number): string {
   return `${mins}:${secs < 10 ? "0" + secs : secs}`;
 }
 
-const MusicItem: React.FC<Props> = ({ data, onClick, index }) => {
+const MusicTableRow: React.FC<Props> = ({ data, onClick, index }) => {
   return (
     <>
       <Td>{index + 1}</Td>
@@ -40,4 +40,4 @@ const MusicItem: React.FC<Props> = ({ data, onClick, index }) => {
   );
 };
 
-export default MusicItem;
+export default MusicTableRow;

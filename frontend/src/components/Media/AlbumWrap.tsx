@@ -16,7 +16,7 @@ const AlbumWrap: React.FC<Props> = ({ items: albums, clickable, onCreateClick })
     <Wrap spacing={4}>
       {albums && albums.map((album, index) => (
         clickable ? (
-          <Link key={index} href={`/albums/${album.id}`}>
+          <Link key={index} href={`/album/${album.id}`}>
             <AlbumCard data={album} />
           </Link>
         ) : (

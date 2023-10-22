@@ -17,6 +17,21 @@ def user_retrieve_all():
             } for user in users if user.roleId != 1]), 200
         except:
             return '', 400
+        
+# Retrieve user by id
+@user_bp.route("/<id>", methods=["GET"])
+def user_retrieve_by_id(id):
+    with Session() as session:
+        try:
+            user = session.query(User).filter(User.id==id).first()
+            if user is None:
+                return '', 404
+            return jsonify({
+                "id": user.id,
+                "name": user.name
+            }), 200
+        except:
+            return '', 400
 
 @user_bp.route("/register", methods=["POST"])
 def register():

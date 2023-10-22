@@ -19,6 +19,7 @@ function durationToTime(seconds: number): string {
 const MusicItem: React.FC<Props> = ({ data, onClick, index }) => {
   return (
     <Flex
+
       minW="300px"
       alignItems="center"
       px={2}

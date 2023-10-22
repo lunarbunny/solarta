@@ -1,7 +1,7 @@
 import { Box, Flex, Text, Image, Button } from "@chakra-ui/react";
 import Playlists from "./Playlists";
-import { TbMusic } from "react-icons/tb";
-import { IoLibraryOutline } from "react-icons/io5";
+import { TbAlbumOff, TbMusic } from "react-icons/tb";
+import { IoAlbums, IoAlbumsSharp, IoLibraryOutline } from "react-icons/io5";
 import SidebarGroup from "./SidebarGroup";
 import SidebarItem from "./SidebarItem";
 import Link from "next/link";
@@ -9,6 +9,8 @@ import { useState } from "react";
 import { useRecoilState } from "recoil";
 import { authAtom } from "@/atoms/auth";
 import useSignOut from "@/hooks/useSignOut";
+import { BiAlbum } from "react-icons/bi";
+import { MdAlbum, MdOutlinePortrait, MdPortrait } from "react-icons/md";
 
 const Sidebar = () => {
   const [page, setPage] = useState("");
@@ -39,11 +41,14 @@ const Sidebar = () => {
           <Link href="/" onClick={() => setPage("home")}>
             <SidebarItem name="Home" icon={<TbMusic size={20} />} />
           </Link>
+          <Link href="/artists" onClick={() => setPage("library")}>
+            <SidebarItem name="Artists" icon={<MdPortrait size={20} />} />
+          </Link>
+          <Link href="/albums" onClick={() => setPage("library")}>
+            <SidebarItem name="Albums" icon={<MdAlbum size={20} />} />
+          </Link>
           <Link href="/library" onClick={() => setPage("library")}>
-            <SidebarItem
-              name="My Library"
-              icon={<IoLibraryOutline size={20} />}
-            />
+            <SidebarItem name="My Library" icon={<IoLibraryOutline size={20} />} />
           </Link>
         </SidebarGroup>
 

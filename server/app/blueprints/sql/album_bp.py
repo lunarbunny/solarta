@@ -64,9 +64,9 @@ def album_by_artist(ownerId):
                     "description": album.description
                 } for album in albums]), 200
             else:
-                return '', 404
+                return 'No such artist', 404
         except:
-            return '', 400
+            return 'Error occured while retriving artist', 400
 
 # Retrieve a specific album        
 @album_bp.route("/<int:idAlbum>", methods=["GET"])

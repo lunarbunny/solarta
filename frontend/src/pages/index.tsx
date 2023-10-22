@@ -1,7 +1,6 @@
-import AlbumGrid from "@/components/Media/AlbumWrap";
+import AlbumWrap from "@/components/Media/AlbumWrap";
 import ArtistWrap from "@/components/Media/ArtistWrap";
 import MusicList from "@/components/Media/MusicList";
-import MusicTable from "@/components/Media/MusicTable";
 import SearchBar from "@/components/Search/SearchBar";
 import useFetch from "@/hooks/useFetch";
 import { API_URL, Album, Artist, Music } from "@/types";
@@ -22,7 +21,7 @@ const HomePage: NextPage = () => {
           "trending albums"
           `
         }
-        templateColumns={'repeat(2, 1fr)'}
+        templateColumns={'1fr 1fr'}
         gridColumnGap={16}
       >
         <GridItem area={'search'} mb={8}>
@@ -31,27 +30,27 @@ const HomePage: NextPage = () => {
 
         <GridItem area={'trending'}>
           <Heading size='md'>Trending today</Heading>
-          <Box flexGrow={4} mt={4}>
+          <Box mt={4}>
             <Skeleton isLoaded={!musicLoading}>
-              <MusicTable items={musicList} />
+              <MusicList items={musicList} />
             </Skeleton>
           </Box>
         </GridItem>
 
         <GridItem area={'artists'} mb={32}>
           <Heading size='md'>Top Artists</Heading>
-          <Box flexGrow={4} mt={4}>
+          <Box mt={4}>
             <Skeleton isLoaded={!artistLoading}>
-              <ArtistWrap items={artists} />
+              <ArtistWrap items={artists} clickable />
             </Skeleton>
           </Box>
         </GridItem>
 
         <GridItem area={'albums'}>
           <Heading size='md'>Top Albums</Heading>
-          <Box flexGrow={4} mt={4}>
+          <Box mt={4}>
             <Skeleton isLoaded={!albumLoading}>
-              <AlbumGrid items={albums} clickable />
+              <AlbumWrap items={albums} clickable />
             </Skeleton>
           </Box>
         </GridItem>

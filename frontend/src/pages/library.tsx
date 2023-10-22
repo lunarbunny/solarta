@@ -25,7 +25,7 @@ const LibraryPage: NextPage = () => {
 
   return (
     <Box w='100%' p={8}>
-      <Heading size='md'>Library</Heading>
+      <Heading size='md' mb={4}>Library</Heading>
 
       <LibrarySection title="My Albums">
         <AlbumManagement albums={albums || []} />

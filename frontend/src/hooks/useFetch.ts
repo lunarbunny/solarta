@@ -6,12 +6,15 @@ interface FetchState<T> {
   error: string | null;
 }
 
-const useFetch = <T>(url: string): FetchState<T> => {
+const useFetch = <T>(url: string, usesRouter?: boolean): FetchState<T> => {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Prevents the fetch from running if the next router is not initialized
+    if (usesRouter && url.includes("undefined")) return;
+
     setLoading(true);
     fetch(url)
       .then((res) => res.json())

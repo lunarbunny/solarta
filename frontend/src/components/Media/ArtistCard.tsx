@@ -4,11 +4,12 @@ import { Artist } from '../../types';
 
 type Props = {
   data: Artist;
+  onClick?: (album: Artist) => void;
 };
 
-const ArtistCard: React.FC<Props> = ({ data }) => {
+const ArtistCard: React.FC<Props> = ({ data, onClick }) => {
   return (
-    <Box textAlign='center' maxW='100px'>
+    <Box textAlign='center' maxW='100px' onClick={(_) => onClick}>
       <Image alt='artist image' borderRadius='full'
         src={'https://picsum.photos/512?random=' + data.id}
       />

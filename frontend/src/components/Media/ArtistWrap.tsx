@@ -1,19 +1,29 @@
-import { Box, Grid, SimpleGrid } from '@chakra-ui/react';
+import { Box, Grid, SimpleGrid, Wrap } from '@chakra-ui/react';
 import React from 'react';
 import { Artist } from '../../types';
 import ArtistCard from './ArtistCard';
+import Link from 'next/link';
 
 type Props = {
   items: Artist[] | null;
+  clickable?: boolean;
 };
 
-const ArtistWrap: React.FC<Props> = ({ items: artists }) => {
+const ArtistWrap: React.FC<Props> = ({ items: artists, clickable }) => {
   return (
-    <SimpleGrid minChildWidth='100px' spacing={4}>
+    <Wrap spacing={4}>
       {artists && artists.map((artist, index) => (
-        <ArtistCard key={index} data={artist} />
+        clickable ? (
+          <Link key={index} href={`/artist/${artist.id}`}>
+            <ArtistCard key={index} data={artist} />
+          </Link>
+        ) : (
+          <Box key={index}>
+            <ArtistCard key={index} data={artist} />
+          </Box>
+        )
       ))}
-    </SimpleGrid>
+    </Wrap>
   );
 };
 
