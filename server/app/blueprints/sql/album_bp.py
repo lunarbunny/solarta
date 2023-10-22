@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask import Blueprint, jsonify, request
-from ..__init__ import Session, Album, AlbumMusic, Music
+from ..__init__ import Session, Album, AlbumMusic, Music, User
 
 album_bp = Blueprint("album_bp", __name__)
 
@@ -36,24 +36,26 @@ def album_retrieve_all_music(idAlbum):
         try:
             album = session.get(Album, idAlbum)
             if album:
-                album_music = session.query(Music).join(AlbumMusic).filter(AlbumMusic.idAlbum == idAlbum)
+                album_music = session.query(Music, User.name, Album.title).select_from(Music).join(AlbumMusic).filter(AlbumMusic.idAlbum == idAlbum).join(User).join(Album)
                 return jsonify([{
                     "id": music.id,
                     "title": music.title,
                     "duration": music.duration,
-                    "genreId": music.genreId
-                } for music in album_music]), 200
+                    "genreId": music.genreId,
+                    "ownerName": owner_name,
+                    "albumName": album_name
+                } for music, owner_name, album_name in album_music]), 200
             else:
-                return '', 404
-        except:
-            return '', 400
+                return 'No album with specified ID.', 404
+        except Exception as e:
+            return 'Error occured', 400
 
 # Retrieve all albums that belong to an artist
 @album_bp.route("/artist=<int:ownerId>")
 def album_by_artist(ownerId):
     with Session() as session:
         try:
-            albums = session.query(Album).filter(Album.ownerId == ownerId)
+            albums = session.query(Album).filter(Album.ownerId == ownerId).all()
             if albums:
                 return jsonify([{
                     "id": album.id,
@@ -61,8 +63,9 @@ def album_by_artist(ownerId):
                     "imageUrl": album.imageUrl,
                     "releaseDate": album.releaseDate,
                     "ownerId": album.ownerId,
+                    "ownerName": ownerName,
                     "description": album.description
-                } for album in albums]), 200
+                } for album, ownerName in albums]), 200
             else:
                 return 'No such artist', 404
         except:
@@ -73,7 +76,7 @@ def album_by_artist(ownerId):
 def album_retrieve(idAlbum):
     with Session() as session:
         try:
-            album = session.get(Album, idAlbum)
+            album, ownerName = session.get(Album, User.name).join(User).filter(Album.id == idAlbum).first()
             if album:
                 return jsonify({
                     "id": album.id,
@@ -81,6 +84,7 @@ def album_retrieve(idAlbum):
                     "imageUrl": album.imageUrl,
                     "releaseDate": album.releaseDate,
                     "ownerId": album.ownerId,
+                    "ownerName": ownerName,
                     "description": album.description
                 }), 200
             else:
@@ -93,15 +97,16 @@ def album_retrieve(idAlbum):
 def album_retrieve_top3():
     with Session() as session:
         try:
-            albums = session.query(Album).limit(3).all()
+            albums = session.query(Album, User.name).join(User).limit(3).all()
             return jsonify([{
                 "id": album.id,
                 "title": album.title,
                 "imageUrl": album.imageUrl,
                 "releaseDate": album.releaseDate,
                 "ownerId": album.ownerId,
+                "ownerName": ownerName,
                 "description": album.description
-            } for album in albums]), 200
+            } for album, ownerName in albums]), 200
         except:
             return 'Error occured when retrieving album.', 400
 
@@ -111,7 +116,7 @@ def album_retrieve_mine():
     with Session() as session:
         try:
             ownerId = 3 # TODO: Should take from session instead
-            albums = session.query(Album).filter(Album.ownerId == ownerId)
+            albums = session.query(Album, User.name).filter(Album.ownerId == ownerId).join(User).all()
             if albums:
                 return jsonify([{
                     "id": album.id,
@@ -119,8 +124,9 @@ def album_retrieve_mine():
                     "imageUrl": album.imageUrl,
                     "releaseDate": album.releaseDate,
                     "ownerId": album.ownerId,
+                    "ownerName": ownerName,
                     "description": album.description
-                } for album in albums]), 200
+                } for album, ownerName in albums]), 200
             else:
                 return '', 404
         except:
@@ -131,15 +137,16 @@ def album_retrieve_mine():
 def album_retrieve_all():
     with Session() as session:
         try:
-            albums = session.query(Album).all()
+            albums = session.query(Album, User.name).join(User).all()
             return jsonify([{
                 "id": album.id,
                 "title": album.title,
                 "imageUrl": album.imageUrl,
                 "releaseDate": album.releaseDate,
                 "ownerId": album.ownerId,
+                "ownerName": ownerName,
                 "description": album.description
-            } for album in albums]), 200
+            } for album, ownerName in albums]), 200
         except:
             return 'Error occured when retrieving album.', 400
     

@@ -26,7 +26,7 @@ const AlbumWrap: React.FC<Props> = ({ items: albums, clickable, onCreateClick })
         )
       ))}
       {onCreateClick && (
-        <Box onClick={onCreateClick} w='150px' borderWidth='1px' borderRadius='lg' overflow='hidden' cursor='pointer'>
+        <Box onClick={onCreateClick} w='150px' minH='235px' borderWidth='1px' borderRadius='lg' overflow='hidden' cursor='pointer'>
           <Center h='100%'>
             <Icon as={FiPlus} w={8} h={8} />
           </Center>
