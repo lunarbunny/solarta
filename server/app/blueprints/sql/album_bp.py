@@ -36,7 +36,7 @@ def album_retrieve_all_music(idAlbum):
         try:
             album = session.get(Album, idAlbum)
             if album:
-                album_music = session.query(Music, User.name, Album.title).select_from(Music).join(AlbumMusic).filter(AlbumMusic.idAlbum == idAlbum).join(User).join(Album)
+                album_music = session.query(Music, User.name, Album.title).select_from(Music).join(AlbumMusic).filter(AlbumMusic.idAlbum == idAlbum).join(User, User.id == Music.ownerId).join(Album, Album.id == AlbumMusic.idAlbum).all()
                 return jsonify([{
                     "id": music.id,
                     "title": music.title,
@@ -76,7 +76,7 @@ def album_by_artist(ownerId):
 def album_retrieve(idAlbum):
     with Session() as session:
         try:
-            album, ownerName = session.get(Album, User.name).join(User).filter(Album.id == idAlbum).first()
+            album, ownerName = session.query(Album, User.name).join(User).filter(Album.id == idAlbum).first()
             if album:
                 return jsonify({
                     "id": album.id,
@@ -89,7 +89,7 @@ def album_retrieve(idAlbum):
                 }), 200
             else:
                 return 'Album not found.', 404
-        except:
+        except Exception as e:
             return 'Error occured when retrieving album.', 400
         
 # Retrive top 3 albums based on number of music

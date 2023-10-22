@@ -13,7 +13,7 @@ const Layout: React.FC<Props> = ({ children }) => {
       <Box flexGrow={1}>
         <Flex direction="row" h="100%">
           <Sidebar />
-          <Box overflowY="scroll" maxH="100vh">
+          <Box overflowY="scroll" maxH="100vh" w="100%">
             {children}
           </Box>
         </Flex>

@@ -18,6 +18,7 @@ type Album = {
   imageUrl: string;
   releaseDate: string;
   ownerId: number;
+  ownerName: string; // Artist name
   description: string;
 
   size: number; // number of songs in the album
