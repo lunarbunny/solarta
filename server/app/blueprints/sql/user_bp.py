@@ -105,3 +105,32 @@ def onboarding(token):
                 return str(e), 400
             else:
                 return "rip something went wrong (#x_x)", 400
+
+@user_bp.route("/login", methods=["POST"])
+def login():
+    with Session() as session:
+        try:
+            data = request.form
+            email = data.get("email")
+            mfa = data.get("mfa")
+            password = data.get("password")
+            user = session.query(User).filter(User.email==email).first()
+
+            if not utils.verify_otp(mfa, user.mfaSecret):
+                return "die", 400
+
+            if not utils.verify_password_hash(user.hashPwd, password):
+                return "die harder", 400
+
+            if user.sessionId == None:
+                user.sessionId = utils.generate_session()
+
+            session.commit()
+            return "ok", 200
+
+        except Exception as e:
+            session.rollback()
+            if utils.is_debug_mode:
+                return str(e), 400
+            else:
+                return "uwu something went wrong (#x_x)", 400

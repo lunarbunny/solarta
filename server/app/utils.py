@@ -87,3 +87,6 @@ def generate_otp_qr_string(username:str, secret: str) -> str: # for frontend to 
 
 def verify_otp(token, secret) -> bool:
     return pyotp.totp.TOTP(secret).verify(token, valid_window=1)
+
+def generate_session() -> str:
+    return os.urandom(43).hex()
