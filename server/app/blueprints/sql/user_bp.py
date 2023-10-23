@@ -130,10 +130,10 @@ def login():
             user = session.query(User).filter(User.email==email).first()
 
             if not utils.verify_otp(mfa, user.mfaSecret):
-                return "die", 400
+                return utils.nachoneko(), 400
 
             if not utils.verify_password_hash(user.hashPwd, password):
-                return "die harder", 400
+                return utils.nachoneko(), 400
 
             if user.sessionId == None:
                 user.sessionId = utils.generate_session()
