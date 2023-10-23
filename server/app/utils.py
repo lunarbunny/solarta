@@ -1,8 +1,11 @@
 from argon2 import PasswordHasher
 import os
 import re
-import hashlib
 import sendgrid
+import pyotp
+import time
+from models.User import User
+from blueprints import Session
 from sendgrid.helpers.mail import *
 from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
@@ -42,7 +45,10 @@ def check_needs_rehash(hash):
     return argon_hasher.check_needs_rehash(hash)
 
 def verify_password_hash(hash, password):
-    return argon_hasher.verify(hash, password)
+    try:
+        return argon_hasher.verify(hash, password)
+    except:
+        return False
 
 def generate_onboarding_token(email):
     return serializer.dumps(email, salt=os.getenv('ONBOARDING_SALT'))
@@ -65,8 +71,8 @@ def send_onboarding_email(username, email):
         print(e.message)
     return response
 
-def verify_onboarding_email(token, expiration=300):
-    verifying_email = None
+def verify_onboarding_email(token, expiration=300) -> str:
+    verifying_email = ""
     try:
         verifying_email = serializer.loads(
             token,
@@ -77,3 +83,73 @@ def verify_onboarding_email(token, expiration=300):
         print(e.message)
         return verifying_email
     return verifying_email
+
+def generate_otp_secret() -> str: 
+    return pyotp.random_base32()
+
+def generate_otp_qr_string(username:str, secret: str) -> str: # for frontend to generate QR code
+    return pyotp.totp.TOTP(secret).provisioning_uri(name=username, issuer_name="Solarta")
+
+def verify_otp(token, secret) -> bool:
+    return pyotp.totp.TOTP(secret).verify(token, valid_window=1)
+
+def generate_session() -> str:
+    return os.urandom(43).hex()
+
+def set_cookie_expiry() -> int:
+    return int(time.time()) + 60 * 60 * 24
+
+def verify_session(sessionId: str) -> bool:
+    with Session() as session:
+        user = session.query(User).filter(User.sessionId==sessionId).first()
+
+        if user is None:
+            return False
+
+        if user.sessionExpiry < int(time.time()):
+            user.sessionId = None
+            user.sessionExpiry = None
+            session.commit()
+            return False
+
+        return True
+
+
+def nachoneko() -> str:
+    return '<br>'.join([
+    "<div style=\"font-family: monospace;white-space: pre-wrap;\">",
+    "nachonekodayo                                                       nachonekodayo",
+    "a               ##**%#                                                          y",
+    "c              %%(((( %%%%                                                      a",
+    "h              %#((((((,%%%%%,                #%/                               d",
+    "o             %%(((((((( %%%%%%%%%%%%%%%%%%%%%%%(,                              o",
+    "n             %%(((((((((.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*.                       k",
+    "e            .%#((((((/.%%%%%%%%@@@@@%%%%%%%%%%%%%%%%%%%%%#     .,****,.        e",
+    "k            *%#((((*(%%%%%%%%%%%%%%%%%%@@@@%%%%%%%%%%%%%%%%%@&@@%@@%%%%%%%%%%% n",
+    "o            *%%#((#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@&@@%%# *((((#% o",
+    "d            .%%#(%%%%%%%%,%%%%%%%%*.%%%%%%%%%%%%%%%%%%%%.%%%%%%%# ,(((((((((%  h",
+    "a            .%%%%%%%%%%,%%%%%%%% (.%%%%%%%%%%%%/%%%,%%%%%/%%%%%%(/(((((((((%(  c",
+    "y            *%%%%%%%%##%%%%%%% &@.%%%%%%%%%%%%.%%%, %%%%%#%%%%%%%%(((((((#%%   a",
+    "o           .%%%%%#%%/%%%%%**.%@@.%%%%%%%%%%,%/%%%#@ %%%%%% %%%%%%%*(((((%%%    n",
+    "            %%%%%/%%,%%%%%%%(@@@@ %%%%%%%%#%%#%% @@@% %%%%%,%%%%%%%%*(((%%#      ",
+    "            %%%%%/%%,%%%%%%%(@@@@ %%%%%%%%#%%#%% @@@% %%%%%,%%%%%%%%*(((%%#      ",
+    "          .%%%%%#,@.&@@@@@ ., &@,%%%.%%%/%%#%%.@@@@@@@*/%%%(%%%%%%%%#%%%         ",
+    "          %%%%%.&&(@@@@@@   .(@*,%%%.%%#%%/%(*@@( ,&@@@@.%#, ,.( ,%%%%.          ",
+    "          %/ %%(@&#@@@@@@@@@@@%#%#%%,%,%%,%(@ &@@@@@%#%@@/%&,*,%* %%%%%          ",
+    "         *%%%%  &@@# &@@@@@@@ @@@@@@@@@@@@@@.@@@@@(.*   @ &,.,(*&    %%          ",
+    "         #%%*%&&&&&&@@@@@@@@@@@@@@@@@@@@@@@@,@@@@@@@@@@&,/%.,*  %%%#/.#          ",
+    "o        %% &&&&&&&&&@@@@@@@@@@@@@@@@@@@@@@@@,*@@@@@@@.@@ %%%%%%%%%%%%/         n",
+    "y        %% %&&&&&&%@@@@@/(((((((/,,%@@@@@@@@@@@@@@@@@@@@.%%%%%%%%%%%%          a",
+    "a        #%%# @@@@@@@@@@&*#%%%%%%%%%%%%#( @@@@@@@&&%         ,(%%%%%%%          c",
+    "d        *%%%% / @@@@@@@@@# #%%%%%%%%%%%% @@@@@@@&&&&&&&.%%%%%%/%%%%%    @@@@   h",
+    "o         %%%% %%%%( @@@@@@@@@@@@@&#(* /& @@@@@@@@  *&&%#%%%%%%,%%%%*  @@@@@@.  o",
+    "k        /%%%%*%%%%%%%%%%.*@@@@@@@@@@@@  @@@@@@@@@@@@&.   %%%%%%%%%(  &@@@@@@   n",
+    "e        % %%%/%%%%%%%%%%* .,,,*,&@@*....,,..         *..%%.*.*%%%(   @@@@@@    e",
+    "n       #%%*%%.%%%#%%%%..,,,,,(/@@@@@@@@, ,,,,,         %%%%,.%%%/    %%%%%#    k",
+    "o       %%%%.%.%%% %%%%, ,,,,,, %#%.#%#%.,,,,,,,       ,%%%*,%%%%*    #%%%%%    o",
+    "h      %%% %%%..%. #%%% ,,,,,,  ./*.%,,...  .,,        %%%,*%%%%%#    *%%%%%    d",
+    "c     %*   (%%%%%   %% ,,,,,,, ,  / ,,, ,,,,,,,,      #%%.%%%%% %%    %%%%%%    a",
+    "a           %%%%/   %(.,,,,,,,.,,,.,,,,.,,,,,,,,.   .%% %%%%%%%      %%%%%%*    y",
+    "nachonekodayo                                                       nachonekodayo"
+    "</div>"
+])

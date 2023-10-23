@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, make_response
 from markupsafe import escape
 
 from .. import Session, User, Role
@@ -73,7 +73,7 @@ def register():
             
             # Fields are valid, proceed to generate user
             hashPwd = utils.hash_password(password)
-            newUser = User(name, email, hashPwd, status=2, roleId=2, mfaSecret="")
+            newUser = User(name, email, hashPwd, status=2, roleId=2, mfaSecret="", about="")
             session.add(newUser)
             session.commit()
             utils.send_onboarding_email(name, email)
@@ -83,7 +83,7 @@ def register():
             if utils.is_debug_mode:
                 return str(e), 400
             else:
-                return "rip something went wrong (#x_x)", 400
+                return utils.nachoneko(), 400
             
 @user_bp.route("/onboarding/<token>", methods=["GET"])
 def onboarding(token):
@@ -91,18 +91,93 @@ def onboarding(token):
         try:
             verifying_email = utils.verify_onboarding_email(token)
             if verifying_email is None:
-                return "bruh you tampered with the token (#x_x)", 400
+                return utils.nachoneko(), 400
             user = session.query(User).filter(User.email==verifying_email).first()
             if user.status != 2:
-                return "bruh you already registered (#x_x)", 400
+                return utils.nachoneko(), 400
             user.status = 0
-            session.add(user)
+            user.mfaSecret = utils.generate_otp_secret()
             session.commit()
-            return "ok!", 200
+            return utils.generate_otp_qr_string(user.name, user.mfaSecret), 200
         except Exception as e:
             session.rollback()
             if utils.is_debug_mode:
                 return str(e), 400
             else:
-                return "rip something went wrong (#x_x)", 400
-            
+                return utils.nachoneko(), 400
+
+@user_bp.route("/login", methods=["POST"])
+def login():
+    with Session() as session:
+        try:
+            data = request.form
+            email = data.get("email")
+            mfa = data.get("mfa")
+            password = data.get("password")
+
+            if email is None:
+                return "Email is required.", 400
+
+            if not utils.is_email_valid(email):
+                return "Email is invalid.", 400
+
+            if mfa is None:
+                return "MFA is required.", 400
+
+            if password is None:
+                return "Password is required.", 400
+
+            user = session.query(User).filter(User.email==email).first()
+
+            if not utils.verify_otp(mfa, user.mfaSecret):
+                return utils.nachoneko(), 400
+
+            if not utils.verify_password_hash(user.hashPwd, password):
+                return utils.nachoneko(), 400
+
+            if user.sessionId == None:
+                user.sessionId = utils.generate_session()
+
+            cookie_expiry = utils.set_cookie_expiry()
+            user.sessionExpiry = cookie_expiry
+            session.commit()
+
+            response = make_response("ok!")
+            response.status = 200
+            response.set_cookie("SESSIONID", value=user.sessionId, max_age=None, expires=cookie_expiry, secure=False, httponly=False, samesite=None)
+
+            return response
+
+        except Exception as e:
+            session.rollback()
+            if utils.is_debug_mode:
+                return str(e), 400
+            else:
+                return utils.nachoneko(), 400
+
+@user_bp.route("/logout", methods=["GET"])
+def logout():
+    with Session() as session:
+        try:
+            sessionId = request.cookies.get('SESSIONID')
+            if sessionId is None:
+                return utils.nachoneko(), 400
+
+            if not utils.verify_session(sessionId):
+                return utils.nachoneko(), 400
+
+            user = session.query(User).filter(User.sessionId==sessionId).first()
+            user.sessionId = None
+            user.sessionExpiry = None
+            session.commit()
+
+            response = make_response("ok")
+            response.set_cookie('SESSIONID', value='', expires=0)
+
+            return response
+        except Exception as e:
+            session.rollback()
+            if utils.is_debug_mode:
+                return str(e), 400
+            else:
+                return utils.nachoneko(), 400
