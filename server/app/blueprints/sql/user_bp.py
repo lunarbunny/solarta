@@ -114,6 +114,19 @@ def login():
             email = data.get("email")
             mfa = data.get("mfa")
             password = data.get("password")
+
+            if email is None:
+                return "Email is required.", 400
+
+            if not utils.is_email_valid(email):
+                return "Email is invalid.", 400
+
+            if mfa is None:
+                return "MFA is required.", 400
+
+            if password is None:
+                return "Password is required.", 400
+
             user = session.query(User).filter(User.email==email).first()
 
             if not utils.verify_otp(mfa, user.mfaSecret):
