@@ -13,13 +13,14 @@ class User(Base):
     roleId: Mapped[int] = mapped_column(Integer, ForeignKey('Role.id'), nullable=False)
     mfaSecret: Mapped[str] = mapped_column(String(255), nullable=True)
     sessionId: Mapped[str] = mapped_column(String(86), nullable=True)
+    sessionExpiry: Mapped[int] = mapped_column(Integer, nullable=True)
     about: Mapped[str] = mapped_column(String(255), nullable=True)
 
     relationship('Album', backref='User')
     relationship('Music', backref='User')
     relationship('Playlist', backref='User')
 
-    def __init__(self, name, email, hashPwd, status, roleId, mfaSecret, sessionId, about):
+    def __init__(self, name, email, hashPwd, status, roleId, mfaSecret, sessionId, sessionExpiry, about):
         self.name = name
         self.email = email
         self.hashPwd = hashPwd
@@ -27,4 +28,5 @@ class User(Base):
         self.roleId = roleId
         self.mfaSecret = mfaSecret
         self.sessionid = sessionId
+        self.sessionExpiry = sessionExpiry
         self.about = about

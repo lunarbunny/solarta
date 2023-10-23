@@ -101,7 +101,19 @@ def set_cookie_expiry() -> int:
 
 def verify_session(sessionId: str) -> bool:
     with Session() as session:
-        return session.query(User).filter(User.sessionId==sessionId).first() is not None
+        user = session.query(User).filter(User.sessionId==sessionId).first()
+
+        if user is None:
+            return False
+
+        if user.sessionExpiry < int(time.time()):
+            user.sessionId = None
+            user.sessionExpiry = None
+            session.commit()
+            return False
+
+        return True
+
 
 def nachoneko() -> str:
     return '<br>'.join([

@@ -137,11 +137,14 @@ def login():
 
             if user.sessionId == None:
                 user.sessionId = utils.generate_session()
-                session.commit()
+
+            cookie_expiry = utils.set_cookie_expiry()
+            user.sessionExpiry = cookie_expiry
+            session.commit()
 
             response = make_response("ok!")
             response.status = 200
-            response.set_cookie("SESSIONID", value=user.sessionId, max_age=None, expires=utils.set_cookie_expiry(), secure=False, httponly=False, samesite=None)
+            response.set_cookie("SESSIONID", value=user.sessionId, max_age=None, expires=cookie_expiry, secure=False, httponly=False, samesite=None)
 
             return response
 
@@ -165,6 +168,7 @@ def logout():
 
             user = session.query(User).filter(User.sessionId==sessionId).first()
             user.sessionId = None
+            user.sessionExpiry = None
             session.commit()
 
             response = make_response("ok")

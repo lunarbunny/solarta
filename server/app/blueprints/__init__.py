@@ -49,18 +49,18 @@ with Session() as session:
     # Seed user
     if session.query(User).count() == 0:
         user_data = [
-            {"name": "Admin1", "email": "admin1@example.com", "hashPwd": "admin1", "status": 0, "roleId": 1, "mfaSecret": "", "sessionId": "", "about": "I am the admin"},
-            {"name": "Admin2", "email": "admin2@example.com", "hashPwd": "admin2", "status": 0, "roleId": 1, "mfaSecret": "", "sessionId": "", "about": "I am the admin"},
-            {"name": "Pixabay", "email": "user1@example.com", "hashPwd": "user1", "status": 0, "roleId": 2, "mfaSecret": "", "sessionId": "", "about": "Hi, I am Pixabay!"},
-            {"name": "Jazz Collective", "email": "user2@example.com", "hashPwd": "user2", "status": 0, "roleId": 2, "mfaSecret": "", "sessionId": "", "about": "Hi, I am Jazz Collective!"},
-            {"name": "Old School Cool", "email": "user3@example.com", "hashPwd": "user3", "status": 0, "roleId": 2, "mfaSecret": "", "sessionId": "", "about": "Hi, I am Old School Cool!"},
-            {"name": "Neon Nights", "email": "user4@example.com", "hashPwd": "user4", "status": 0, "roleId": 2, "mfaSecret": "", "sessionId": "", "about": "Hi, I am Neon Nights!"},
-            {"name": "Velvet", "email": "user5@example.com", "hashPwd": "user5", "status": 0, "roleId": 2, "mfaSecret": "", "sessionId": "", "about": "Hi, I am Velvet!"},
-            {"name": "Angry Octopus", "email": "user6@example.com", "hashPwd": "user6", "status": 0, "roleId": 2, "mfaSecret": "", "sessionId": "", "about": "Hi, I am Angry Octopus!"},
-            {"name": "Midnight Muses", "email": "user7@example.com", "hashPwd": "user7", "status": 0, "roleId": 2, "mfaSecret": "", "sessionId": "", "about": "Hi, I am Midnight Muses!"},
-            {"name": "Velocity", "email": "user8@example.com", "hashPwd": "user8", "status": 0, "roleId": 2, "mfaSecret": "", "sessionId": "", "about": "Hi, I am Velocity!"},
-            {"name": "Nightcore", "email": "user9@example.com", "hashPwd": "user9", "status": 0, "roleId": 2, "mfaSecret": "", "sessionId": "", "about": "Hi, I am Nightcore!"},
-            {"name": "Take 3", "email": "user10@example.com", "hashPwd": "user10", "status": 0, "roleId": 2, "mfaSecret": "", "sessionId": "", "about": "Hi, I am Take 3!"},
+            {"name": "Admin1", "email": "admin1@example.com", "hashPwd": "admin1", "status": 0, "roleId": 1, "mfaSecret": "", "sessionExpiry": None, "sessionId": "", "about": "I am the admin"},
+            {"name": "Admin2", "email": "admin2@example.com", "hashPwd": "admin2", "status": 0, "roleId": 1, "mfaSecret": "", "sessionExpiry": None, "sessionId": "", "about": "I am the admin"},
+            {"name": "Pixabay", "email": "user1@example.com", "hashPwd": "user1", "status": 0, "roleId": 2, "mfaSecret": "", "sessionExpiry": None, "sessionId": "", "about": "Hi, I am Pixabay!"},
+            {"name": "Jazz Collective", "email": "user2@example.com", "hashPwd": "user2", "status": 0, "roleId": 2, "mfaSecret": "", "sessionExpiry": None, "sessionId": "", "about": "Hi, I am Jazz Collective!"},
+            {"name": "Old School Cool", "email": "user3@example.com", "hashPwd": "user3", "status": 0, "roleId": 2, "mfaSecret": "", "sessionExpiry": None, "sessionId": "", "about": "Hi, I am Old School Cool!"},
+            {"name": "Neon Nights", "email": "user4@example.com", "hashPwd": "user4", "status": 0, "roleId": 2, "mfaSecret": "", "sessionExpiry": None, "sessionId": "", "about": "Hi, I am Neon Nights!"},
+            {"name": "Velvet", "email": "user5@example.com", "hashPwd": "user5", "status": 0, "roleId": 2, "mfaSecret": "", "sessionExpiry": None, "sessionId": "", "about": "Hi, I am Velvet!"},
+            {"name": "Angry Octopus", "email": "user6@example.com", "hashPwd": "user6", "status": 0, "roleId": 2, "mfaSecret": "", "sessionExpiry": None, "sessionId": "", "about": "Hi, I am Angry Octopus!"},
+            {"name": "Midnight Muses", "email": "user7@example.com", "hashPwd": "user7", "status": 0, "roleId": 2, "mfaSecret": "", "sessionExpiry": None, "sessionId": "", "about": "Hi, I am Midnight Muses!"},
+            {"name": "Velocity", "email": "user8@example.com", "hashPwd": "user8", "status": 0, "roleId": 2, "mfaSecret": "", "sessionExpiry": None, "sessionId": "", "about": "Hi, I am Velocity!"},
+            {"name": "Nightcore", "email": "user9@example.com", "hashPwd": "user9", "status": 0, "roleId": 2, "mfaSecret": "", "sessionExpiry": None, "sessionId": "", "about": "Hi, I am Nightcore!"},
+            {"name": "Take 3", "email": "user10@example.com", "hashPwd": "user10", "status": 0, "roleId": 2, "mfaSecret": "", "sessionExpiry": None, "sessionId": "", "about": "Hi, I am Take 3!"},
         ]
 
         for user in user_data:
