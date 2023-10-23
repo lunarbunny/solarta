@@ -93,3 +93,6 @@ def verify_otp(token, secret) -> bool:
 
 def generate_session() -> str:
     return os.urandom(43).hex()
+
+def set_cookie_expiry() -> int:
+    return int(time.time()) + 60 * 60 * 24

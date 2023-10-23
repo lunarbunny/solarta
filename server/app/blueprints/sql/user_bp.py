@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, make_response
 from markupsafe import escape
 
 from .. import Session, User, Role
@@ -124,9 +124,13 @@ def login():
 
             if user.sessionId == None:
                 user.sessionId = utils.generate_session()
+                session.commit()
 
-            session.commit()
-            return "ok", 200
+            response = make_response("ok!")
+            response.status = 200
+            response.set_cookie("SESSIONID", value=user.sessionId, max_age=None, expires=utils.set_cookie_expiry(), secure=False, httponly=False, samesite=None)
+
+            return response
 
         except Exception as e:
             session.rollback()
