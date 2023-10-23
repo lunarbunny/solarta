@@ -43,7 +43,10 @@ def check_needs_rehash(hash):
     return argon_hasher.check_needs_rehash(hash)
 
 def verify_password_hash(hash, password):
-    return argon_hasher.verify(hash, password)
+    try:
+        return argon_hasher.verify(hash, password)
+    except:
+        return False
 
 def generate_onboarding_token(email):
     return serializer.dumps(email, salt=os.getenv('ONBOARDING_SALT'))
