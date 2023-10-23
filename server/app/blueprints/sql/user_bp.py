@@ -151,3 +151,29 @@ def login():
                 return str(e), 400
             else:
                 return utils.nachoneko(), 400
+
+@user_bp.route("/logout", methods=["GET"])
+def logout():
+    with Session() as session:
+        try:
+            sessionId = request.cookies.get('SESSIONID')
+            if sessionId is None:
+                return utils.nachoneko(), 400
+
+            if not utils.verify_session(sessionId):
+                return utils.nachoneko(), 400
+
+            user = session.query(User).filter(User.sessionId==sessionId).first()
+            user.sessionId = None
+            session.commit()
+
+            response = make_response("ok")
+            response.set_cookie('SESSIONID', value='', expires=0)
+
+            return response
+        except Exception as e:
+            session.rollback()
+            if utils.is_debug_mode:
+                return str(e), 400
+            else:
+                return utils.nachoneko(), 400
