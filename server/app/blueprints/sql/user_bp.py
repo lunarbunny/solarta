@@ -73,7 +73,7 @@ def register():
             
             # Fields are valid, proceed to generate user
             hashPwd = utils.hash_password(password)
-            newUser = User(name, email, hashPwd, status=2, roleId=2, mfaSecret="")
+            newUser = User(name, email, hashPwd, status=2, roleId=2, mfaSecret="", about="")
             session.add(newUser)
             session.commit()
             utils.send_onboarding_email(name, email)
@@ -96,13 +96,12 @@ def onboarding(token):
             if user.status != 2:
                 return "bruh you already registered (#x_x)", 400
             user.status = 0
-            session.add(user)
+            user.mfaSecret = utils.generate_otp_secret()
             session.commit()
-            return "ok!", 200
+            return utils.generate_otp_qr_string(user.name, user.mfaSecret), 200
         except Exception as e:
             session.rollback()
             if utils.is_debug_mode:
                 return str(e), 400
             else:
                 return "rip something went wrong (#x_x)", 400
-            

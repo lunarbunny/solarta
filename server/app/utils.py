@@ -1,8 +1,9 @@
 from argon2 import PasswordHasher
 import os
 import re
-import hashlib
 import sendgrid
+import pyotp
+import time
 from sendgrid.helpers.mail import *
 from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
@@ -65,8 +66,8 @@ def send_onboarding_email(username, email):
         print(e.message)
     return response
 
-def verify_onboarding_email(token, expiration=300):
-    verifying_email = None
+def verify_onboarding_email(token, expiration=300) -> str:
+    verifying_email = ""
     try:
         verifying_email = serializer.loads(
             token,
@@ -77,3 +78,12 @@ def verify_onboarding_email(token, expiration=300):
         print(e.message)
         return verifying_email
     return verifying_email
+
+def generate_otp_secret() -> str: 
+    return pyotp.random_base32()
+
+def generate_otp_qr_string(username:str, secret: str) -> str: # for frontend to generate QR code
+    return pyotp.totp.TOTP(secret).provisioning_uri(name=username, issuer_name="Solarta")
+
+def verify_otp(token, secret) -> bool:
+    return pyotp.totp.TOTP(secret).verify(token, valid_window=1)
