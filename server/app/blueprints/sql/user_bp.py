@@ -83,7 +83,7 @@ def register():
             if utils.is_debug_mode:
                 return str(e), 400
             else:
-                return "rip something went wrong (#x_x)", 400
+                return utils.nachoneko(), 400
             
 @user_bp.route("/onboarding/<token>", methods=["GET"])
 def onboarding(token):
@@ -91,10 +91,10 @@ def onboarding(token):
         try:
             verifying_email = utils.verify_onboarding_email(token)
             if verifying_email is None:
-                return "bruh you tampered with the token (#x_x)", 400
+                return utils.nachoneko(), 400
             user = session.query(User).filter(User.email==verifying_email).first()
             if user.status != 2:
-                return "bruh you already registered (#x_x)", 400
+                return utils.nachoneko(), 400
             user.status = 0
             user.mfaSecret = utils.generate_otp_secret()
             session.commit()
@@ -104,7 +104,7 @@ def onboarding(token):
             if utils.is_debug_mode:
                 return str(e), 400
             else:
-                return "rip something went wrong (#x_x)", 400
+                return utils.nachoneko(), 400
 
 @user_bp.route("/login", methods=["POST"])
 def login():
@@ -150,4 +150,4 @@ def login():
             if utils.is_debug_mode:
                 return str(e), 400
             else:
-                return "uwu something went wrong (#x_x)", 400
+                return utils.nachoneko(), 400
