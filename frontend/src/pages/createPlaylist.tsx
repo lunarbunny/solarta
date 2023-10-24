@@ -11,28 +11,24 @@ import {
   useEditableControls,
   useColorModeValue,
   Input,
-  Textarea,
   Flex,
   Tooltip,
   Icon,
   Spacer,
-  Text,
   Table,
   Thead,
   Tbody,
   Tr,
   Th,
   Td,
-  TableContainer,
   Image,
   Button,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SearchBar from "@/components/Search/SearchBar";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { BiTime } from "react-icons/bi";
-import { MdEdit } from "react-icons/md";
 
 const CreatePlayListPage: NextPage = () => {
   type PlaylistItem = {
@@ -111,16 +107,40 @@ const CreatePlayListPage: NextPage = () => {
     },
   ];
   const [playlistSongs, setPlayListSongs] = useState(playlist);
-  const [playlistTitle, setPlaylistTitle] = useState("Rasengan ⚡️");
+  const [playlistTitle, setPlaylistTitle] = useState("Playlist #4");
   const [playlistDesc, setPlaylistDesc] = useState(
     "A short description of the playlist can be written here!"
   );
 
   const bgColour = useColorModeValue("gray.600", "gray.700");
 
-  function handleSubmit() {
-    console.log("playlisttitle:" + playlistTitle);
-    console.log("playlistdesc:" + playlistDesc);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("ownerID", "1");
+    formData.append("creationDate", formatDate(new Date()));
+    formData.append("title", playlistTitle);
+    formData.append("description", playlistDesc);
+    console.log(formData);
+    const response = await fetch(`${API_URL}/playlist/create`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (response.ok) {
+      window.location.reload();
+    } else {
+      console.log(response);
+    }
+  };
+
+  function formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Add 1 to month because it's zero-based
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
   }
 
   function convertToMinutes(duration: number): string {
@@ -139,7 +159,7 @@ const CreatePlayListPage: NextPage = () => {
       useEditableControls();
 
     return isEditing ? (
-      <ButtonGroup my={8} mx="20px" size="sm" w="50%  " spacing={2}>
+      <ButtonGroup my={9} mx="20px" size="sm" w="50%" spacing={2}>
         <IconButton
           aria-label="confirm playlist title"
           icon={<CheckIcon />}
@@ -165,20 +185,14 @@ const CreatePlayListPage: NextPage = () => {
   }
 
   return (
-    <Box
-      // color="whiteAlpha.800"
-      w="100%"
-      h="100%"
-      borderColor="pink.100"
-      justifyContent="space-evenly"
-      border="2px"
-    >
-      <Box my={5} mx={5} border="2px">
+    <Box w="100%" h="100%">
+      <Box h="20%">
         <Editable
-          px="5px"
+          px={5}
+          py={3}
           fontSize="50px"
           size="lg"
-          defaultValue="Rasengan ⚡️"
+          defaultValue={playlistTitle}
           isPreviewFocusable={true}
           selectAllOnFocus={false}
           onChange={(newValue) => setPlaylistTitle(newValue)}
@@ -192,17 +206,18 @@ const CreatePlayListPage: NextPage = () => {
             />
           </Tooltip>
           <Flex direction="row">
-            <Input my={8} px={4} as={EditableInput} />
+            <Input size="lg" my={8} mx={2} as={EditableInput} />
             <Spacer />
             <EditableControls />
           </Flex>
         </Editable>
 
         <Editable
-          px="5px"
+          px={5}
+          py={3}
           fontSize="xl"
           size="lg"
-          defaultValue="A short description of the playlist can be written here!"
+          defaultValue={playlistDesc}
           isPreviewFocusable={true}
           selectAllOnFocus={false}
           onChange={(newValue) => setPlaylistDesc(newValue)}
@@ -216,30 +231,31 @@ const CreatePlayListPage: NextPage = () => {
             />
           </Tooltip>
           <Flex direction="row">
-            <Input px={4} as={EditableInput} />
+            <Input size="lg" my={8} mx={2} as={EditableInput} />
             <EditableControls />
           </Flex>
         </Editable>
       </Box>
       {/* Search bar*/}
-      <Box
-        border="2px"
-        color="whiteAlpha.900"
-        bg="purple.600"
-        borderRadius="full"
-        px={5}
-        py={5}
-        mx={7}
-      >
+      <Box display="flex" alignItems="center" h="10%" py={3} px={8}>
         <SearchBar />
       </Box>
 
       {/* Music list */}
       <Box
-        h="container.sm"
-        // border="2px"
-        // borderColor="red.500"
+        h="60%"
         overflowY="auto"
+        sx={{
+          "&::-webkit-scrollbar": {
+            width: "10px",
+            borderRadius: "500px",
+            backgroundColor: `rgba(65, 62, 63, 0.8)`,
+          },
+          "&::-webkit-scrollbar-thumb": {
+            borderRadius: "500px",
+            backgroundColor: `rgba(251, 154, 0, 0.8)`,
+          },
+        }}
       >
         <Table size="md" colorScheme="facebook" variant="simple">
           <Thead>
@@ -273,9 +289,9 @@ const CreatePlayListPage: NextPage = () => {
         </Table>
       </Box>
       {/* Button */}
-      <Flex w="100%" justify="end" px={5}>
-        <Button alignItems="end" colorScheme="telegram" onClick={handleSubmit}>
-          Save Playlist
+      <Flex h="10%" w="100%" align="center" justify="end" px={5}>
+        <Button colorScheme="telegram" type="submit">
+          Create playlist
         </Button>
       </Flex>
     </Box>

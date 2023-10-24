@@ -75,7 +75,11 @@ const MusicTable: React.FC<Props> = ({ items }) => {
                 borderRadius="2xl"
                 _hover={{ bg: "blue.700", cursor: "pointer" }}
               >
-                <MusicTableRow index={index} data={song} onClick={handleClick} />
+                <MusicTableRow
+                  index={index}
+                  data={song}
+                  onClick={handleClick}
+                />
               </Tr>
             ))}
         </Tbody>

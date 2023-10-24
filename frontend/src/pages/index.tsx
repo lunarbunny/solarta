@@ -8,28 +8,33 @@ import { Box, Heading, Skeleton, Grid, GridItem } from "@chakra-ui/react";
 import { NextPage } from "next";
 
 const HomePage: NextPage = () => {
-  const { data: musicTrending, loading: musicLoading } = useFetch<Music[]>(`${API_URL}/music/trending`);
-  const { data: top3Artists, loading: artistLoading } = useFetch<Artist[]>(`${API_URL}/user/top3`);
-  const { data: top3Albums, loading: albumLoading } = useFetch<Album[]>(`${API_URL}/album/top3`);
+  const { data: musicTrending, loading: musicLoading } = useFetch<Music[]>(
+    `${API_URL}/music/trending`
+  );
+  const { data: top3Artists, loading: artistLoading } = useFetch<Artist[]>(
+    `${API_URL}/user/top3`
+  );
+  const { data: top3Albums, loading: albumLoading } = useFetch<Album[]>(
+    `${API_URL}/album/top3`
+  );
   return (
-    <Box w='100%' p={8}>
-      <Grid columnGap={16}
-        templateAreas={
-          `
+    <Box w="100%" p={8}>
+      <Grid
+        columnGap={16}
+        templateAreas={`
           "search search"
           "trending artists"
           "trending albums"
-          `
-        }
-        templateColumns={'1fr 1fr'}
+          `}
+        templateColumns={"1fr 1fr"}
         gridColumnGap={16}
       >
-        <GridItem area={'search'} mb={8}>
+        <GridItem area={"search"} mb={8}>
           <SearchBar />
         </GridItem>
 
-        <GridItem area={'trending'}>
-          <Heading size='md'>Trending today</Heading>
+        <GridItem area={"trending"}>
+          <Heading size="md">Trending today</Heading>
           <Box mt={4}>
             <Skeleton isLoaded={!musicLoading}>
               <MusicList items={musicTrending} />
@@ -37,8 +42,8 @@ const HomePage: NextPage = () => {
           </Box>
         </GridItem>
 
-        <GridItem area={'artists'} mb={32}>
-          <Heading size='md'>Top Artists</Heading>
+        <GridItem area={"artists"} mb={32}>
+          <Heading size="md">Top Artists</Heading>
           <Box mt={4}>
             <Skeleton isLoaded={!artistLoading}>
               <ArtistWrap items={top3Artists} clickable />
@@ -46,8 +51,8 @@ const HomePage: NextPage = () => {
           </Box>
         </GridItem>
 
-        <GridItem area={'albums'}>
-          <Heading size='md'>Top Albums</Heading>
+        <GridItem area={"albums"}>
+          <Heading size="md">Top Albums</Heading>
           <Box mt={4}>
             <Skeleton isLoaded={!albumLoading}>
               <AlbumWrap items={top3Albums} clickable />
@@ -57,6 +62,6 @@ const HomePage: NextPage = () => {
       </Grid>
     </Box>
   );
-}
+};
 
 export default HomePage;
