@@ -19,10 +19,14 @@ const useRegister = (): RegisterState => {
     setError(null);
 
     try {
-      let res = await fetch(`${API_URL}/register`, {
+      let formData = new FormData();
+      formData.append('name', name);
+      formData.append('email', email);
+      formData.append('password', password);
+
+      let res = await fetch(`${API_URL}/user/register`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body: formData,
       });
 
       if (!res.ok) {

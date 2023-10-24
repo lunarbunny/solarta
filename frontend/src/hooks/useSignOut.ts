@@ -19,7 +19,7 @@ const useSignOut = (): SignOutState => {
     setError(null);
 
     try {
-      let res = await fetch(`${API_URL}/logout`);
+      let res = await fetch(`${API_URL}/user/logout`);
 
       if (!res.ok) {
         let msg = await res.text();
