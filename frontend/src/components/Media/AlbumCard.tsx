@@ -6,14 +6,16 @@ import { dateToYear } from "@/utils";
 type Props = {
   data: Album;
   onClick?: (album: Album) => void;
+  isPage: boolean;
 };
 
-const AlbumCard: React.FC<Props> = ({ data, onClick }) => {
+const AlbumCard: React.FC<Props> = ({ data, onClick, isPage }) => {
+  console.log(isPage);
   return (
     <Flex
       h="100%"
       direction="column"
-      maxW="250px"
+      maxW={isPage ? "350px" : "150px"}
       borderWidth="1px"
       borderRadius="lg"
       overflow="hidden"
@@ -25,10 +27,14 @@ const AlbumCard: React.FC<Props> = ({ data, onClick }) => {
         alt={data.title}
       />
       <Flex p={4} direction="column" flexGrow={1}>
-        <Text fontSize="sm" fontWeight="semibold" flexGrow={1}>
+        <Text
+          fontSize={isPage ? "lg" : "sm"}
+          fontWeight="semibold"
+          flexGrow={1}
+        >
           {data.title}
         </Text>
-        <Text mt={2} color="gray.600">
+        <Text fontSize={isPage ? "lg" : "sm"} mt={2} color="gray.600">
           {dateToYear(data.releaseDate)}
         </Text>
       </Flex>

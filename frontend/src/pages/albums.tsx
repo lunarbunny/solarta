@@ -19,7 +19,7 @@ const AlbumPage: NextPage = () => {
             albums.map((album, index) => (
               <GridItem>
                 <Link key={index} href={`/album/${album.id}`}>
-                  <AlbumCard key={index} data={album} />
+                  <AlbumCard isPage={true} key={index} data={album} />
                 </Link>
               </GridItem>
             ))}
