@@ -31,6 +31,7 @@ type Playlist = {
 type Artist = {
   id: string;
   name: string;
+  about: string;
 };
 
 type Genre = {

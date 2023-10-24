@@ -55,7 +55,7 @@ def album_retrieve_all_music(idAlbum):
 def album_by_artist(ownerId):
     with Session() as session:
         try:
-            albums = session.query(Album).filter(Album.ownerId == ownerId).all()
+            albums = session.query(Album, User.name).join(User).filter(Album.ownerId == ownerId).all()
             if albums:
                 return jsonify([{
                     "id": album.id,
@@ -68,7 +68,7 @@ def album_by_artist(ownerId):
                 } for album, ownerName in albums]), 200
             else:
                 return 'No such artist', 404
-        except:
+        except Exception as e:
             return 'Error occured while retriving artist', 400
 
 # Retrieve a specific album        

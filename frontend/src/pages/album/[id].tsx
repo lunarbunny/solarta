@@ -19,6 +19,7 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { NextPage } from "next";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { MdLocalShipping } from 'react-icons/md';
 
@@ -32,21 +33,15 @@ const AlbumDetailPage: NextPage = () => {
     return <CircularProgress isIndeterminate color='white.500' />;
   }
 
-  console.log(album);
-
   return (
-    // <Flex direction='row'>
-    //   <AlbumCard data={album} />
-    //   <MusicList items={albumMusic} />
-    // </Flex>
     <Box w='100%' maxW={'7xl'}>
       <Image
-        alt={'product image'}
+        alt={'album cover'}
         src={`https://picsum.photos/720?random=${router.query.id}`}
         fit={'cover'}
         align={'center'}
         w={'100%'}
-        h={{ base: '100%', sm: '400px', lg: '500px' }}
+        h={{ base: '100%', sm: '400px' }}
       />
 
       <Box p={8}>
@@ -61,12 +56,12 @@ const AlbumDetailPage: NextPage = () => {
             color='gray.400'
             fontWeight={300}
             fontSize={'2xl'}>
-            {album.ownerName}
+            By <u><Link href={`album/${album.id}`}>{album.ownerName}</Link></u>
           </Text>
         </Box>
 
         <Text>
-          {album.description && album.description}
+          {album.description}
         </Text>
 
         <Divider my={4} />

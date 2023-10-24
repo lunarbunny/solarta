@@ -26,6 +26,10 @@ type Props = {
 const MusicList: React.FC<Props> = ({ items }) => {
   const setMusicPlayer = useSetRecoilState(musicPlayerAtom);
 
+  if (items && items.length == 0) {
+    return <Box>Music list is empty.</Box>;
+  }
+
   const handleClick = (m: Music) => {
     setMusicPlayer((prevState) => {
       // If the music is already in the playlist, don't add it again.
