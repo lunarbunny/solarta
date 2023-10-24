@@ -14,7 +14,8 @@ def user_retrieve_all():
             users = session.query(User).join(Role).filter(User.roleId != 1).all()
             return jsonify([{
                 "id": user.id,
-                "name": user.name
+                "name": user.name,
+                "about": user.about,
             } for user in users]), 200
         except:
             return '', 400
@@ -27,7 +28,8 @@ def user_retrieve_top3():
             users = session.query(User).filter(User.roleId != 1).limit(3).all()
             return jsonify([{
                 "id": user.id,
-                "name": user.name
+                "name": user.name,
+                "about": user.about,
             } for user in users[:3]]), 200
         except:
             return '', 400
@@ -42,7 +44,8 @@ def user_retrieve_by_id(id):
                 return '', 404
             return jsonify({
                 "id": user.id,
-                "name": user.name
+                "name": user.name,
+                "about": user.about,
             }), 200
         except:
             return '', 400
@@ -55,7 +58,7 @@ def register():
             name = data.get("name")
             email = data.get("email")
             password = data.get("password")
-            confirmPassword = data.get("confirmPassword")
+            #confirmPassword = data.get("confirmPassword")
             if name is None:
                 return "Name is required.", 400
             
@@ -68,12 +71,12 @@ def register():
             if not utils.is_email_valid(email):
                 return "Email is invalid.", 400
             
-            if confirmPassword != password:
-                return "Check that you entered both passwords correctly.", 400
+            #if confirmPassword != password:
+            #    return "Check that you entered both passwords correctly.", 400
             
             # Fields are valid, proceed to generate user
             hashPwd = utils.hash_password(password)
-            newUser = User(name, email, hashPwd, status=2, roleId=2, mfaSecret="", about="")
+            newUser = User(name, email, hashPwd, status=2, roleId=2, mfaSecret="", sessionId="", sessionExpiry=None, about="")
             session.add(newUser)
             session.commit()
             utils.send_onboarding_email(name, email)

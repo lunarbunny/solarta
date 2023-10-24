@@ -39,7 +39,7 @@ const Register: React.FC<RegisterProps> = ({ onLoginClick }) => {
 
   return (
     <>
-      <Text textAlign="center" fontSize="20pt" color="white" mb={2}>Account Registeration</Text>
+      <Text textAlign="center" fontSize="20pt" color="white" mb={2}>Register for a Solarta account</Text>
 
       <form onSubmit={onRegisterSubmit}>
         <Input
