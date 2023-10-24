@@ -5,7 +5,6 @@ import sendgrid
 import pyotp
 import time
 from models.User import User
-from blueprints import Session
 from sendgrid.helpers.mail import *
 from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
@@ -99,20 +98,19 @@ def generate_session() -> str:
 def set_cookie_expiry() -> int:
     return int(time.time()) + 60 * 60 * 24
 
-def verify_session(sessionId: str) -> bool:
-    with Session() as session:
-        user = session.query(User).filter(User.sessionId==sessionId).first()
+def verify_session(session, sessionId: str) -> User | None:
+    user = session.query(User).filter(User.sessionId==sessionId).first()
 
-        if user is None:
-            return False
+    if user is None:
+        return None
 
-        if user.sessionExpiry < int(time.time()):
-            user.sessionId = None
-            user.sessionExpiry = None
-            session.commit()
-            return False
+    if user.sessionExpiry < int(time.time()):
+        user.sessionId = None
+        user.sessionExpiry = None
+        session.commit()
+        return None
 
-        return True
+    return user
 
 
 def nachoneko() -> str:

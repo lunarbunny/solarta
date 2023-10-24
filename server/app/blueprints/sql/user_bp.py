@@ -163,10 +163,10 @@ def logout():
             if sessionId is None:
                 return utils.nachoneko(), 400
 
-            if not utils.verify_session(sessionId):
+            user = utils.verify_session(session, sessionId)
+            if user is None:
                 return utils.nachoneko(), 400
 
-            user = session.query(User).filter(User.sessionId==sessionId).first()
             user.sessionId = None
             user.sessionExpiry = None
             session.commit()
