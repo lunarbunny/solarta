@@ -33,7 +33,7 @@ services:
             - db
         volumes:
             - ./server/app/creds:/creds:ro
-            - ./server/assets:/assets/music:rw
+            - /var/lib/solarta/assets/music:/assets/music:rw
         ports:
             - "5000:5000"
 
