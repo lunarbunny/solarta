@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request, make_response
 from markupsafe import escape
+from utils import clean_input
 
 from .. import Session, User, Role
 import utils
@@ -35,10 +36,11 @@ def user_retrieve_top3():
             return '', 400
         
 # Retrieve user by id
-@user_bp.route("/<id>", methods=["GET"])
+@user_bp.route("/<int:id>", methods=["GET"])
 def user_retrieve_by_id(id):
     with Session() as session:
         try:
+            id = clean_input(str(id))
             user = session.query(User).filter(User.id==id).first()
             if user is None:
                 return '', 404
@@ -55,10 +57,10 @@ def register():
     with Session() as session:
         try:
             data = request.form
-            name = data.get("name")
-            email = data.get("email")
-            password = data.get("password")
-            #confirmPassword = data.get("confirmPassword")
+            name = clean_input(data.get("name"))
+            email = clean_input(data.get("email"))
+            password = clean_input(data.get("password"))
+            #confirmPassword = clean_input(data.get("confirmPassword"))
             if name is None:
                 return "Name is required.", 400
             
@@ -76,7 +78,7 @@ def register():
             
             # Fields are valid, proceed to generate user
             hashPwd = utils.hash_password(password)
-            newUser = User(name, email, hashPwd, status=2, roleId=2, mfaSecret="", sessionId="", sessionExpiry=None, about="")
+            newUser = User(name, email, hashPwd, status=2, roleId=2, mfaSecret=None, sessionId=None, sessionExpiry=None, about=None)
             session.add(newUser)
             session.commit()
             utils.send_onboarding_email(name, email)
@@ -88,10 +90,11 @@ def register():
             else:
                 return utils.nachoneko(), 400
             
-@user_bp.route("/onboarding/<token>", methods=["GET"])
+@user_bp.route("/onboarding/<string:token>", methods=["GET"])
 def onboarding(token):
     with Session() as session:
         try:
+            token = clean_input(token)
             verifying_email = utils.verify_onboarding_email(token)
             if verifying_email is None:
                 return utils.nachoneko(), 400
@@ -114,9 +117,9 @@ def login():
     with Session() as session:
         try:
             data = request.form
-            email = data.get("email")
-            mfa = data.get("mfa")
-            password = data.get("password")
+            email = clean_input(data.get("email"))
+            mfa = clean_input(data.get("mfa"))
+            password = clean_input(data.get("password"))
 
             if email is None:
                 return "Email is required.", 400
@@ -126,6 +129,8 @@ def login():
 
             if mfa is None:
                 return "MFA is required.", 400
+            elif not mfa.isdigit() or len(mfa) != 6:
+                return "MFA is incorrect.", 400
 
             if password is None:
                 return "Password is required.", 400
@@ -162,7 +167,7 @@ def login():
 def logout():
     with Session() as session:
         try:
-            sessionId = request.cookies.get('SESSIONID')
+            sessionId = clean_input(request.cookies.get('SESSIONID'))
             if sessionId is None:
                 return utils.nachoneko(), 400
 

@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask import Blueprint, jsonify, request
 from ..__init__ import Session, Playlist, PlaylistMusic, Music
+from utils import clean_input
 
 playlist_bp = Blueprint("playlist_bp", __name__)
 
@@ -10,6 +11,7 @@ def playlist_delete(id):
     from ..__init__ import PlaylistMusic
     with Session() as session:
         try:
+            id = clean_input(str(id))
             playlist = session.get(Playlist, id)
             if playlist:
                 session.query(PlaylistMusic).filter(PlaylistMusic.idPlaylist == id).delete()
@@ -28,12 +30,12 @@ def playlist_create():
     with Session() as session:
         try:
             data = request.form
-            ownerId = int(data["ownerId"]) # TODO: Should take from session instead
-            creationDateStr = data.get("creationDate", datetime.now().strftime("%Y-%m-%d")) # Format: YYYY-MM-DD
-            title = data["title"]
-            description = data.get("description", None)
+            ownerId = int(clean_input(data["ownerId"])) # TODO: Should take from session instead
+            creationDateStr = clean_input(data.get("creationDate", "")) # Format: YYYY-MM-DD
+            title = clean_input(data["title"])
+            description = clean_input(data.get("description", None)) # Optional
 
-            if ownerId == "" or title == "":
+            if ownerId == "" or title == "" or creationDateStr == "":
                 return "Missing parameters", 400
 
             creationDate = datetime.strptime(creationDateStr, "%Y-%m-%d")
@@ -41,17 +43,17 @@ def playlist_create():
             session.add(new_playlist)
             session.commit()
             return "Created", 201
-        except Exception as e:
+        except:
             session.rollback()
-            return str(e), 400
+            return '', 400
         
 # Add song to playlist
 @playlist_bp.route("/playlist=<int:idPlaylist>/music=<int:idMusic>", methods=["POST"])
 def playlist_add_song(idPlaylist, idMusic):
     with Session() as session:
         try:
-            idPlaylist = int(idPlaylist)
-            idMusic = int(idMusic)
+            idPlaylist = int(clean_input(idPlaylist))
+            idMusic = int(clean_input(idMusic))
             playlist = session.get(Playlist, idPlaylist)
             music = session.get(Music, idMusic)
 
@@ -62,35 +64,37 @@ def playlist_add_song(idPlaylist, idMusic):
                 return 'Created', 201
             else:
                 return '', 404
-        except Exception as e:
+        except:
             session.rollback()
-            return str(e), 400
+            return '', 400
 
 # Update a playlist (title and/or description)
 @playlist_bp.route("/<int:id>/update", methods=["PUT"])
 def playlist_update(id):
     with Session() as session:
         try:
+            id = clean_input(str(id))
             music = session.get(Playlist, id)
             if music:
                 data = request.form
-                title = data.get("title", music.title)
-                description = data.get("description", music.description)
+                title = clean_input(data.get("title", music.title))
+                description = clean_input(data.get("description", music.description))
                 music.title = title
                 music.description = description
                 session.commit()
                 return 'OK', 200
             else:
                 return '', 404
-        except Exception as e:
+        except:
             session.rollback()
-            return str(e), 400
+            return '', 400
 
 # Retrieve all music based on Playlist ID
 @playlist_bp.route("/<int:idPlaylist>/music", methods=["GET"])
 def playlist_retrieve_all_music(idPlaylist):
     with Session() as session:
         try:
+            idPlaylist = clean_input(str(idPlaylist))
             playlist = session.get(Playlist, idPlaylist)
             if playlist:
                 playlist_music = session.query(Music).join(PlaylistMusic).filter(PlaylistMusic.idPlaylist == idPlaylist)
@@ -110,6 +114,7 @@ def playlist_retrieve_all_music(idPlaylist):
 def playlist_retrieve_user(ownerId):
     with Session() as session:
         try:
+            ownerId = clean_input(str(ownerId))
             playlists = session.query(Playlist).filter(Playlist.ownerId == ownerId).all()
             return jsonify([{
                 "id": playlist.id,

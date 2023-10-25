@@ -2,7 +2,7 @@ import math
 import os
 from flask import Blueprint, jsonify, request, send_file
 from ..__init__ import Session, Music, User, AlbumMusic, PlaylistMusic, Album
-from utils import music_get_save_dir, music_get_duration
+from utils import clean_input, music_get_save_dir, music_get_duration
 from werkzeug.utils import secure_filename
 
 music_bp = Blueprint("music_bp", __name__)
@@ -12,6 +12,7 @@ music_bp = Blueprint("music_bp", __name__)
 def music_delete(id):
     with Session() as session:
         try:
+            id = clean_input(str(id))
             music = session.get(Music, id)
             if music:
                 session.query(AlbumMusic).filter(AlbumMusic.idMusic == id).delete()
@@ -31,10 +32,10 @@ def music_create():
     with Session() as session:
         try:
             data = request.form
-            title = data["title"]
-            genreId = int(data["genreId"])
-            ownerId = int(data["ownerId"]) # TODO: Should take from session instead
-            albumId = int(data["albumId"])
+            title = clean_input(data["title"])
+            genreId = int(clean_input(data["genreId"]))
+            ownerId = int(clean_input(data["ownerId"])) # TODO: Should take from session instead
+            albumId = int(clean_input(data["albumId"]))
             music_file = request.files["music_file"]
 
             if title == "" or genreId == "" or ownerId == "" or albumId == "" or music_file == "":
@@ -63,15 +64,16 @@ def music_create():
             session.add(AlbumMusic(albumId, new_music.id))
             session.commit()
             return 'Created', 201
-        except Exception as e:
+        except:
             session.rollback()
-            return str(e), 400
+            return '', 400
 
 # Retrieve all music that matches (substring of) search
 @music_bp.route("/search=<string:title>", methods=["GET"])
 def music_search_string(title):
     with Session() as session:
         try:
+            title = clean_input(title)
             music_search_results = session.query(Music).filter(Music.title.ilike(f"%{title}"))
             if music_search_results:
                 return jsonify([{
@@ -90,13 +92,14 @@ def music_search_string(title):
 def music_play_id(id):
     with Session() as session:
         try:
+            id = clean_input(str(id))
             music = session.query(Music).filter(Music.id==id).first()
             if music:
                 return send_file(os.path.join(music_get_save_dir(), music.filename), as_attachment=False), 200
             else:
                 return 'Not found', 404
-        except Exception as e:
-            return str(e), 400
+        except:
+            return '', 400
         
 # Retrieve top 10 music
 @music_bp.route("/trending", methods=["GET"])

@@ -18,6 +18,9 @@ serializer = URLSafeTimedSerializer(secret_key=os.getenv('URL_SIGN_SECRET'))
 import eyed3
 import sys
 
+def clean_input(input):
+    return re.sub(r'[^0-9A-Za-z.]+', '', input)
+
 def music_get_save_dir():
     dir = os.environ.get("MUSIC_ASSET_DIR")
     if dir is None:
@@ -111,7 +114,6 @@ def verify_session(session, sessionId: str) -> User | None:
         return None
 
     return user
-
 
 def nachoneko() -> str:
     return '<br>'.join([

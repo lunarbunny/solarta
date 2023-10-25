@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask import Blueprint, jsonify, request
 from ..__init__ import Session, Album, AlbumMusic, Music, User
+from utils import clean_input
 
 album_bp = Blueprint("album_bp", __name__)
 
@@ -10,11 +11,17 @@ def album_create():
     with Session() as session:
         try:
             data = request.form
-            title = data.get("title", "")
-            releaseDateStr = data.get("releaseDate", "") # Format: YYYY-MM-DD
+            title = clean_input(data.get("title", ""))
+            releaseDateStr = clean_input(data.get("releaseDate", "")) # Format: YYYY-MM-DD
             description = data.get("description", None) # Optional
             imageUrl = data.get("imageUrl", None) # Optional
-            ownerId = data.get("ownerId", '3') # TODO: Should take from session instead
+            ownerId = int(clean_input(data.get("ownerId", '3'))) # TODO: Should take from session instead
+
+            if description is not None:
+                description = clean_input(imageUrl)
+
+            if imageUrl is not None:
+                imageUrl = clean_input(imageUrl)
 
             if title == "" or releaseDateStr == "":
                 return "Missing parameters", 400
@@ -25,15 +32,16 @@ def album_create():
             session.add(new_album)
             session.commit()
             return "Created", 201
-        except Exception as e:
+        except:
             session.rollback()
-            return str(e), 500
+            return "Error occured", 400
 
 # Retrieve all music based on Album ID
 @album_bp.route("/<int:idAlbum>/music", methods=["GET"])
 def album_retrieve_all_music(idAlbum):
     with Session() as session:
         try:
+            idAlbum = clean_input(str(idAlbum))
             album = session.get(Album, idAlbum)
             if album:
                 album_music = session.query(Music, User.name, Album.title).select_from(Music).join(AlbumMusic).filter(AlbumMusic.idAlbum == idAlbum).join(User, User.id == Music.ownerId).join(Album, Album.id == AlbumMusic.idAlbum).all()
@@ -51,10 +59,11 @@ def album_retrieve_all_music(idAlbum):
             return 'Error occured', 400
 
 # Retrieve all albums that belong to an artist
-@album_bp.route("/artist=<int:ownerId>")
+@album_bp.route("/artist=<int:ownerId>", methods=["GET"])
 def album_by_artist(ownerId):
     with Session() as session:
         try:
+            ownerId = clean_input(str(ownerId))
             albums = session.query(Album, User.name).join(User).filter(Album.ownerId == ownerId).all()
             if albums:
                 return jsonify([{
@@ -76,6 +85,7 @@ def album_by_artist(ownerId):
 def album_retrieve(idAlbum):
     with Session() as session:
         try:
+            idAlbum = clean_input(str(idAlbum))
             album, ownerName = session.query(Album, User.name).join(User).filter(Album.id == idAlbum).first()
             if album:
                 return jsonify({
