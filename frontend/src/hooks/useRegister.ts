@@ -5,12 +5,13 @@ import { useRecoilState } from "recoil";
 
 interface RegisterState {
   register: (name: string, email: string, password: string) => Promise<void>;
+  registered: boolean;
   loading: boolean;
   error: string | null;
 }
 
 const useRegister = (): RegisterState => {
-  const [authState, setAuthState] = useRecoilState(authAtom);
+  const [registered, setRegistered] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,19 +36,17 @@ const useRegister = (): RegisterState => {
         return;
       }
 
-      const { accessToken } = await res.json();
-      setAuthState({ ...authState, accessToken });
-      console.log('Logged in successfully');
-      window.location.href = '/';
+      console.log('Registered successfully');
+      setRegistered(true);
     } catch (e) {
       console.warn(e);
-      setError('An error occurred during sign-in.');
+      setError('An error occurred during registration.');
     } finally {
       setLoading(false);
     }
   };
 
-  return { register, loading, error };
+  return { register, registered, loading, error };
 };
 
 export default useRegister;

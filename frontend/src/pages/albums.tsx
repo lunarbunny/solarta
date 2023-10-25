@@ -17,9 +17,9 @@ const AlbumPage: NextPage = () => {
         <Grid templateColumns="repeat(4, 1fr)" gap={8}>
           {albums &&
             albums.map((album, index) => (
-              <GridItem>
-                <Link key={index} href={`/album/${album.id}`}>
-                  <AlbumCard isPage={true} key={index} data={album} />
+              <GridItem key={index}>
+                <Link href={`/album/${album.id}`}>
+                  <AlbumCard isPage={true} data={album} />
                 </Link>
               </GridItem>
             ))}

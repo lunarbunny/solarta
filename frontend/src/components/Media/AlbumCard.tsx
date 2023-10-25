@@ -6,7 +6,7 @@ import { dateToYear } from "@/utils";
 type Props = {
   data: Album;
   onClick?: (album: Album) => void;
-  isPage: boolean;
+  isPage?: boolean;
 };
 
 const AlbumCard: React.FC<Props> = ({ data, onClick, isPage }) => {

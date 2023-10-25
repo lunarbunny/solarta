@@ -1,5 +1,5 @@
 import { Button, Input, InputGroup, Text } from '@chakra-ui/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useRegister from '@/hooks/useRegister';
 
 type RegisterProps = {
@@ -15,9 +15,15 @@ const Register: React.FC<RegisterProps> = ({ onLoginClick }) => {
   });
   const [error, setError] = useState('');
 
-  const { register, loading, error: registerError } = useRegister();
+  const { register, registered, loading, error: registerError } = useRegister();
 
-  function onRegisterSubmit(e: React.FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    if (registered) {
+      setError('Registration successful! Please check your email for a verification link.');
+    }
+  }, [registered]);
+
+  const onRegisterSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (error) setError(''); // Reset error message
 

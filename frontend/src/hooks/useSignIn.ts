@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRecoilState } from "recoil";
 
 interface SignInState {
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string, otp: string) => Promise<void>;
   loading: boolean;
   error: string | null;
 }
@@ -14,7 +14,7 @@ const useSignIn = (): SignInState => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, otp: string) => {
     setLoading(true);
     setError(null);
 
@@ -22,6 +22,7 @@ const useSignIn = (): SignInState => {
       let formData = new FormData();
       formData.append('email', email);
       formData.append('password', password);
+      formData.append('mfa', otp);
 
       let res = await fetch(`${API_URL}/user/login`, {
         method: 'POST',

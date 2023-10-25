@@ -19,7 +19,7 @@ import eyed3
 import sys
 
 def clean_input(input):
-    return re.sub(r'[^0-9A-Za-z.]+', '', input)
+    return re.sub(r'[^0-9A-Za-z.@]+', '', input)
 
 def music_get_save_dir():
     dir = os.environ.get("MUSIC_ASSET_DIR")
@@ -56,7 +56,7 @@ def generate_onboarding_token(email):
     return serializer.dumps(email, salt=os.getenv('ONBOARDING_SALT'))
 
 def send_onboarding_email(username, email):
-    confirmation_link = f"https://solarta.nisokkususu.com/api/user/onboarding/{generate_onboarding_token(email)}"
+    confirmation_link = f"https://solarta.nisokkususu.com/onboarding/{generate_onboarding_token(email)}"
     message = Mail(
     from_email='solarta@nisokkususu.com',
     to_emails=email,
@@ -73,7 +73,7 @@ def send_onboarding_email(username, email):
         print(e.message)
     return response
 
-def verify_onboarding_email(token, expiration=300) -> str:
+def verify_onboarding_email(token, expiration=2 * 60 * 60) -> str:
     verifying_email = ""
     try:
         verifying_email = serializer.loads(

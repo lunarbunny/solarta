@@ -1,4 +1,4 @@
-import { Button, Input, Text } from '@chakra-ui/react';
+import { Button, Input, InputGroup, Text } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import useSignIn from '@/hooks/useSignIn';
 
@@ -10,6 +10,7 @@ const Login: React.FC<LoginProps> = ({ onRegisterClick }) => {
   const [loginForm, setLoginForm] = useState({
     email: '',
     password: '',
+    otp: '',
   });
   const [error, setError] = useState('');
 
@@ -24,7 +25,7 @@ const Login: React.FC<LoginProps> = ({ onRegisterClick }) => {
       return;
     }
 
-    signIn(loginForm.email, loginForm.password);
+    signIn(loginForm.email, loginForm.password, loginForm.otp);
   }
 
   return (
@@ -43,6 +44,13 @@ const Login: React.FC<LoginProps> = ({ onRegisterClick }) => {
           placeholder="Password"
           value={loginForm.password}
           onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+          mt={2}
+        />
+        <Input
+          type="number"
+          placeholder="OTP"
+          value={loginForm.otp}
+          onChange={(e) => setLoginForm({ ...loginForm, otp: e.target.value })}
           mt={2}
         />
 

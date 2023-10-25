@@ -94,7 +94,6 @@ def register():
 def onboarding(token):
     with Session() as session:
         try:
-            token = clean_input(token)
             verifying_email = utils.verify_onboarding_email(token)
             if verifying_email is None:
                 return utils.nachoneko(), 400
@@ -117,15 +116,16 @@ def login():
     with Session() as session:
         try:
             data = request.form
-            email = clean_input(data.get("email"))
-            mfa = clean_input(data.get("mfa"))
-            password = clean_input(data.get("password"))
+            email = data.get("email", None)
+            password = data.get("password", None)
+            mfa = data.get("mfa", None)
 
             if email is None:
                 return "Email is required.", 400
-
-            if not utils.is_email_valid(email):
+            elif not utils.is_email_valid(email):
                 return "Email is invalid.", 400
+            
+            clean_email = clean_input(email)
 
             if mfa is None:
                 return "MFA is required.", 400
@@ -134,8 +134,8 @@ def login():
 
             if password is None:
                 return "Password is required.", 400
-
-            user = session.query(User).filter(User.email==email).first()
+        
+            user = session.query(User).filter(User.email==clean_email).first()
 
             if not utils.verify_otp(mfa, user.mfaSecret):
                 return utils.nachoneko(), 400
@@ -152,7 +152,14 @@ def login():
 
             response = make_response("ok!")
             response.status = 200
-            response.set_cookie("SESSIONID", value=user.sessionId, max_age=None, expires=cookie_expiry, secure=False, httponly=False, samesite=None)
+            response.set_cookie("SESSIONID",
+                                value=user.sessionId,
+                                max_age=None,
+                                expires=cookie_expiry,
+                                secure=False,
+                                httponly=True,
+                                samesite=None,
+                                domain="localhost")
 
             return response
 
