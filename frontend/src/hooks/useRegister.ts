@@ -1,7 +1,5 @@
-import { authAtom } from "@/atoms/auth";
 import { API_URL } from "@/types";
 import { useState } from "react";
-import { useRecoilState } from "recoil";
 
 interface RegisterState {
   register: (name: string, email: string, password: string) => Promise<void>;
@@ -30,8 +28,9 @@ const useRegister = (): RegisterState => {
         body: formData,
       });
 
+      let msg = await res.text();
+
       if (!res.ok) {
-        let msg = await res.text();
         setError(msg);
         return;
       }

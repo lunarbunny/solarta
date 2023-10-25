@@ -27,6 +27,6 @@ class User(Base):
         self.status = status
         self.roleId = roleId
         self.mfaSecret = mfaSecret
-        self.sessionid = sessionId
+        self.sessionId = sessionId
         self.sessionExpiry = sessionExpiry
         self.about = about

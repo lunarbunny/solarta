@@ -1,7 +1,7 @@
 import { Box, Flex, Text, Image, Button } from "@chakra-ui/react";
 import Playlists from "./Playlists";
-import { TbAlbumOff, TbMusic } from "react-icons/tb";
-import { IoAlbums, IoAlbumsSharp, IoLibraryOutline } from "react-icons/io5";
+import { TbMusic } from "react-icons/tb";
+import { IoLibraryOutline } from "react-icons/io5";
 import SidebarGroup from "./SidebarGroup";
 import SidebarItem from "./SidebarItem";
 import Link from "next/link";
@@ -9,13 +9,13 @@ import { useState } from "react";
 import { useRecoilState } from "recoil";
 import { authAtom } from "@/atoms/auth";
 import useSignOut from "@/hooks/useSignOut";
-import { BiAlbum } from "react-icons/bi";
-import { MdAlbum, MdOutlinePortrait, MdPortrait } from "react-icons/md";
+import { MdAlbum, MdPortrait } from "react-icons/md";
+import useFetch from "@/hooks/useFetch";
+import { API_URL, User } from "@/types";
 
 const Sidebar = () => {
   const [page, setPage] = useState("");
-
-  const [auth] = useRecoilState(authAtom);
+  const { data: user } = useFetch<User>(`${API_URL}/user/authenticated`, false, true);
   const { signOut, loading, error } = useSignOut();
 
   return (
@@ -58,10 +58,10 @@ const Sidebar = () => {
       </Box>
 
       <Flex direction="row" align="flex-end" p={4}>
-        {auth.accessToken ? (
+        {user ? (
           <>
             <Text fontSize="md" noOfLines={1}>
-              {auth.email}
+              {user.email}
             </Text>
             <Button size="sm" onClick={signOut}>
               Logout

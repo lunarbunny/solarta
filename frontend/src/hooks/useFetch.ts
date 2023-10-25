@@ -6,7 +6,7 @@ interface FetchState<T> {
   error: string | null;
 }
 
-const useFetch = <T>(url: string, usesRouter?: boolean): FetchState<T> => {
+const useFetch = <T>(url: string, usesRouter?: boolean, includeCred?: boolean): FetchState<T> => {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -16,7 +16,7 @@ const useFetch = <T>(url: string, usesRouter?: boolean): FetchState<T> => {
     if (usesRouter && url.includes("undefined")) return;
 
     setLoading(true);
-    fetch(url)
+    fetch(url, includeCred ? {credentials: 'include'} : undefined)
       .then((res) => res.json())
       .then((data: T) => {
         setData(data);
@@ -26,7 +26,7 @@ const useFetch = <T>(url: string, usesRouter?: boolean): FetchState<T> => {
         setError(error.name);
         setLoading(false);
       });
-  }, [url, usesRouter]);
+  }, [url, usesRouter, includeCred]);
 
   return { data, loading, error };
 };

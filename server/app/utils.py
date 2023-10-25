@@ -101,7 +101,10 @@ def generate_session() -> str:
 def set_cookie_expiry() -> int:
     return int(time.time()) + 60 * 60 * 24
 
-def verify_session(session, sessionId: str) -> User | None:
+def verify_session(session, sessionId: str | None) -> User | None:
+    if sessionId is None:
+        return None
+
     user = session.query(User).filter(User.sessionId==sessionId).first()
 
     if user is None:

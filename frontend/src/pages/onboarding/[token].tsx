@@ -45,7 +45,7 @@ const OnboardingPage: NextPage = () => {
         )}
         {otpToken && (
           <Flex direction="row">
-            <Box p={4}>
+            <Box m={2} p={2} bg='white'>
               <QRCode size={256} value={otpToken} />
             </Box>
             <Flex p={4} direction="column">

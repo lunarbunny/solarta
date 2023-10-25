@@ -10,7 +10,6 @@ type Props = {
 };
 
 const AlbumCard: React.FC<Props> = ({ data, onClick, isPage }) => {
-  console.log(isPage);
   return (
     <Flex
       h="100%"

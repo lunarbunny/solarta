@@ -1,5 +1,5 @@
 import { Button, Input, InputGroup, Text } from '@chakra-ui/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useSignIn from '@/hooks/useSignIn';
 
 type LoginProps = {
@@ -14,7 +14,7 @@ const Login: React.FC<LoginProps> = ({ onRegisterClick }) => {
   });
   const [error, setError] = useState('');
 
-  const { signIn, loading, error: loginError } = useSignIn();
+  const { signIn, loggedIn, loading, error: loginError } = useSignIn();
 
   const handleLoginSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -27,6 +27,13 @@ const Login: React.FC<LoginProps> = ({ onRegisterClick }) => {
 
     signIn(loginForm.email, loginForm.password, loginForm.otp);
   }
+
+  useEffect(() => {
+    if (loggedIn) {
+      window.location.href = '/';
+    }
+  }
+  , [loggedIn]);
 
   return (
     <>
@@ -54,8 +61,8 @@ const Login: React.FC<LoginProps> = ({ onRegisterClick }) => {
           mt={2}
         />
 
-        <Text textAlign="center" mt={2} fontSize="12pt" color="red.300">
-          {error || loginError}
+        <Text textAlign="center" mt={2} fontSize="12pt" color="red.300" noOfLines={2}>
+          {error || (loginError && 'Error occured while logging in.')}
         </Text>
 
         <Button

@@ -1,16 +1,18 @@
 import { authAtom } from "@/atoms/auth";
 import { API_URL } from "@/types";
 import { useState } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 
 interface SignInState {
   signIn: (email: string, password: string, otp: string) => Promise<void>;
+  loggedIn: boolean;
   loading: boolean;
   error: string | null;
 }
 
 const useSignIn = (): SignInState => {
-  const [authState, setAuthState] = useRecoilState(authAtom);
+  const setAuthState = useSetRecoilState(authAtom);
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,16 +31,16 @@ const useSignIn = (): SignInState => {
         body: formData,
       });
 
+      let msg = await res.text();
+
       if (!res.ok) {
-        let msg = await res.text();
         setError(msg || 'Invalid credentials.');
         return;
       }
 
-      const { accessToken } = await res.json();
-      setAuthState({ ...authState, accessToken });
+      setAuthState((old) => ({ ...old, accessToken: msg }));
+      setLoggedIn(true);
       console.log('Logged in successfully');
-      window.location.href = '/';
     } catch (e) {
       console.warn(e);
       setError('An error occurred during sign-in.');
@@ -47,7 +49,7 @@ const useSignIn = (): SignInState => {
     }
   };
 
-  return { signIn, loading, error };
+  return { signIn, loggedIn, loading, error };
 };
 
 export default useSignIn;

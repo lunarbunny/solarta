@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import Blueprint, jsonify, request
 from ..__init__ import Session, Album, AlbumMusic, Music, User
-from utils import clean_input
+from utils import clean_input, nachoneko, verify_session
 
 album_bp = Blueprint("album_bp", __name__)
 
@@ -10,6 +10,10 @@ album_bp = Blueprint("album_bp", __name__)
 def album_create():
     with Session() as session:
         try:
+            user = verify_session(session, request.cookies.get("sessionId"))
+            if user is None:
+                return nachoneko(), 401
+
             data = request.form
             title = clean_input(data.get("title", ""))
             releaseDateStr = clean_input(data.get("releaseDate", "")) # Format: YYYY-MM-DD

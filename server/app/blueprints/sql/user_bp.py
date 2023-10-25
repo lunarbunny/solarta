@@ -68,7 +68,7 @@ def register():
                 return "Email is required.", 400
             
             if len(name) > 64:
-                return escape("Name is too long, must be < 64 characters."), 400
+                return escape("Name is too long, must be <= 64 characters."), 400
             
             if not utils.is_email_valid(email):
                 return "Email is invalid.", 400
@@ -163,6 +163,31 @@ def login():
 
             return response
 
+        except Exception as e:
+            session.rollback()
+            if utils.is_debug_mode:
+                return str(e), 400
+            else:
+                return utils.nachoneko(), 400
+            
+@user_bp.route("/authenticated", methods=["GET"])
+def authenticated():
+    with Session() as session:
+        try:
+            sessionId = request.cookies.get('SESSIONID', None)
+            if sessionId is None:
+                return utils.nachoneko(), 400
+
+            user = utils.verify_session(session, sessionId)
+            if user is None:
+                return utils.nachoneko(), 400
+
+            return jsonify({
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "about": user.about,
+            }), 200
         except Exception as e:
             session.rollback()
             if utils.is_debug_mode:

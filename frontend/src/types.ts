@@ -34,6 +34,13 @@ type Artist = {
   about: string;
 };
 
+type User = {
+  id: string;
+  name: string;
+  email: string;
+  about: string;
+}
+
 type Genre = {
   id: number;
   name: string;
@@ -58,6 +65,7 @@ export type {
   Album,
   Playlist,
   Artist,
+  User,
   Genre,
   SearchRespose,
   PlayerPlaylistItem,
