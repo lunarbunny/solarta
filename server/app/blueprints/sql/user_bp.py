@@ -159,7 +159,7 @@ def login():
                                 secure=False,
                                 httponly=True,
                                 samesite=None,
-                                domain="localhost")
+                                domain="nisokkususu.com")
 
             return response
 
