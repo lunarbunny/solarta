@@ -186,7 +186,7 @@ const CreatePlayListPage: NextPage = () => {
 
   return (
     <Box w="100%" h="100%">
-      <Box h="20%">
+      <Box h="25%">
         <Editable
           px={5}
           py={3}
@@ -237,13 +237,13 @@ const CreatePlayListPage: NextPage = () => {
         </Editable>
       </Box>
       {/* Search bar*/}
-      <Box display="flex" alignItems="center" h="10%" py={3} px={8}>
+      <Box display="flex" alignItems="center" h="10%" py={4} px={8}>
         <SearchBar />
       </Box>
 
       {/* Music list */}
       <Box
-        h="60%"
+        h="55%"
         overflowY="auto"
         sx={{
           "&::-webkit-scrollbar": {

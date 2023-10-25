@@ -28,9 +28,18 @@ import { BsFillPlayFill } from "react-icons/bs";
 import MusicTable from "@/components/Media/MusicTable";
 import { useSetRecoilState } from "recoil";
 import { musicPlayerAtom } from "@/atoms/musicPlayer";
-import { PlayerPlaylistItem } from "../types";
+import { PlayerPlaylistItem } from "../../types";
+import { useRouter } from "next/router";
 
 const PlaylistPage: NextPage = () => {
+  const router = useRouter();
+
+  //TODO: get playlist title and desc somehow ?
+
+  const { data: playlistMusic } = useFetch<Music[]>(
+    `${API_URL}/playlist/${router.query.id}/music`
+  );
+
   const [playlistName, setPlaylistName] = useState("rasengan");
   const [playlistDesc, setPlaylistDesc] = useState("abc");
 
@@ -38,10 +47,6 @@ const PlaylistPage: NextPage = () => {
   const [editDesc, setEditDesc] = useState("");
 
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  // TODO: fetch the id of the playlist the user selected and set it to playlist_id
-
-  const { data: playlistMusic } = useFetch<Music[]>(`${API_URL}/music`);
 
   const setMusicPlayer = useSetRecoilState(musicPlayerAtom);
 
@@ -68,11 +73,31 @@ const PlaylistPage: NextPage = () => {
     }
   }
 
-  const handleSavePlaylistDetails = () => {
+  const handleSavePlaylistDetails = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     let newTitle = editTitle;
     let newDesc = editDesc;
 
-    //TODO: call API to post new title and desc to db
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("title", playlistName);
+    formData.append("description", playlistDesc);
+
+    const response = await fetch(
+      `${API_URL}/playlist/${router.query.id}/update`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    if (response.ok) {
+      window.location.reload();
+    } else {
+      console.log(response);
+    }
 
     if (newTitle != "") {
       setPlaylistName(newTitle);
@@ -80,22 +105,15 @@ const PlaylistPage: NextPage = () => {
     if (newDesc != "") {
       setPlaylistDesc(newDesc);
     }
-    onClose();
   };
 
   return (
     <Box color="whiteAlpha.800" bg="blackAlpha.700" w="100%" h="100%">
-      <Box
-        bgGradient="linear(to-t, blackAlpha.700, blue.900)"
-        w="100%"
-        h="30%"
-        // border="2px"
-        // borderColor="red.100"
-      >
+      <Box bgGradient="linear(to-t, blackAlpha.700, blue.900)" w="100%" h="30%">
         <Box h="70%">
           <Text
             px={{ md: 5, lg: 8 }}
-            fontSize={{ sm: "50px", md: "75px", lg: "100px" }}
+            fontSize={"75px"}
             onClick={onOpen}
             _hover={{ cursor: "pointer" }}
           >
@@ -179,42 +197,41 @@ const PlaylistPage: NextPage = () => {
       </Box>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Edit Details</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel>Playlist Name</FormLabel>
-              <Input
-                size="md"
-                width="auto"
-                placeholder={playlistName}
-                onChange={(newValue) => setEditTitle(newValue.target.value)}
-              />
-            </FormControl>
-            <Spacer h={5} />
-            <FormControl>
-              <FormLabel>Playlist Description</FormLabel>
-              <Textarea
-                placeholder={playlistDesc}
-                onChange={(newValue) => setEditDesc(newValue.target.value)}
-              />
-            </FormControl>
-          </ModalBody>
+        <form onSubmit={handleSavePlaylistDetails}>
+          <ModalContent>
+            <ModalHeader>Edit Details</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl>
+                <FormLabel>Playlist Name</FormLabel>
+                <Input
+                  size="md"
+                  width="auto"
+                  placeholder={playlistName}
+                  onChange={(newValue) => setEditTitle(newValue.target.value)}
+                />
+              </FormControl>
 
-          <ModalFooter>
-            <Button
-              colorScheme="blue"
-              mr={3}
-              onClick={handleSavePlaylistDetails}
-            >
-              Save
-            </Button>
-            <Button variant="ghost" onClick={onClose}>
-              Close
-            </Button>
-          </ModalFooter>
-        </ModalContent>
+              <Spacer h={5} />
+              <FormControl>
+                <FormLabel>Playlist Description</FormLabel>
+                <Textarea
+                  placeholder={playlistDesc}
+                  onChange={(newValue) => setEditDesc(newValue.target.value)}
+                />
+              </FormControl>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} type="submit" onClick={onClose}>
+                Save
+              </Button>
+              <Button variant="ghost" onClick={onClose}>
+                Close
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </form>
       </Modal>
     </Box>
   );

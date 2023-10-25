@@ -25,7 +25,10 @@ type Album = {
 };
 
 type Playlist = {
-  name: string;
+  id: number;
+  title: string;
+  description: string;
+  creationDate: string;
 };
 
 type Artist = {

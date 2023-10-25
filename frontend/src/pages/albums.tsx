@@ -13,19 +13,7 @@ const AlbumPage: NextPage = () => {
       <Heading size="md" mb={4}>
         Released Albums
       </Heading>
-      <Box py="20px" px="20px">
-        <Grid templateColumns="repeat(4, 1fr)" gap={8}>
-          {albums &&
-            albums.map((album, index) => (
-              <GridItem key={index}>
-                <Link href={`/album/${album.id}`}>
-                  <AlbumCard isPage={true} data={album} />
-                </Link>
-              </GridItem>
-            ))}
-        </Grid>
-      </Box>
-      {/* <AlbumWrap items={albums} clickable /> */}
+      <AlbumWrap items={albums} clickable />
     </Box>
   );
 };

@@ -22,11 +22,11 @@ const AlbumWrap: React.FC<Props> = ({
         albums.map((album, index) =>
           clickable ? (
             <Link key={index} href={`/album/${album.id}`}>
-              <AlbumCard isPage={false} data={album} />
+              <AlbumCard data={album} />
             </Link>
           ) : (
             <Box key={index}>
-              <AlbumCard isPage={false} data={album} />
+              <AlbumCard data={album} />
             </Box>
           )
         )}

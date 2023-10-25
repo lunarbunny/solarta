@@ -21,19 +21,7 @@ const ArtistsPage: NextPage = () => {
       <Heading size="lg" mb={4}>
         Our Talented Artists
       </Heading>
-      <Box py="20px" px="20px">
-        <Grid templateColumns="repeat(4, 1fr)" gap={10}>
-          {artists &&
-            artists.map((artist, index) => (
-              <GridItem key={index}>
-                <Link href={`/artist/${artist.id}`}>
-                  <ArtistCard data={artist} />
-                </Link>
-              </GridItem>
-            ))}
-        </Grid>
-      </Box>
-      {/* <ArtistWrap items={artists} clickable /> */}
+      <ArtistWrap items={artists} clickable />
     </Box>
   );
 };
