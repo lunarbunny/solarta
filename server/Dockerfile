@@ -1,13 +1,13 @@
-FROM python:3.11-bullseye
+FROM python:3.12-bookworm
 
 WORKDIR /app
 COPY app/ /app
 
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt && \
+    useradd -m -g users api
+
+USER api
 
 EXPOSE 5000
 
-ENV GOOGLE_APPLICATION_CREDENTIALS "/creds/serviceAccountKey.json"
-ENV MUSIC_ASSET_DIR "/assets/music"
-
-CMD ["python3", "main.py"]
+CMD ["waitress-serve", "--host=0.0.0.0", "--port=5000", "main:app"]

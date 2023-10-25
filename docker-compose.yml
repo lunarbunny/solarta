@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+    database:
+        image: mariadb
+        container_name: solarta-database
+        environment:
+            - MARIADB_DATABASE=solarta
+            - MARIADB_USER=${MARIADB_USER}
+            - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+            - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+        restart: always
+        networks:
+            - db
+        volumes:
+            - solarta-db-volume:/var/lib/mysql
+
+    api:
+        build: ./server
+        image: solarta-api
+        container_name: solarta-api
+        depends_on:
+            - database
+        environment:
+            - MUSIC_ASSET_DIR=/assets/music
+            - SQLALCHEMY_DATABASE_URI=mysql+pymysql://${MARIADB_USER}:${MARIADB_PASSWORD}@database:3306/solarta
+            - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+            - URL_SIGN_SECRET=${URL_SIGN_SECRET}
+            - ONBOARDING_SALT=${ONBOARDING_SALT}
+            - GOOGLE_APPLICATION_CREDENTIALS=/creds/serviceAccountKey.json
+        restart: always
+        networks:
+            - db
+        volumes:
+            - ./server/app/creds:/creds:ro
+            - ./server/assets:/assets/music:rw
+        ports:
+            - "5000:5000"
+
+    web:
+        build: ./frontend
+        image: solarta-web
+        container_name: solarta-web
+        depends_on:
+            - api
+        environment:
+            - NEXT_PUBLIC_SOLARTA_API_URL=https://solarta.nisokkususu.com/api
+        restart: always
+        ports:
+            - "3000:3000"
+
+volumes:
+    solarta-db-volume:
+        external: false
+
+networks:
+    db:
+        name: solarta-db-local
