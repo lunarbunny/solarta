@@ -176,11 +176,17 @@ def authenticated():
         try:
             sessionId = request.cookies.get('SESSIONID', None)
             if sessionId is None:
-                return utils.nachoneko(), 400
+                if utils.is_debug_mode:
+                    return "No session cookie found.", 400
+                else:
+                    return utils.nachoneko(), 400
 
             user = utils.verify_session(session, sessionId)
             if user is None:
-                return utils.nachoneko(), 400
+                if utils.is_debug_mode:
+                    return "Invalid session cookie.", 400
+                else:
+                    return utils.nachoneko(), 400
 
             return jsonify({
                 "id": user.id,
@@ -199,7 +205,7 @@ def authenticated():
 def logout():
     with Session() as session:
         try:
-            sessionId = clean_input(request.cookies.get('SESSIONID'))
+            sessionId = request.cookies.get('SESSIONID', None)
             if sessionId is None:
                 return utils.nachoneko(), 400
 

@@ -13,9 +13,7 @@ const useAuth = (): CurrentAuthState => {
   const setAuthState = useSetRecoilState(authAtom);
 
   useEffect(() => {
-    if (user) {
-      setAuthState((old) => ({ ...old, user }));
-    }
+    setAuthState((old) => ({ ...old, user }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 

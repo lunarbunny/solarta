@@ -4,7 +4,7 @@ from flask_cors import CORS
 from utils import is_debug_mode
 
 app = Flask(__name__)
-CORS(app) # Allow CORS for all endpoints
+CORS(app, supports_credentials=True) # Allow CORS for all endpoints
 
 # Register NoSQL blueprints
 from blueprints.nosql.history_bp import history_bp
