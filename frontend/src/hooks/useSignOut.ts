@@ -27,9 +27,9 @@ const useSignOut = (): SignOutState => {
         return;
       }
 
-      setAuthState({ ...authState, accessToken: null });
+      setAuthState({ ...authState, user: null });
       console.log('Signed out successfully');
-      window.location.href = '/';
+      window.location.href = '/auth';
     } catch (e) {
       console.warn(e);
       setError('An error occurred during sign-out.');

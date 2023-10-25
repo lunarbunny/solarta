@@ -11,7 +11,6 @@ interface SignInState {
 }
 
 const useSignIn = (): SignInState => {
-  const setAuthState = useSetRecoilState(authAtom);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +37,6 @@ const useSignIn = (): SignInState => {
         return;
       }
 
-      setAuthState((old) => ({ ...old, accessToken: msg }));
       setLoggedIn(true);
       console.log('Logged in successfully');
     } catch (e) {
