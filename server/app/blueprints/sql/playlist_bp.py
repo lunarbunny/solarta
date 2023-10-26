@@ -124,4 +124,23 @@ def playlist_retrieve_user(ownerId):
             } for playlist in playlists]), 200
         except:
             return '', 400
-    
+        
+# Retrieve a certain playlist
+@playlist_bp.route("/<int:idPlaylist>", methods=["GET"])
+def playlist_retrieve_details(idPlaylist):
+    with Session() as session:
+        try:
+            idPlaylist = clean_input(str(idPlaylist))
+            playlist = session.get(Playlist, idPlaylist)
+            if playlist:
+                return jsonify({
+                    "id": playlist.id,
+                    "title": playlist.title,
+                    "description": playlist.description,
+                    "creationDate": playlist.creationDate
+                }), 200
+            else:
+                return 'Playlist not found.', 404
+        except:
+            return 'Error occured when retrieving playlist.', 400
+        

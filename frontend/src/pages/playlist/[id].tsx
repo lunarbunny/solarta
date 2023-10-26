@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useFetch from "@/hooks/useFetch";
-import { Music, API_URL } from "@/types";
+import { Music, API_URL, Playlist } from "@/types";
 import {
   Box,
   Flex,
@@ -34,7 +34,10 @@ import { useRouter } from "next/router";
 const PlaylistPage: NextPage = () => {
   const router = useRouter();
 
-  //TODO: get playlist title and desc somehow ?
+  const { data: playlist } = useFetch<Playlist>(
+    `${API_URL}/playlist/${router.query.id}`,
+    true
+  );
 
   const { data: playlistMusic } = useFetch<Music[]>(
     `${API_URL}/playlist/${router.query.id}/music`
@@ -42,6 +45,7 @@ const PlaylistPage: NextPage = () => {
 
   const [playlistName, setPlaylistName] = useState("rasengan");
   const [playlistDesc, setPlaylistDesc] = useState("abc");
+  const [playlistDate, setPlaylistDate] = useState("2023-10-26");
 
   const [editTitle, setEditTitle] = useState("");
   const [editDesc, setEditDesc] = useState("");
@@ -107,6 +111,19 @@ const PlaylistPage: NextPage = () => {
     }
   };
 
+  useEffect(() => {
+    if (playlist != null) {
+      setPlaylistName(playlist.title);
+      setPlaylistDesc(playlist.description);
+
+      const date = new Date(playlist.creationDate);
+      const year = date.getUTCFullYear();
+      const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+      const day = date.getUTCDate().toString().padStart(2, '0');
+      setPlaylistDate(`${year}-${month}-${day}`);
+    }
+  });
+
   return (
     <Box color="whiteAlpha.800" bg="blackAlpha.700" w="100%" h="100%">
       <Box bgGradient="linear(to-t, blackAlpha.700, blue.900)" w="100%" h="30%">
@@ -167,11 +184,11 @@ const PlaylistPage: NextPage = () => {
               <Text fontSize="lg" as="b">
                 .
               </Text>
-              <Text fontSize="lg">15 songs</Text>
+              <Text fontSize="lg">{playlistMusic ? playlistMusic.length : 0} songs</Text>
               <Text fontSize="lg" as="b">
                 .
               </Text>
-              <Text fontSize="lg">50 min 20 sec</Text>
+              <Text fontSize="lg">Created {playlistDate}</Text>
             </HStack>
           </Flex>
         </Box>
