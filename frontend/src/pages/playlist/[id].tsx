@@ -43,9 +43,9 @@ const PlaylistPage: NextPage = () => {
     `${API_URL}/playlist/${router.query.id}/music`
   );
 
-  const [playlistName, setPlaylistName] = useState("rasengan");
-  const [playlistDesc, setPlaylistDesc] = useState("abc");
-  const [playlistDate, setPlaylistDate] = useState("2023-10-26");
+  const [playlistName, setPlaylistName] = useState("");
+  const [playlistDesc, setPlaylistDesc] = useState("");
+  const [playlistDate, setPlaylistDate] = useState("");
 
   const [editTitle, setEditTitle] = useState("");
   const [editDesc, setEditDesc] = useState("");
@@ -92,34 +92,38 @@ const PlaylistPage: NextPage = () => {
     const response = await fetch(
       `${API_URL}/playlist/${router.query.id}/update`,
       {
-        method: "POST",
+        method: "PUT",
         body: formData,
       }
     );
 
     if (response.ok) {
-      window.location.reload();
+      console.log(response);
     } else {
       console.log(response);
     }
 
     if (newTitle != "") {
       setPlaylistName(newTitle);
+      setEditTitle("");
     }
     if (newDesc != "") {
       setPlaylistDesc(newDesc);
+      setEditDesc("");
     }
   };
 
   useEffect(() => {
     if (playlist != null) {
+      console.log("in use effect", playlist.title);
+      console.log("in use effect", playlist.description);
+
       setPlaylistName(playlist.title);
       setPlaylistDesc(playlist.description);
-
       const date = new Date(playlist.creationDate);
       const year = date.getUTCFullYear();
-      const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-      const day = date.getUTCDate().toString().padStart(2, '0');
+      const month = (date.getUTCMonth() + 1).toString().padStart(2, "0");
+      const day = date.getUTCDate().toString().padStart(2, "0");
       setPlaylistDate(`${year}-${month}-${day}`);
     }
   });
@@ -184,7 +188,9 @@ const PlaylistPage: NextPage = () => {
               <Text fontSize="lg" as="b">
                 .
               </Text>
-              <Text fontSize="lg">{playlistMusic ? playlistMusic.length : 0} songs</Text>
+              <Text fontSize="lg">
+                {playlistMusic ? playlistMusic.length : 0} songs
+              </Text>
               <Text fontSize="lg" as="b">
                 .
               </Text>

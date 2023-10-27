@@ -13,7 +13,7 @@ import Link from "next/link";
 
 const Playlists = () => {
   const { data: playlists } = useFetch<Playlist[]>(
-    `${API_URL}/playlist/owner/2`,
+    `${API_URL}/playlist/owner/2`, // replace with user's ID instead
     true
   );
   return (
