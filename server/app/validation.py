@@ -1,7 +1,7 @@
 import re
 
 # Alphanumberic, space, and common punctuations.
-ptn_text = re.compile(r'[^0-9A-Za-z .,?!]+')
+ptn_text = re.compile(r'[^0-9A-Za-z .,?!\'\"]+')
 def clean_text(input):
     return re.sub(ptn_text, '', input)
 

@@ -8,7 +8,7 @@ class Role(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     role: Mapped[str] = mapped_column(String(45), nullable=False, unique=True)
 
-    relationship('User', backref='Role')
+    users = relationship('User', backref='Role')
 
     def __init__(self, role):
         self.role = role

@@ -8,7 +8,7 @@ class Genre(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False, autoincrement=True)
     name: Mapped[str] = mapped_column(String(45), nullable=False)
 
-    relationship('Music', backref='Genre')
+    musics = relationship('Music', backref='Genre')
 
     def __init__(self, name):
         self.name = name

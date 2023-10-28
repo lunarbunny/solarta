@@ -12,8 +12,8 @@ class Music(Base):
     genreId: Mapped[int] = mapped_column(Integer, ForeignKey('Genre.id'), nullable=False)
     ownerId: Mapped[int] = mapped_column(Integer, ForeignKey('User.id'), nullable=False)
 
-    relationship('AlbumMusic', backref='Music', cascade='all, delete-orphan') # Disassociate Music from Album when deleted
-    relationship('PlaylistMusic', backref='Music', cascade='all, delete-orphan') # Disassociate Music from Playlist when deleted
+    albums = relationship('AlbumMusic', backref='Music', cascade='all, delete-orphan') # Disassociate Music from Album when deleted
+    playlists = relationship('PlaylistMusic', backref='Music', cascade='all, delete-orphan') # Disassociate Music from Playlist when deleted
 
     def __init__(self, title, filename, duration, genreId, ownerId):
         self.title = title

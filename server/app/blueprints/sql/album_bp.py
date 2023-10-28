@@ -83,7 +83,7 @@ def album_by_artist(ownerId):
         except Exception as e:
             return 'Error occured while retriving artist', 400
 
-# Retrieve a specific album        
+# Retrieve a specific album
 @album_bp.route("/<int:idAlbum>", methods=["GET"])
 def album_retrieve(idAlbum):
     with Session() as session:

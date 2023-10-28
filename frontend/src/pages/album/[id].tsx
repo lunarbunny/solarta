@@ -2,6 +2,7 @@ import MusicList from "@/components/Media/MusicList";
 import useAuth from "@/hooks/useAuth";
 import useFetch from "@/hooks/useFetch";
 import { Album, API_URL, Music } from "@/types";
+import { dateToPretty } from "@/utils";
 import {
   Box,
   CircularProgress,
@@ -32,7 +33,7 @@ const AlbumDetailPage: NextPage = () => {
     return <CircularProgress isIndeterminate color="white.500" />;
   }
 
-  let isOwner = user && user.id == album.ownerId;
+  let isOwner = user ? user.id == album.ownerId : false;
 
   return (
     <Box w="100%" maxW={"7xl"}>
@@ -47,25 +48,25 @@ const AlbumDetailPage: NextPage = () => {
       />
 
       <Box p={8}>
-        <Box as={"header"}>
+        <Box>
           <Heading
             lineHeight={1.1}
-            fontWeight={600}
-            fontSize={{ base: "2xl", sm: "4xl", lg: "5xl" }}
+            fontWeight="semibold"
+            fontSize={{ base: "4xl", lg: "5xl" }}
           >
             {album.title}
           </Heading>
-          <Text color="gray.400" fontWeight={300} fontSize={"2xl"}>
+          <Text color="gray.400" fontWeight={300} fontSize={"xl"}>
             By{" "}
             <u><Link href={`/artist/${album.ownerId}`}>{album.ownerName}</Link></u>{isOwner && " (You)"}
           </Text>
         </Box>
 
-        <Text>{album.description}</Text>
+        <Text mt={4} color="gray.400">Released on <strong>{dateToPretty(album.releaseDate)}</strong>. {album.description}</Text>
 
         <Divider my={4} />
 
-        <MusicList items={albumMusic} />
+        <MusicList items={albumMusic} editable={isOwner} />
       </Box>
     </Box>
   );

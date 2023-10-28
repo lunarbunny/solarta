@@ -1,7 +1,7 @@
 import { authAtom } from "@/atoms/auth";
 import { API_URL, User } from "@/types";
-import { useEffect, useState } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useEffect } from "react";
+import { useSetRecoilState } from "recoil";
 import useFetch from "./useFetch";
 
 interface CurrentAuthState {

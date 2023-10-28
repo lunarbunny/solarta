@@ -16,9 +16,9 @@ class User(Base):
     sessionExpiry: Mapped[int] = mapped_column(Integer, nullable=True)
     about: Mapped[str] = mapped_column(String(255), nullable=True)
 
-    relationship('Album', backref='User')
-    relationship('Music', backref='User')
-    relationship('Playlist', backref='User')
+    albums = relationship('Album', backref='User')
+    musics = relationship('Music', backref='User')
+    playlists = relationship('Playlist', backref='User')
 
     def __init__(self, name, email, hashPwd, status, roleId, mfaSecret, sessionId, sessionExpiry, about):
         self.name = name

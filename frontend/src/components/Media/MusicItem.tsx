@@ -1,29 +1,19 @@
-import { Box, Flex, Image, Text, Tr, Th, Td } from "@chakra-ui/react";
+import { Box, Flex, Image, Text } from "@chakra-ui/react";
 import React from "react";
 import { Music } from "../../types";
-import { FiHeart } from "react-icons/fi";
-import { Value } from "sass";
+import { FiHeart, FiTrash } from "react-icons/fi";
+import { durationToTime } from "@/utils";
 
 type Props = {
   data: Music;
   onClick?: (m: Music) => void | undefined;
-  index: number;
 };
 
-function durationToTime(seconds: number): string {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}:${secs < 10 ? "0" + secs : secs}`;
-}
-
-const MusicItem: React.FC<Props> = ({ data, onClick, index }) => {
+const MusicItem: React.FC<Props> = ({ data, onClick }) => {
   return (
     <Flex
-
-      minW="300px"
+      px={2} py={1}
       alignItems="center"
-      px={2}
-      py={1}
       _hover={{ bg: "blue.700" }}
       cursor={onClick ? "pointer" : "default"}
       onClick={onClick && (() => onClick(data))}
@@ -34,7 +24,7 @@ const MusicItem: React.FC<Props> = ({ data, onClick, index }) => {
         borderRadius="full"
         src={data.imageUrl || "https://picsum.photos/42?random=" + data.id}
       />
-      <Box flex={1} ml={3} mr={3}>
+      <Box flexGrow={1} ml={3}>
         <Text fontWeight="semibold" noOfLines={1}>{data.title}</Text>
         <Text fontSize="sm" color="gray.500">
           {data.ownerName || "Unknown artist"}

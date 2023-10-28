@@ -37,8 +37,8 @@ const ArtistDetailPage: NextPage = () => {
         <Box as={'header'}>
           <Heading
             lineHeight={1.1}
-            fontWeight={600}
-            fontSize={{ base: '2xl', sm: '4xl', lg: '5xl' }}>
+            fontWeight="semibold"
+            fontSize={{ base: '4xl', lg: '5xl' }}>
             {artist.name}
           </Heading>
           <Text
@@ -49,9 +49,7 @@ const ArtistDetailPage: NextPage = () => {
           </Text>
         </Box>
 
-        <Text>
-          {artist.about}
-        </Text>
+        <Text>{artist.about}</Text>
 
         <Divider my={4} />
 

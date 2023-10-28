@@ -9,25 +9,6 @@ import utils
 
 music_bp = Blueprint("music_bp", __name__)
 
-# Delete a music entry
-@music_bp.route("/<int:id>/delete", methods=["DELETE"])
-def music_delete(id):
-    with Session() as session:
-        try:
-            id = clean_num_only(id)
-            music = session.get(Music, id)
-            if music:
-                session.query(AlbumMusic).filter(AlbumMusic.idMusic == id).delete()
-                session.query(PlaylistMusic).filter(PlaylistMusic.idMusic == id).delete()
-                session.delete(music)
-                session.commit()
-                return '', 200
-            else:
-                return '', 404
-        except:
-            session.rollback()
-            return '', 400
-
 # Create a new music entry
 @music_bp.route("/create", methods=["POST"])
 def music_create():
@@ -73,6 +54,26 @@ def music_create():
         except:
             session.rollback()
             return '', 400
+        
+# Delete music, and remove from all playlists and albums
+@music_bp.route("/delete/<int:id>", methods=["DELETE"])
+def music_delete_id(id):
+    with Session() as session:
+        try:
+            user, status = utils.check_authenticated(session, request)
+            if user is None:
+                return utils.nachoneko(), status
+             
+            music = session.get(Music, id)
+            if music and music.ownerId == user.id:
+                session.delete(music)
+                session.commit()
+                return '', 200
+            else:
+                return '', 404
+        except Exception as e:
+            session.rollback()
+            return '', 400
 
 # Retrieve all music that matches (substring of) search
 @music_bp.route("/search=<string:title>", methods=["GET"])
@@ -98,7 +99,6 @@ def music_search_string(title):
 def music_play_id(id):
     with Session() as session:
         try:
-            id = clean_num_only(str(id))
             music = session.query(Music).filter(Music.id==id).first()
             if music:
                 return send_file(os.path.join(utils.music_get_save_dir(), music.filename), as_attachment=False), 200

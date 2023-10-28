@@ -1,36 +1,30 @@
 import {
   Box,
+  Flex,
+  IconButton,
   List,
   ListItem,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  TableContainer,
-  Icon,
 } from "@chakra-ui/react";
-import React, { useCallback } from "react";
+import React from "react";
 import { API_URL, Music, PlayerPlaylistItem } from "../../types";
 import MusicItem from "./MusicItem";
-import useFetch from "@/hooks/useFetch";
 import { useSetRecoilState } from "recoil";
 import { musicPlayerAtom } from "@/atoms/musicPlayer";
-import { BiTime } from "react-icons/bi";
+import { FiTrash } from "react-icons/fi";
 
 type Props = {
   items: Music[] | null;
+  editable?: boolean;
 };
 
-const MusicList: React.FC<Props> = ({ items }) => {
+const MusicList: React.FC<Props> = ({ items, editable }) => {
   const setMusicPlayer = useSetRecoilState(musicPlayerAtom);
 
   if (items && items.length == 0) {
     return <Box>Music list is empty.</Box>;
   }
 
-  const handleClick = (m: Music) => {
+  const playMusic = (m: Music) => {
     setMusicPlayer((prevState) => {
       // If the music is already in the playlist, don't add it again.
       // Instead, move it to the top of the playlist.
@@ -62,13 +56,56 @@ const MusicList: React.FC<Props> = ({ items }) => {
     });
   };
 
+  const deleteMusic = async (m: Music) => {
+    // Ask for confirmation
+    if (!confirm(`Are you sure you want to delete "${m.title}"?`)) {
+      return;
+    }
+
+    // DELETE /music/:id
+    let res = await fetch(`${API_URL}/music/delete/${m.id}`, {
+      method: "DELETE",
+      credentials: "include",
+    })
+
+    if (res.ok) {
+      // Remove the music from the playlist
+      setMusicPlayer((prevState) => {
+        const index = prevState.playlist.findIndex((i) => i.id == m.id);
+        if (index != -1) {
+          return {
+            ...prevState,
+            playlist: [
+              ...prevState.playlist.slice(0, index),
+              ...prevState.playlist.slice(index + 1),
+            ],
+          };
+        } else {
+          return prevState;
+        }
+      });
+      window.location.reload();
+    }
+  }
+
   return (
     <Box>
       <List spacing={1}>
         {items &&
-          items.map((song, index) => (
+          items.map((music, index) => (
             <ListItem key={index}>
-              <MusicItem index={index} data={song} onClick={handleClick} />
+              <Flex w="100%" align="center">
+                <Box flexGrow={1}>
+                  <MusicItem data={music} onClick={playMusic} />
+                </Box>
+                {editable && (
+                  <IconButton ml={2}
+                    aria-label="Delete"
+                    icon={<FiTrash />} color="red"
+                    onClick={() => deleteMusic(music)}
+                  />
+                )}
+              </Flex>
             </ListItem>
           ))}
       </List>

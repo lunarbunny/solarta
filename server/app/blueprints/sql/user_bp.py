@@ -38,7 +38,7 @@ def user_retrieve_by_id(id):
         except:
             return '', 400
         
-# Retrive top 3 users
+# Retrive top 3 users (artists)
 @user_bp.route("/top3", methods=["GET"])
 def user_retrieve_top3():
     with Session() as session:

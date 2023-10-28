@@ -11,7 +11,7 @@ class Playlist(Base):
     title: Mapped[str] = mapped_column(String(45), nullable=False)
     description: Mapped[str] = mapped_column(String(45), nullable=True)
 
-    relationship('PlaylistMusic', backref='Playlist')
+    musics = relationship('PlaylistMusic', backref='Playlist')
 
     def __init__(self, ownerId, creationDate, title, description=None):
         self.ownerId = ownerId

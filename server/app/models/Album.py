@@ -12,7 +12,7 @@ class Album(Base):
     ownerId: Mapped[int] = mapped_column(Integer, ForeignKey('User.id'), nullable=False)
     description: Mapped[str] = mapped_column(String(45), nullable=True)
 
-    relationship('AlbumMusic', backref='Album')
+    musics = relationship('AlbumMusic', backref='Album')
 
     def __init__(self, title, releaseDate, ownerId, imageUrl=None, description=None):
         self.title = title
