@@ -1,19 +1,3 @@
-# Initialise Firestore
-from firebase_admin import credentials, firestore, initialize_app
-
-
-class Firestore:
-    _instance = None
-
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(Firestore, cls).__new__(cls)
-            cred = credentials.Certificate(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
-            initialize_app(cred)
-        return firestore.client()
-
-
-# Initialise MariaDB
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv

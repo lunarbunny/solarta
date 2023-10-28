@@ -6,12 +6,7 @@ from utils import is_debug_mode
 app = Flask(__name__)
 CORS(app, supports_credentials=True) # Allow CORS for all endpoints
 
-# Register NoSQL blueprints
-from blueprints.nosql.history_bp import history_bp
-
-app.register_blueprint(history_bp, url_prefix="/api/music/history")
-
-# Register SQL blueprints
+# Register blueprints
 from blueprints.sql.album_bp import album_bp
 from blueprints.sql.genre_bp import genre_bp
 from blueprints.sql.music_bp import music_bp
