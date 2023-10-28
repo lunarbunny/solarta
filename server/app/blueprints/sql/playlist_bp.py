@@ -115,7 +115,7 @@ def playlist_retrieve_all_music(idPlaylist):
 
 # Retrieve all playlists of a user
 @playlist_bp.route("/mine", methods=["GET"])
-def playlist_retrieve_user(ownerId):
+def playlist_retrieve_user():
     with Session() as session:
         try:
             user, status = utils.check_authenticated(session, request)
