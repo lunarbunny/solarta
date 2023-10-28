@@ -4,8 +4,8 @@ from flask import Blueprint, jsonify, request, send_file
 from werkzeug.utils import secure_filename
 
 from ..__init__ import Session, Music, User, AlbumMusic, PlaylistMusic, Album
-from utils import music_get_save_dir, music_get_duration
-from validation import clean_alphanum, clean_num_only, clean_text
+from validation import clean_num_only, clean_text
+import utils
 
 music_bp = Blueprint("music_bp", __name__)
 
@@ -33,10 +33,14 @@ def music_delete(id):
 def music_create():
     with Session() as session:
         try:
+            user, status = utils.check_authenticated(session, request)
+            if user is None:
+                return utils.nachoneko(), status
+
+            ownerId = user.id
             data = request.form
             title = data.get("title", "")
             genreId = data.get("genreId", "")
-            ownerId = data.get("ownerId", "") # TODO: Should take from session instead
             albumId = data.get("albumId", "")
             music_file = request.files["music_file"]
 
@@ -51,11 +55,11 @@ def music_create():
             # Limit title to 28 characters, leave 6 characters for owner ID prefix, and 5 characters for extension
             # XXXXXX-<title>.mp3
             filename = f"{ownerId:06}-{secure_filename(filename)[:28]}{ext}"
-            save_dir = music_get_save_dir()
+            save_dir = utils.music_get_save_dir()
             save_path = os.path.join(save_dir, filename)
             
             music_file.save(save_path)
-            duration = music_get_duration(save_path)
+            duration = utils.music_get_duration(save_path)
             if duration is None:
                 return 'Cannot get duration', 422
             
@@ -97,7 +101,7 @@ def music_play_id(id):
             id = clean_num_only(str(id))
             music = session.query(Music).filter(Music.id==id).first()
             if music:
-                return send_file(os.path.join(music_get_save_dir(), music.filename), as_attachment=False), 200
+                return send_file(os.path.join(utils.music_get_save_dir(), music.filename), as_attachment=False), 200
             else:
                 return 'Not found', 404
         except:
@@ -128,7 +132,9 @@ def music_retrieve_trending():
 def music_retrieve_mine():
     with Session() as session:
         try:
-            ownerId = 3 # TODO: Should take from session instead
+            user, status = utils.check_authenticated(session, request)
+            ownerId = user.id
+
             musics = session.query(Music, User.name, Album.title).filter(Music.ownerId == ownerId).join(User, Music.ownerId == User.id).join(AlbumMusic, Music.id == AlbumMusic.idMusic).join(Album, AlbumMusic.idAlbum == Album.id).all()
             if musics:
                 return jsonify([{

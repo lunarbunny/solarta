@@ -9,7 +9,10 @@ interface CurrentAuthState {
 }
 
 const useAuth = (): CurrentAuthState => {
-  const { data: user } = useFetch<User>(`${API_URL}/user/authenticated`, false, true);
+  const { data: user } = useFetch<User>(
+    `${API_URL}/user/authenticated`,
+    { includeCred: true }
+  );
   const setAuthState = useSetRecoilState(authAtom);
 
   useEffect(() => {

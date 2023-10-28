@@ -21,7 +21,7 @@ const AlbumManagement: React.FC<Props> = ({ albums }) => {
 
   const [albumForm, setAlbumForm] = useState<AlbumForm>({
     title: '',
-    releaseDate: '',
+    releaseDate: new Date().toISOString().slice(0, 10),
     description: '',
     imageUrl: null,
   });
@@ -42,6 +42,7 @@ const AlbumManagement: React.FC<Props> = ({ albums }) => {
     const response = await fetch(`${API_URL}/album/create`, {
       method: 'POST',
       body: formData,
+      credentials: 'include',
     });
 
     if (response.ok) {

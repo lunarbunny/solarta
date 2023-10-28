@@ -126,6 +126,7 @@ const CreatePlayListPage: NextPage = () => {
     const response = await fetch(`${API_URL}/playlist/create`, {
       method: "POST",
       body: formData,
+      credentials: 'include',
     });
 
     if (response.ok) {

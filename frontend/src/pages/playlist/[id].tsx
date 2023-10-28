@@ -36,11 +36,12 @@ const PlaylistPage: NextPage = () => {
 
   const { data: playlist } = useFetch<Playlist>(
     `${API_URL}/playlist/${router.query.id}`,
-    true
+    { usesRouter: true }
   );
 
   const { data: playlistMusic } = useFetch<Music[]>(
-    `${API_URL}/playlist/${router.query.id}/music`
+    `${API_URL}/playlist/${router.query.id}/music`,
+    { usesRouter: true }
   );
 
   const [playlistName, setPlaylistName] = useState("");

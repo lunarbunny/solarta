@@ -1,4 +1,5 @@
 from datetime import datetime
+from email import utils
 from flask import Blueprint, jsonify, request
 
 from ..__init__ import Session, Playlist, PlaylistMusic, Music
@@ -30,7 +31,8 @@ def playlist_delete(id):
 def playlist_create():
     with Session() as session:
         try:
-            ownerId = 3 # TODO: Should take from session instead
+            user, status = utils.check_authenticated(session, request)
+            ownerId = user.id
             
             data = request.form
             creationDateStr = data.get("creationDate", "") # Format: YYYY-MM-DD
@@ -112,11 +114,15 @@ def playlist_retrieve_all_music(idPlaylist):
             return '', 400
 
 # Retrieve all playlists of a user
-@playlist_bp.route("/owner/<int:ownerId>", methods=["GET"])
+@playlist_bp.route("/mine", methods=["GET"])
 def playlist_retrieve_user(ownerId):
     with Session() as session:
         try:
-            ownerId = clean_num_only(str(ownerId))
+            user, status = utils.check_authenticated(session, request)
+            if user is None:
+                return utils.nachoneko(), status
+
+            ownerId = user.id
             playlists = session.query(Playlist).filter(Playlist.ownerId == ownerId).all()
             return jsonify([{
                 "id": playlist.id,

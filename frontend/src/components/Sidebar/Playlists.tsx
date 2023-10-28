@@ -5,16 +5,10 @@ import SidebarItem from "./SidebarItem";
 import useFetch from "@/hooks/useFetch";
 import Link from "next/link";
 
-// const playlists: Playlist[] = [
-//   { name: "Favourites" },
-//   { name: "我们一起喵喵喵" },
-//   { name: "阳光彩虹小白马" },
-// ];
-
 const Playlists = () => {
   const { data: playlists } = useFetch<Playlist[]>(
-    `${API_URL}/playlist/owner/2`, // replace with user's ID instead
-    true
+    `${API_URL}/playlist/mine`,
+    { includeCred: true }
   );
   return (
     <>

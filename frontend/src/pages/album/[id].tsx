@@ -1,6 +1,7 @@
 import MusicList from "@/components/Media/MusicList";
+import useAuth from "@/hooks/useAuth";
 import useFetch from "@/hooks/useFetch";
-import { Album, API_URL, Music, User } from "@/types";
+import { Album, API_URL, Music } from "@/types";
 import {
   Box,
   CircularProgress,
@@ -13,25 +14,25 @@ import { NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-type Props = {
-  user: User | null;
-};
-
 // Accessed via /album/[id]
-const AlbumDetailPage: NextPage<Props> = ({ user }) => {
+const AlbumDetailPage: NextPage = () => {
   const router = useRouter();
   const { data: album } = useFetch<Album>(
     `${API_URL}/album/${router.query.id}`,
-    true
+    { usesRouter: true },
   );
   const { data: albumMusic } = useFetch<Music[]>(
     `${API_URL}/album/${router.query.id}/music`,
-    true
+    { usesRouter: true },
   );
+
+  const { user } = useAuth();
 
   if (!album) {
     return <CircularProgress isIndeterminate color="white.500" />;
   }
+
+  let isOwner = user && user.id == album.ownerId;
 
   return (
     <Box w="100%" maxW={"7xl"}>
@@ -56,9 +57,11 @@ const AlbumDetailPage: NextPage<Props> = ({ user }) => {
           </Heading>
           <Text color="gray.400" fontWeight={300} fontSize={"2xl"}>
             By{" "}
-            <u>
-              <Link href={`album/${album.id}`}>{album.ownerName}</Link>
-            </u>
+            {isOwner ? (
+              "You"
+            ) : (
+              <u><Link href={`album/${album.id}`}>{album.ownerName}</Link></u>
+            )}
           </Text>
         </Box>
 

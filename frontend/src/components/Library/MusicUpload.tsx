@@ -63,6 +63,7 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
     const response = await fetch(`${API_URL}/music/create`, {
       method: "POST",
       body: formData,
+      credentials: 'include',
     });
 
     if (response.ok) {

@@ -30,7 +30,6 @@ pipeline {
             }
         }
 
-        // TODO: Add a stage to deploy frontend
         stage('Build and Deploy Frontend') {
             steps{
                 script {

@@ -6,7 +6,12 @@ interface FetchState<T> {
   error: string | null;
 }
 
-const useFetch = <T>(url: string, usesRouter?: boolean, includeCred?: boolean): FetchState<T> => {
+interface FetchOptions {
+  usesRouter?: boolean;
+  includeCred?: boolean;
+}
+
+const useFetch = <T>(url: string, { usesRouter = false, includeCred = false }: FetchOptions = {}): FetchState<T> => {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);

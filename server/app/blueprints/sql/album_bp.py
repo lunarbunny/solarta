@@ -1,8 +1,9 @@
 from datetime import datetime
+from email import utils
 from flask import Blueprint, jsonify, request
 
 from ..__init__ import Session, Album, AlbumMusic, Music, User
-from utils import check_authenticated, nachoneko
+import utils
 from validation import clean_alphanum, clean_num_only, clean_text
 
 album_bp = Blueprint("album_bp", __name__)
@@ -12,19 +13,20 @@ album_bp = Blueprint("album_bp", __name__)
 def album_create():
     with Session() as session:
         try:
-            user, status = check_authenticated(session, request.cookies.get("session_id"))
+            user, status = utils.check_authenticated(session, request)
             if user is None:
-                return nachoneko(), status
+                return utils.nachoneko(), status
 
+            ownerId = user.id
+            
             data = request.form
             title = clean_text(data.get("title", ""))
             releaseDateStr = data.get("releaseDate", "") # Format: YYYY-MM-DD
-            description = data.get("description", None) # Optional
+            description = data.get("description", "") # Optional
             imageUrl = data.get("imageUrl", None) # Optional
-            ownerId = int(clean_num_only(data.get("ownerId", '3'))) # TODO: Should take from session instead
 
-            if description is not None:
-                description = clean_alphanum(imageUrl)
+            if description != "":
+                description = clean_alphanum(description)
 
             if title == "" or releaseDateStr == "":
                 return "Missing parameters", 400
@@ -125,7 +127,11 @@ def album_retrieve_top3():
 def album_retrieve_mine():
     with Session() as session:
         try:
-            ownerId = 3 # TODO: Should take from session instead
+            user, status = utils.check_authenticated(session, request)
+            if user is None:
+                return utils.nachoneko(), status
+
+            ownerId = user.id
             albums = session.query(Album, User.name).filter(Album.ownerId == ownerId).join(User).all()
             if albums:
                 return jsonify([{

@@ -32,13 +32,13 @@ type Playlist = {
 };
 
 type Artist = {
-  id: string;
+  id: number;
   name: string;
   about: string;
 };
 
 type User = {
-  id: string;
+  id: number;
   name: string;
   email: string;
   about: string;
