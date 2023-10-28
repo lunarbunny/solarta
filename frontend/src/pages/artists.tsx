@@ -18,7 +18,7 @@ const ArtistsPage: NextPage = () => {
 
   return (
     <Box w="100%" p={8} h="100%">
-      <Heading size="lg" mb={4}>
+      <Heading size="md" mb={4}>
         Our Talented Artists
       </Heading>
       <ArtistWrap items={artists} clickable />

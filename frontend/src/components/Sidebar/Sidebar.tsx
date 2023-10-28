@@ -65,13 +65,13 @@ const Sidebar = () => {
           <Playlists />
         </SidebarGroup>
       </Box>
-      <Flex direction="row" align="flex-end" p={4}>
+      <Flex direction="column" p={4}>
         {user ? (
           <>
-            <Text fontSize="md" noOfLines={1}>
-              {user.email}
+            <Text fontSize="md" noOfLines={1} color="gray.300">
+              You are signed in as <strong>{user.name}</strong>
             </Text>
-            <Button size="sm" onClick={signOut}>
+            <Button size="sm" onClick={signOut} variant={"outline"}>
               Logout
             </Button>
           </>

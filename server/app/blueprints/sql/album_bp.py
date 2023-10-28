@@ -26,7 +26,7 @@ def album_create():
             imageUrl = data.get("imageUrl", None) # Optional
 
             if description != "":
-                description = clean_alphanum(description)
+                description = clean_text(description)
 
             if title == "" or releaseDateStr == "":
                 return "Missing parameters", 400

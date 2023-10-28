@@ -57,11 +57,7 @@ const AlbumDetailPage: NextPage = () => {
           </Heading>
           <Text color="gray.400" fontWeight={300} fontSize={"2xl"}>
             By{" "}
-            {isOwner ? (
-              "You"
-            ) : (
-              <u><Link href={`album/${album.id}`}>{album.ownerName}</Link></u>
-            )}
+            <u><Link href={`/artist/${album.ownerId}`}>{album.ownerName}</Link></u>{isOwner && " (You)"}
           </Text>
         </Box>
 
