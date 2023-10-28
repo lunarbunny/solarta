@@ -98,27 +98,24 @@ def generate_session() -> str:
 def set_cookie_expiry() -> int:
     return int(time.time()) + 60 * 60 * 24
 
-def require_authenticated(request) -> User | None:
-    if request.cookies.get("SESSIONID") is None:
-        return nachoneko(), 401
-    return verify_session(request.cookies.get("SESSIONID"))
+# Check if user is authenticated, return (User | None, http status code)
+def check_authenticated(db, request) -> tuple[User | None, int]:
+    session_id = request.cookies.get("SESSIONID")
+    if session_id is None:
+        return None, 401
 
-def verify_session(session, sessionId: str | None) -> User | None:
-    if sessionId is None:
-        return None
-
-    user = session.query(User).filter(User.sessionId==sessionId).first()
+    user = db.query(User).filter(User.sessionId==session_id).first()
 
     if user is None:
-        return None
+        return None, 401
 
     if user.sessionExpiry < int(time.time()):
         user.sessionId = None
         user.sessionExpiry = None
-        session.commit()
-        return None
+        db.commit()
+        return None, 401
 
-    return user
+    return user, 200
 
 def nachoneko() -> str:
     return '<br>'.join([

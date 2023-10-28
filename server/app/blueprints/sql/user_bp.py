@@ -21,20 +21,6 @@ def user_retrieve_all():
         except:
             return '', 400
         
-# Retrive top 3 users
-@user_bp.route("/top3", methods=["GET"])
-def user_retrieve_top3():
-    with Session() as session:
-        try:
-            users = session.query(User).filter(User.roleId != 1).limit(3).all()
-            return jsonify([{
-                "id": user.id,
-                "name": user.name,
-                "about": user.about,
-            } for user in users[:3]]), 200
-        except:
-            return '', 400
-        
 # Retrieve user by id
 @user_bp.route("/<int:id>", methods=["GET"])
 def user_retrieve_by_id(id):
@@ -51,7 +37,22 @@ def user_retrieve_by_id(id):
             }), 200
         except:
             return '', 400
+        
+# Retrive top 3 users
+@user_bp.route("/top3", methods=["GET"])
+def user_retrieve_top3():
+    with Session() as session:
+        try:
+            users = session.query(User).filter(User.roleId != 1).limit(3).all()
+            return jsonify([{
+                "id": user.id,
+                "name": user.name,
+                "about": user.about,
+            } for user in users[:3]]), 200
+        except:
+            return '', 400
 
+# Register a new user
 @user_bp.route("/register", methods=["POST"])
 def register():
     with Session() as session:
@@ -89,6 +90,7 @@ def register():
             else:
                 return utils.nachoneko(), 400
             
+# Verify email and setup MFA
 @user_bp.route("/onboarding/<string:token>", methods=["GET"])
 def onboarding(token):
     with Session() as session:
@@ -110,6 +112,7 @@ def onboarding(token):
             else:
                 return utils.nachoneko(), 400
 
+# Login with email, password and OTP
 @user_bp.route("/login", methods=["POST"])
 def login():
     with Session() as session:
@@ -168,49 +171,34 @@ def login():
                 return str(e), 400
             else:
                 return utils.nachoneko(), 400
-            
+    
+# Check if user is authenticated
 @user_bp.route("/authenticated", methods=["GET"])
 def authenticated():
     with Session() as session:
-        try:
-            sessionId = request.cookies.get('SESSIONID', None)
-            if sessionId is None:
-                if utils.is_debug_mode:
-                    return "No session cookie found.", 400
-                else:
-                    return utils.nachoneko(), 400
+        user, status = utils.check_authenticated(session, request)
 
-            user = utils.verify_session(session, sessionId)
-            if user is None:
-                if utils.is_debug_mode:
-                    return "Invalid session cookie.", 400
-                else:
-                    return utils.nachoneko(), 400
-
-            return jsonify({
-                "id": user.id,
-                "name": user.name,
-                "email": user.email,
-                "about": user.about,
-            }), 200
-        except Exception as e:
-            session.rollback()
+        if user is None:
             if utils.is_debug_mode:
-                return str(e), 400
+                return "Invalid session cookie.", status
             else:
-                return utils.nachoneko(), 400
+                return utils.nachoneko(), status
+
+        return jsonify({
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "about": user.about,
+            "admin": user.roleId == 1,
+        }), 200
 
 @user_bp.route("/logout", methods=["GET"])
 def logout():
     with Session() as session:
         try:
-            sessionId = request.cookies.get('SESSIONID', None)
-            if sessionId is None:
-                return utils.nachoneko(), 400
-
-            user = utils.verify_session(session, sessionId)
+            user, status = utils.check_authenticated(session, request)
             if user is None:
-                return utils.nachoneko(), 400
+                return utils.nachoneko(), status
 
             user.sessionId = None
             user.sessionExpiry = None

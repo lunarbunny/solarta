@@ -1,30 +1,24 @@
 import MusicList from "@/components/Media/MusicList";
 import useFetch from "@/hooks/useFetch";
-import { Album, API_URL, Music } from "@/types";
+import { Album, API_URL, Music, User } from "@/types";
 import {
   Box,
-  Button,
   CircularProgress,
-  Container,
   Divider,
-  Flex,
   Heading,
   Image,
-  List,
-  ListItem,
-  SimpleGrid,
-  Stack,
-  StackDivider,
   Text,
-  VStack,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { MdLocalShipping } from "react-icons/md";
+
+type Props = {
+  user: User | null;
+};
 
 // Accessed via /album/[id]
-const AlbumDetailPage: NextPage = () => {
+const AlbumDetailPage: NextPage<Props> = ({ user }) => {
   const router = useRouter();
   const { data: album } = useFetch<Album>(
     `${API_URL}/album/${router.query.id}`,

@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import Blueprint, jsonify, request
 
 from ..__init__ import Session, Album, AlbumMusic, Music, User
-from utils import nachoneko, verify_session
+from utils import check_authenticated, nachoneko
 from validation import clean_alphanum, clean_num_only, clean_text
 
 album_bp = Blueprint("album_bp", __name__)
@@ -12,9 +12,9 @@ album_bp = Blueprint("album_bp", __name__)
 def album_create():
     with Session() as session:
         try:
-            user = verify_session(session, request.cookies.get("sessionId"))
+            user, status = check_authenticated(session, request.cookies.get("session_id"))
             if user is None:
-                return nachoneko(), 401
+                return nachoneko(), status
 
             data = request.form
             title = clean_text(data.get("title", ""))
@@ -44,7 +44,6 @@ def album_create():
 def album_retrieve_all_music(idAlbum):
     with Session() as session:
         try:
-            idAlbum = clean_num_only(idAlbum)
             album = session.get(Album, idAlbum)
             if album:
                 album_music = session.query(Music, User.name, Album.title).select_from(Music).join(AlbumMusic).filter(AlbumMusic.idAlbum == idAlbum).join(User, User.id == Music.ownerId).join(Album, Album.id == AlbumMusic.idAlbum).all()
@@ -66,7 +65,6 @@ def album_retrieve_all_music(idAlbum):
 def album_by_artist(ownerId):
     with Session() as session:
         try:
-            ownerId = clean_num_only(ownerId)
             albums = session.query(Album, User.name).join(User).filter(Album.ownerId == ownerId).all()
             if albums:
                 return jsonify([{
@@ -88,7 +86,6 @@ def album_by_artist(ownerId):
 def album_retrieve(idAlbum):
     with Session() as session:
         try:
-            idAlbum = clean_num_only(idAlbum)
             album, ownerName = session.query(Album, User.name).join(User).filter(Album.id == idAlbum).first()
             if album:
                 return jsonify({
