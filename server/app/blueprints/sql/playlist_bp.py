@@ -1,7 +1,8 @@
 from datetime import datetime
 from flask import Blueprint, jsonify, request
+
 from ..__init__ import Session, Playlist, PlaylistMusic, Music
-from utils import clean_input
+from validation import clean_alphanum, clean_num_only, clean_text
 
 playlist_bp = Blueprint("playlist_bp", __name__)
 
@@ -11,7 +12,7 @@ def playlist_delete(id):
     from ..__init__ import PlaylistMusic
     with Session() as session:
         try:
-            id = clean_input(str(id))
+            id = clean_num_only(str(id))
             playlist = session.get(Playlist, id)
             if playlist:
                 session.query(PlaylistMusic).filter(PlaylistMusic.idPlaylist == id).delete()
@@ -29,11 +30,12 @@ def playlist_delete(id):
 def playlist_create():
     with Session() as session:
         try:
+            ownerId = 3 # TODO: Should take from session instead
+            
             data = request.form
-            ownerId = int(clean_input(data["ownerId"])) # TODO: Should take from session instead
-            creationDateStr = clean_input(data.get("creationDate", "")) # Format: YYYY-MM-DD
-            title = clean_input(data["title"])
-            description = clean_input(data.get("description", None)) # Optional
+            creationDateStr = data.get("creationDate", "") # Format: YYYY-MM-DD
+            title = clean_text(data["title"])
+            description = clean_text(data.get("description", None)) # Optional
 
             if ownerId == "" or title == "" or creationDateStr == "":
                 return "Missing parameters", 400
@@ -52,8 +54,8 @@ def playlist_create():
 def playlist_add_song(idPlaylist, idMusic):
     with Session() as session:
         try:
-            idPlaylist = int(clean_input(idPlaylist))
-            idMusic = int(clean_input(idMusic))
+            idPlaylist = int(clean_num_only(idPlaylist))
+            idMusic = int(clean_num_only(idMusic))
             playlist = session.get(Playlist, idPlaylist)
             music = session.get(Music, idMusic)
 
@@ -73,12 +75,12 @@ def playlist_add_song(idPlaylist, idMusic):
 def playlist_update(id):
     with Session() as session:
         try:
-            id = clean_input(str(id))
+            id = clean_num_only(str(id))
             music = session.get(Playlist, id)
             if music:
                 data = request.form
-                title = clean_input(data.get("title", music.title))
-                description = clean_input(data.get("description", music.description))
+                title = clean_text(data.get("title", music.title))
+                description = clean_text(data.get("description", music.description))
                 music.title = title
                 music.description = description
                 session.commit()
@@ -94,7 +96,7 @@ def playlist_update(id):
 def playlist_retrieve_all_music(idPlaylist):
     with Session() as session:
         try:
-            idPlaylist = clean_input(str(idPlaylist))
+            idPlaylist = clean_num_only(str(idPlaylist))
             playlist = session.get(Playlist, idPlaylist)
             if playlist:
                 playlist_music = session.query(Music).join(PlaylistMusic).filter(PlaylistMusic.idPlaylist == idPlaylist)
@@ -114,7 +116,7 @@ def playlist_retrieve_all_music(idPlaylist):
 def playlist_retrieve_user(ownerId):
     with Session() as session:
         try:
-            ownerId = clean_input(str(ownerId))
+            ownerId = clean_num_only(str(ownerId))
             playlists = session.query(Playlist).filter(Playlist.ownerId == ownerId).all()
             return jsonify([{
                 "id": playlist.id,
@@ -130,7 +132,7 @@ def playlist_retrieve_user(ownerId):
 def playlist_retrieve_details(idPlaylist):
     with Session() as session:
         try:
-            idPlaylist = clean_input(str(idPlaylist))
+            idPlaylist = clean_num_only(str(idPlaylist))
             playlist = session.get(Playlist, idPlaylist)
             if playlist:
                 return jsonify({

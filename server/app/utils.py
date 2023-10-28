@@ -18,9 +18,6 @@ serializer = URLSafeTimedSerializer(secret_key=os.getenv('URL_SIGN_SECRET'))
 import eyed3
 import sys
 
-def clean_input(input):
-    return re.sub(r'[^0-9A-Za-z.@]+', '', input)
-
 def music_get_save_dir():
     dir = os.environ.get("MUSIC_ASSET_DIR")
     if dir is None:
@@ -100,6 +97,11 @@ def generate_session() -> str:
 
 def set_cookie_expiry() -> int:
     return int(time.time()) + 60 * 60 * 24
+
+def require_authenticated(request) -> User | None:
+    if request.cookies.get("SESSIONID") is None:
+        return nachoneko(), 401
+    return verify_session(request.cookies.get("SESSIONID"))
 
 def verify_session(session, sessionId: str | None) -> User | None:
     if sessionId is None:

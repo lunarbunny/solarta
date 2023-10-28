@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, make_response
 from markupsafe import escape
-from utils import clean_input
+from validation import clean_alphanum, clean_email, clean_num_only, clean_text
 
 from .. import Session, User, Role
 import utils
@@ -40,7 +40,7 @@ def user_retrieve_top3():
 def user_retrieve_by_id(id):
     with Session() as session:
         try:
-            id = clean_input(str(id))
+            id = clean_num_only(str(id))
             user = session.query(User).filter(User.id==id).first()
             if user is None:
                 return '', 404
@@ -57,10 +57,9 @@ def register():
     with Session() as session:
         try:
             data = request.form
-            name = clean_input(data.get("name"))
-            email = clean_input(data.get("email"))
-            password = clean_input(data.get("password"))
-            #confirmPassword = clean_input(data.get("confirmPassword"))
+            name = clean_text(data.get("name"))
+            email = clean_email(data.get("email"))
+            password = data.get("password")
             if name is None:
                 return "Name is required.", 400
             
@@ -125,7 +124,7 @@ def login():
             elif not utils.is_email_valid(email):
                 return "Email is invalid.", 400
             
-            clean_email = clean_input(email)
+            cleaned_email = clean_email(email)
 
             if mfa is None:
                 return "MFA is required.", 400
@@ -135,7 +134,7 @@ def login():
             if password is None:
                 return "Password is required.", 400
         
-            user = session.query(User).filter(User.email==clean_email).first()
+            user = session.query(User).filter(User.email==cleaned_email).first()
 
             if not utils.verify_otp(mfa, user.mfaSecret):
                 return utils.nachoneko(), 400

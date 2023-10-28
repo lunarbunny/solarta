@@ -12,10 +12,10 @@ import SidebarItem from "./SidebarItem";
 import { useRouter } from "next/router";
 
 const Sidebar = () => {
-  const [page, setPage] = useState("");
-  const { user } = useAuth();
-  const { signOut, loading, error } = useSignOut();
   const router = useRouter();
+  const { user } = useAuth();
+  const { signOut } = useSignOut();
+  const [page, setPage] = useState("home");
 
   console.log(router.asPath);
   return (
@@ -40,20 +40,21 @@ const Sidebar = () => {
           <Box flexGrow={1}>
             <SidebarGroup title="DISCOVER" hasButton={false}>
               <Link href="/" onClick={() => setPage("home")}>
-                <SidebarItem name="Home" icon={<TbMusic size={20} />} />
+                <SidebarItem name="Home" icon={<TbMusic size={20} />} bolded={page == 'home'} />
               </Link>
-              <Link href="/artists" onClick={() => setPage("library")}>
-                <SidebarItem name="Artists" icon={<MdPortrait size={20} />} />
+              <Link href="/artists" onClick={() => setPage("artists")}>
+                <SidebarItem name="Artists" icon={<MdPortrait size={20} />} bolded={page == 'artists'} />
               </Link>
-              <Link href="/albums" onClick={() => setPage("library")}>
-                <SidebarItem name="Albums" icon={<MdAlbum size={20} />} />
+              <Link href="/albums" onClick={() => setPage("albums")}>
+                <SidebarItem name="Albums" icon={<MdAlbum size={20} />} bolded={page == 'albums'} />
               </Link>
-              <Link href="/library" onClick={() => setPage("library")}>
-                <SidebarItem
-                  name="My Library"
-                  icon={<IoLibraryOutline size={20} />}
-                />
-              </Link>
+              {
+                user && (
+                  <Link href="/library" onClick={() => setPage("library")}>
+                    <SidebarItem name="My Library" icon={<IoLibraryOutline size={20} />} bolded={page == 'library'} />
+                  </Link>
+                )
+              }
             </SidebarGroup>
 
             <SidebarGroup title="PLAYLISTS" hasButton={true}>
