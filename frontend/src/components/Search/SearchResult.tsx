@@ -1,13 +1,14 @@
 import useFetch from "@/hooks/useFetch";
 import { Box } from "@chakra-ui/react";
 import SidebarItem from "../Sidebar/SidebarItem";
+import { Music, API_URL } from "@/types";
 
 type Props = {
   query: string;
 };
 
 const SearchResults = ({ query }: Props) => {
-  //const { data, loading, error } = useFetch<SearchRespose>(`${API_URL}}/search?q=${query}`);
+  const { data, loading, error } = useFetch<Music[]>(`${API_URL}/music/search=${query}`);
 
   return (
     <>
@@ -21,12 +22,9 @@ const SearchResults = ({ query }: Props) => {
         >
           {/* {loading && <strong>Loading...</strong>}
           {error && <strong>Error occured</strong>} */}
-
-          <SidebarItem name="Result 1" icon={<></>} />
-          <SidebarItem name="Result 2" icon={<></>} />
-          <SidebarItem name="Result 3" icon={<></>} />
-          <SidebarItem name="Result 4" icon={<></>} />
-          <SidebarItem name="Result 5" icon={<></>} />
+          {data && data.map((song, index) => (
+            <SidebarItem key={index} name={song.title} icon={<></>} />
+          ))}
         </Box>
       )}
     </>

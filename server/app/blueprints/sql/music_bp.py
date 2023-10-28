@@ -80,7 +80,7 @@ def music_search_string(title):
     with Session() as session:
         try:
             title = clean_text(title)
-            music_search_results = session.query(Music).filter(Music.title.ilike(f"%{title}"))
+            music_search_results = session.query(Music).filter(Music.title.ilike(f"{title}%"))
             if music_search_results:
                 return jsonify([{
                     "id": music.id,

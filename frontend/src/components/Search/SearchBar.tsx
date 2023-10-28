@@ -14,7 +14,7 @@ const SearchBar = () => {
         mb="-4px"
         flexGrow={1}
         type="text"
-        placeholder='Search for songs, artists...'
+        placeholder='Search for songs...'
         _placeholder={{ color: 'gray.200' }}
         variant="unstyled"
         value={query}
