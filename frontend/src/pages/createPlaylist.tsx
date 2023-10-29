@@ -1,4 +1,4 @@
-import { API_URL } from "@/types";
+import { API_URL, Music } from "@/types";
 import {
   Box,
   Center,
@@ -29,84 +29,57 @@ import { useState } from "react";
 import SearchBar from "@/components/Search/SearchBar";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { BiTime } from "react-icons/bi";
+import { formatDate, durationToTime } from "../utils";
 
 const CreatePlayListPage: NextPage = () => {
-  type PlaylistItem = {
-    src: string;
-    title: string;
-    artist: string;
-    album: string;
-    duration: number;
-    cover: string;
-  };
-
-  const playlist: PlaylistItem[] = [
+  const playlist: Music[] = [
     {
-      src: `${API_URL}/music/play/1`,
+      id: 1,
       title: "Yo!",
-      artist: "Xandr",
-      album: "ICTSMC",
       duration: 180,
-      cover: "https://picsum.photos/64?random=1",
+      ownerName: "Xandr",
+      albumName: "ICTSMC",
+      genreId: 1,
+      imageUrl: "https://picsum.photos/64?random=1",
     },
     {
-      src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
+      id: 2,
       title: "SoundHelix-Song-9",
-      artist: "somebody",
-      album: "Free Music",
       duration: 200,
-      cover: "https://bit.ly/dan-abramov",
+      ownerName: "somebody",
+      albumName: "Free Music",
+      genreId: 1,
+      imageUrl: "https://bit.ly/dan-abramov",
     },
     {
-      src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+      id: 3,
       title: "SoundHelix-Song-2",
-      artist: "anybody",
-      album: "Free Music",
       duration: 140,
-      cover: "https://bit.ly/dan-abramov",
+      ownerName: "anybody",
+      albumName: "Free Music",
+      genreId: 1,
+      imageUrl: "https://bit.ly/dan-abramov",
     },
     {
-      src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
+      id: 4,
       title: "SoundHelix-Song-9",
-      artist: "somebody",
-      album: "Free Music",
       duration: 200,
-      cover: "https://bit.ly/dan-abramov",
+      ownerName: "somebody",
+      albumName: "Free Music",
+      genreId: 1,
+      imageUrl: "https://bit.ly/dan-abramov",
     },
     {
-      src: `${API_URL}/music/play/1`,
+      id: 5,
       title: "Yo!",
-      artist: "Xandr",
-      album: "ICTSMC",
+      ownerName: "Xandr",
+      albumName: "ICTSMC",
       duration: 180,
-      cover: "https://picsum.photos/64?random=1",
-    },
-    {
-      src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
-      title: "SoundHelix-Song-9",
-      artist: "somebody",
-      album: "Free Music",
-      duration: 200,
-      cover: "https://bit.ly/dan-abramov",
-    },
-    {
-      src: `${API_URL}/music/play/1`,
-      title: "Yo!",
-      artist: "Xandr",
-      album: "ICTSMC",
-      duration: 180,
-      cover: "https://picsum.photos/64?random=1",
-    },
-    {
-      src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
-      title: "SoundHelix-Song-9",
-      artist: "somebody",
-      album: "Free Music",
-      duration: 200,
-      cover: "https://bit.ly/dan-abramov",
+      genreId: 1,
+      imageUrl: "https://picsum.photos/64?random=1",
     },
   ];
-  const [playlistSongs, setPlayListSongs] = useState(playlist);
+  const [playlistSongs, setPlayListSongs] = useState<Music[]>(playlist);
   const [playlistTitle, setPlaylistTitle] = useState("Playlist #4");
   const [playlistDesc, setPlaylistDesc] = useState(
     "A short description of the playlist can be written here!"
@@ -118,15 +91,15 @@ const CreatePlayListPage: NextPage = () => {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append("ownerID", "1");
+    formData.append("ownerID", "2");
     formData.append("creationDate", formatDate(new Date()));
+    console.log(formatDate(new Date()));
     formData.append("title", playlistTitle);
     formData.append("description", playlistDesc);
-    console.log(formData);
     const response = await fetch(`${API_URL}/playlist/create`, {
       method: "POST",
       body: formData,
-      credentials: 'include',
+      credentials: "include",
     });
 
     if (response.ok) {
@@ -136,25 +109,6 @@ const CreatePlayListPage: NextPage = () => {
     }
   };
 
-  function formatDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Add 1 to month because it's zero-based
-    const day = String(date.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-  }
-
-  function convertToMinutes(duration: number): string {
-    const minutes = Math.floor(duration / 60);
-    const remainingSeconds = duration % 60;
-    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes.toString();
-    const formattedSeconds =
-      remainingSeconds < 10
-        ? `0${remainingSeconds}`
-        : remainingSeconds.toString();
-
-    return `${formattedMinutes}:${formattedSeconds}`;
-  }
   function EditableControls() {
     const { isEditing, getSubmitButtonProps, getCancelButtonProps } =
       useEditableControls();
@@ -186,7 +140,7 @@ const CreatePlayListPage: NextPage = () => {
   }
 
   return (
-    <Box w="100%" h="100%">
+    <form onSubmit={handleSubmit} style={{ width: "100%", height: "100%" }}>
       <Box h="25%">
         <Editable
           px={5}
@@ -270,22 +224,28 @@ const CreatePlayListPage: NextPage = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {playlistSongs.map((info, key) => (
-              <Tr key={key} _hover={{ bg: "blue.700" }}>
-                <Td>{key + 1}</Td>
-                <Td>
-                  <Flex direction="row">
-                    <Image boxSize="64px" src={info.cover} mr={2} alt="cover" />
-                    <Flex justify="center" direction="column">
-                      <Box>{info.title}</Box>
-                      {info.artist}
+            {playlistSongs &&
+              playlistSongs.map((info, key) => (
+                <Tr key={key} _hover={{ bg: "blue.700" }}>
+                  <Td>{key + 1}</Td>
+                  <Td>
+                    <Flex direction="row">
+                      <Image
+                        boxSize="64px"
+                        src={info ? info.imageUrl! : ""}
+                        mr={2}
+                        alt="cover"
+                      />
+                      <Flex justify="center" direction="column">
+                        <Box>{info ? info.title : ""}</Box>
+                        {info ? info.ownerName : ""}
+                      </Flex>
                     </Flex>
-                  </Flex>
-                </Td>
-                <Td>{info.album}</Td>
-                <Td>{convertToMinutes(info.duration)}</Td>
-              </Tr>
-            ))}
+                  </Td>
+                  <Td>{info ? info.albumName : ""}</Td>
+                  <Td>{durationToTime(info ? info.duration : 0)}</Td>
+                </Tr>
+              ))}
           </Tbody>
         </Table>
       </Box>
@@ -295,7 +255,7 @@ const CreatePlayListPage: NextPage = () => {
           Create playlist
         </Button>
       </Flex>
-    </Box>
+    </form>
   );
 };
 

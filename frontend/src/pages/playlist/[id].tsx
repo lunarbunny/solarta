@@ -48,8 +48,8 @@ const PlaylistPage: NextPage = () => {
   const [playlistDesc, setPlaylistDesc] = useState("");
   const [playlistDate, setPlaylistDate] = useState("");
 
-  const [editTitle, setEditTitle] = useState("");
-  const [editDesc, setEditDesc] = useState("");
+  const [editTitle, setEditTitle] = useState(playlistName);
+  const [editDesc, setEditDesc] = useState(playlistDesc);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -81,9 +81,6 @@ const PlaylistPage: NextPage = () => {
   const handleSavePlaylistDetails = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
-    let newTitle = editTitle;
-    let newDesc = editDesc;
-
     e.preventDefault();
 
     const formData = new FormData();
@@ -99,35 +96,26 @@ const PlaylistPage: NextPage = () => {
     );
 
     if (response.ok) {
-      console.log(response);
+      // setEditTitle(playlistName);
+      // setEditDesc(playlistDesc);
     } else {
       console.log(response);
-    }
-
-    if (newTitle != "") {
-      setPlaylistName(newTitle);
-      setEditTitle("");
-    }
-    if (newDesc != "") {
-      setPlaylistDesc(newDesc);
-      setEditDesc("");
     }
   };
 
   useEffect(() => {
     if (playlist != null) {
-      console.log("in use effect", playlist.title);
-      console.log("in use effect", playlist.description);
-
       setPlaylistName(playlist.title);
       setPlaylistDesc(playlist.description);
+      // setEditTitle(playlist.title);
+      // setEditDesc(playlist.description);
       const date = new Date(playlist.creationDate);
       const year = date.getUTCFullYear();
       const month = (date.getUTCMonth() + 1).toString().padStart(2, "0");
       const day = date.getUTCDate().toString().padStart(2, "0");
       setPlaylistDate(`${year}-${month}-${day}`);
     }
-  });
+  }, []);
 
   return (
     <Box color="whiteAlpha.800" bg="blackAlpha.700" w="100%" h="100%">
@@ -232,7 +220,9 @@ const PlaylistPage: NextPage = () => {
                   size="md"
                   width="auto"
                   placeholder={playlistName}
-                  onChange={(newValue) => setEditTitle(newValue.target.value)}
+                  onChange={(newValue) =>
+                    setPlaylistName(newValue.target.value)
+                  }
                 />
               </FormControl>
 
@@ -241,7 +231,9 @@ const PlaylistPage: NextPage = () => {
                 <FormLabel>Playlist Description</FormLabel>
                 <Textarea
                   placeholder={playlistDesc}
-                  onChange={(newValue) => setEditDesc(newValue.target.value)}
+                  onChange={(newValue) =>
+                    setPlaylistDesc(newValue.target.value)
+                  }
                 />
               </FormControl>
             </ModalBody>

@@ -20,7 +20,6 @@ type Album = {
   ownerId: number;
   ownerName: string; // Artist name
   description: string;
-
   size: number; // number of songs in the album
 };
 
@@ -43,7 +42,8 @@ type User = {
   email: string;
   about: string;
   admin: boolean | null;
-}
+  status: number;
+};
 
 type Genre = {
   id: number;
