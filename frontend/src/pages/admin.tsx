@@ -31,7 +31,10 @@ import { IoMdMusicalNote } from "react-icons/io";
 
 const AdminPage: NextPage = () => {
   const [selectedTable, setSelectedTable] = useState("Users");
-  const [selectedUser, setSelectedUser] = useState(0);
+  const [selectedUser, setSelectedUser] = useState({
+    id: 0,
+    ownerName: "",
+  });
   const [selectedSong, setSelectedSong] = useState({
     id: 0,
     title: "",
@@ -101,7 +104,8 @@ const AdminPage: NextPage = () => {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
-    console.log(`${API_URL}/music/delete/${selectedSong.id.toString()}`);
+
+    // dk if selectedSong.id needs to have toString()
     const response = await fetch(`${API_URL}/music/delete/${selectedSong.id}`, {
       method: "DELETE",
       credentials: "include",
@@ -117,7 +121,9 @@ const AdminPage: NextPage = () => {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
-    const response = await fetch(`${API_URL}/user/${selectedUser}/ban`, {
+
+    // dk if selectedUser.id needs to have toString()
+    const response = await fetch(`${API_URL}/user/${selectedUser.id}/ban`, {
       method: "POST",
     });
     if (response.ok) {
@@ -187,7 +193,9 @@ const AdminPage: NextPage = () => {
                         bg="blue.700"
                         color="whiteAlpha.900"
                         onClick={onUserOpen}
-                        onMouseOver={(e) => setSelectedUser(data.id)}
+                        onMouseOver={(e) =>
+                          setSelectedUser({ id: data.id, ownerName: data.name })
+                        }
                       >
                         BAN
                       </Button>
@@ -268,7 +276,8 @@ const AdminPage: NextPage = () => {
             <ModalCloseButton />
             <ModalBody>
               <Text>
-                Are you sure you want to ban {"user's name"} for xxx days?
+                Are you sure you want to ban {selectedUser.ownerName} for xxx
+                days?
               </Text>
             </ModalBody>
 
