@@ -51,9 +51,11 @@ def music_create():
             session.add(AlbumMusic(albumId, new_music.id))
             session.commit()
             return 'Created', 201
-        except:
+        except Exception as e:
             session.rollback()
-            return '', 400
+            if utils.is_debug_mode:
+                return str(e), 400
+            return utils.nachoneko(), 400
         
 # Delete music, and remove from all playlists and albums
 @music_bp.route("/delete/<int:id>", methods=["DELETE"])
@@ -72,9 +74,9 @@ def music_delete_id(id):
             else:
                 return utils.nachoneko(), 404
         except Exception as e:
+            session.rollback()
             if utils.is_debug_mode:
                 return str(e), 400
-            session.rollback()
             return utils.nachoneko(), 400
 
 # Retrieve all music that matches (substring of) search
@@ -92,9 +94,11 @@ def music_search_string(title):
                     "genreId": music.genreId
                 } for music in music_search_results]), 200
             else:
-                return '', 404
-        except:
-            return '', 400
+                return 'Not found', 404
+        except Exception as e:
+            if utils.is_debug_mode:
+                return str(e), 400
+            return utils.nachoneko(), 400
 
 # Retrieve music file based on ID
 @music_bp.route("/play/<int:id>", methods=["GET"])
@@ -106,8 +110,10 @@ def music_play_id(id):
                 return send_file(os.path.join(utils.music_get_save_dir(), music.filename), as_attachment=False), 200
             else:
                 return 'Not found', 404
-        except:
-            return '', 400
+        except Exception as e:
+            if utils.is_debug_mode:
+                return str(e), 400
+            return utils.nachoneko(), 400
         
 # Retrieve top 10 music
 @music_bp.route("/trending", methods=["GET"])
@@ -125,9 +131,11 @@ def music_retrieve_trending():
                     "albumName": album_name
                 } for music, owner_name, album_name in musics]), 200
             else:
-                return '', 404
-        except:
-            return '', 400
+                return 'Not found', 404
+        except Exception as e:
+            if utils.is_debug_mode:
+                return str(e), 400
+            return utils.nachoneko(), 400
         
 # Retrieve music owned by caller
 @music_bp.route("/mine", methods=["GET"])
@@ -148,9 +156,11 @@ def music_retrieve_mine():
                     "albumName": album_name
                 } for music, owner_name, album_name in musics]), 200
             else:
-                return '', 404
-        except:
-            return '', 400
+                return 'Not found', 404
+        except Exception as e:
+            if utils.is_debug_mode:
+                return str(e), 400
+            return utils.nachoneko(), 400
 
 # Retrieve all music
 @music_bp.route("/", methods=["GET"])
@@ -166,6 +176,8 @@ def music_retrieve_all():
                 "ownerName": owner_name,
                 "albumName": album_name
             } for music, owner_name, album_name in musics]), 200
-        except:
-            return '', 400
+        except Exception as e:
+            if utils.is_debug_mode:
+                return str(e), 400
+            return utils.nachoneko(), 400
     
