@@ -8,24 +8,29 @@ import utils
 
 playlist_bp = Blueprint("playlist_bp", __name__)
 
+
 # Delete a playlist
 @playlist_bp.route("/<int:id>/delete", methods=["DELETE"])
 def playlist_delete(id):
     from ..__init__ import PlaylistMusic
+
     with Session() as session:
         try:
             id = clean_num_only(str(id))
             playlist = session.get(Playlist, id)
             if playlist:
-                session.query(PlaylistMusic).filter(PlaylistMusic.idPlaylist == id).delete()
+                session.query(PlaylistMusic).filter(
+                    PlaylistMusic.idPlaylist == id
+                ).delete()
                 session.delete(playlist)
                 session.commit()
-                return '', 200
+                return "", 200
             else:
-                return '', 404
+                return "", 404
         except:
             session.rollback()
-            return '', 400
+            return "", 400
+
 
 # Create a playlist
 @playlist_bp.route("/create", methods=["POST"])
@@ -34,11 +39,11 @@ def playlist_create():
         try:
             user, status = utils.check_authenticated(session, request)
             ownerId = user.id
-            
+
             data = request.form
-            creationDateStr = data.get("creationDate", "") # Format: YYYY-MM-DD
+            creationDateStr = data.get("creationDate", "")  # Format: YYYY-MM-DD
             title = clean_text(data["title"])
-            description = clean_text(data.get("description", None)) # Optional
+            description = clean_text(data.get("description", None))  # Optional
 
             if ownerId == "" or title == "" or creationDateStr == "":
                 return "Missing parameters", 400
@@ -50,8 +55,9 @@ def playlist_create():
             return "Created", 201
         except:
             session.rollback()
-            return '', 400
-        
+            return "Failed to create playlist", 400
+
+
 # Add song to playlist
 @playlist_bp.route("/playlist=<int:idPlaylist>/music=<int:idMusic>", methods=["POST"])
 def playlist_add_song(idPlaylist, idMusic):
@@ -66,12 +72,13 @@ def playlist_add_song(idPlaylist, idMusic):
                 new_playlist_music = PlaylistMusic(idPlaylist, idMusic)
                 session.add(new_playlist_music)
                 session.commit()
-                return 'Created', 201
+                return "Created", 201
             else:
-                return '', 404
+                return "", 404
         except:
             session.rollback()
-            return '', 400
+            return "", 400
+
 
 # Update a playlist (title and/or description)
 @playlist_bp.route("/<int:id>/update", methods=["PUT"])
@@ -87,12 +94,13 @@ def playlist_update(id):
                 music.title = title
                 music.description = description
                 session.commit()
-                return 'OK', 200
+                return "OK", 200
             else:
-                return '', 404
+                return "", 404
         except:
             session.rollback()
-            return '', 400
+            return "", 400
+
 
 # Retrieve all music based on Playlist ID
 @playlist_bp.route("/<int:idPlaylist>/music", methods=["GET"])
@@ -102,17 +110,30 @@ def playlist_retrieve_all_music(idPlaylist):
             idPlaylist = clean_num_only(str(idPlaylist))
             playlist = session.get(Playlist, idPlaylist)
             if playlist:
-                playlist_music = session.query(Music).join(PlaylistMusic).filter(PlaylistMusic.idPlaylist == idPlaylist)
-                return jsonify([{
-                    "id": music.id,
-                    "title": music.title,
-                    "duration": music.duration,
-                    "genreId": music.genreId
-                } for music in playlist_music]), 200
+                playlist_music = (
+                    session.query(Music)
+                    .join(PlaylistMusic)
+                    .filter(PlaylistMusic.idPlaylist == idPlaylist)
+                )
+                return (
+                    jsonify(
+                        [
+                            {
+                                "id": music.id,
+                                "title": music.title,
+                                "duration": music.duration,
+                                "genreId": music.genreId,
+                            }
+                            for music in playlist_music
+                        ]
+                    ),
+                    200,
+                )
             else:
-                return '', 404
+                return "", 404
         except:
-            return '', 400
+            return "", 400
+
 
 # Retrieve all playlists of a user
 @playlist_bp.route("/mine", methods=["GET"])
@@ -124,16 +145,27 @@ def playlist_retrieve_user():
                 return utils.nachoneko(), status
 
             ownerId = user.id
-            playlists = session.query(Playlist).filter(Playlist.ownerId == ownerId).all()
-            return jsonify([{
-                "id": playlist.id,
-                "creationDate": playlist.creationDate,
-                "title": playlist.title,
-                "description": playlist.description
-            } for playlist in playlists]), 200
+            playlists = (
+                session.query(Playlist).filter(Playlist.ownerId == ownerId).all()
+            )
+            return (
+                jsonify(
+                    [
+                        {
+                            "id": playlist.id,
+                            "creationDate": playlist.creationDate,
+                            "title": playlist.title,
+                            "description": playlist.description,
+                        }
+                        for playlist in playlists
+                    ]
+                ),
+                200,
+            )
         except:
-            return '', 400
-        
+            return "", 400
+
+
 # Retrieve a certain playlist
 @playlist_bp.route("/<int:idPlaylist>", methods=["GET"])
 def playlist_retrieve_details(idPlaylist):
@@ -142,14 +174,18 @@ def playlist_retrieve_details(idPlaylist):
             idPlaylist = clean_num_only(str(idPlaylist))
             playlist = session.get(Playlist, idPlaylist)
             if playlist:
-                return jsonify({
-                    "id": playlist.id,
-                    "title": playlist.title,
-                    "description": playlist.description,
-                    "creationDate": playlist.creationDate
-                }), 200
+                return (
+                    jsonify(
+                        {
+                            "id": playlist.id,
+                            "title": playlist.title,
+                            "description": playlist.description,
+                            "creationDate": playlist.creationDate,
+                        }
+                    ),
+                    200,
+                )
             else:
-                return 'Playlist not found.', 404
+                return "Playlist not found.", 404
         except:
-            return 'Error occured when retrieving playlist.', 400
-        
+            return "Error occured when retrieving playlist.", 400

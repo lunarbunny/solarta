@@ -22,9 +22,19 @@ import {
   FormLabel,
   Textarea,
   Spacer,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverHeader,
+  PopoverBody,
+  PopoverFooter,
+  PopoverArrow,
+  PopoverCloseButton,
+  PopoverAnchor,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { BsFillPlayFill } from "react-icons/bs";
+import { BiDotsHorizontalRounded } from "react-icons/bi";
 import MusicTable from "@/components/Media/MusicTable";
 import { useSetRecoilState } from "recoil";
 import { musicPlayerAtom } from "@/atoms/musicPlayer";
@@ -103,6 +113,20 @@ const PlaylistPage: NextPage = () => {
     }
   };
 
+  const handlePlaylistDelete = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log("hi");
+    const response = await fetch(
+      `${API_URL}/playlist/${router.query.id}/delete`
+    );
+
+    if (response.ok) {
+      router.push("http://localhost:3000/");
+    } else {
+      console.log(response);
+    }
+  };
+
   useEffect(() => {
     if (playlist != null) {
       setPlaylistName(playlist.title);
@@ -115,7 +139,7 @@ const PlaylistPage: NextPage = () => {
       const day = date.getUTCDate().toString().padStart(2, "0");
       setPlaylistDate(`${year}-${month}-${day}`);
     }
-  }, []);
+  });
 
   return (
     <Box color="whiteAlpha.800" bg="blackAlpha.700" w="100%" h="100%">
@@ -185,6 +209,36 @@ const PlaylistPage: NextPage = () => {
               </Text>
               <Text fontSize="lg">Created {playlistDate}</Text>
             </HStack>
+            <Popover>
+              <PopoverTrigger>
+                <span>
+                  <Icon
+                    boxSize="35px"
+                    _hover={{
+                      transform: "scale(1.05)",
+                      color: "whiteAlpha.900",
+                      cursor: "pointer",
+                    }}
+                    _active={{
+                      transform: "scale(0.98)",
+                    }}
+                    as={BiDotsHorizontalRounded}
+                  />
+                </span>
+              </PopoverTrigger>
+              <PopoverContent w="100%">
+                <PopoverBody p={0}>
+                  <Box
+                    px={0}
+                    my={3}
+                    _hover={{ bg: "whiteAlpha.300", cursor: "pointer" }}
+                    // onClick={}
+                  >
+                    <Text px={2}>Delete playlist</Text>
+                  </Box>
+                </PopoverBody>
+              </PopoverContent>
+            </Popover>
           </Flex>
         </Box>
       </Box>

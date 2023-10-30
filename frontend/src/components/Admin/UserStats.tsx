@@ -18,9 +18,14 @@ type Props = {
     value: number;
   };
   icon: IconType;
+  onClick: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const UserStats: React.FC<Props> = ({ data, icon }) => {
+const UserStats: React.FC<Props> = ({ data, icon, onClick }) => {
+  function getMetric(metric: string) {
+    const wordArray = metric.split(" ");
+    return wordArray[2];
+  }
   return (
     <Flex
       my={10}
@@ -31,6 +36,14 @@ const UserStats: React.FC<Props> = ({ data, icon }) => {
       justify="start"
       w="20%"
       borderRadius="2xl"
+      _hover={{
+        cursor: "pointer",
+        bg: "whiteAlpha.500",
+      }}
+      _active={{
+        transform: "scale(0.98)",
+      }}
+      onClick={() => onClick(getMetric(data.metric))}
     >
       <Icon
         borderRadius="full"
