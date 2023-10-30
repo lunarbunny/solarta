@@ -140,8 +140,8 @@ def test_music_get_duration():
         assert music_get_duration("yo!.mp3") == 6
 
 def test_is_email_valid():
-    from utils import is_email_valid
-    assert bool(is_email_valid("test@test.com")) == True
+    from validation import validate_email
+    assert validate_email("test@test.com")[0] == True
 
     invalid_list = {
         'test',
@@ -150,7 +150,7 @@ def test_is_email_valid():
     }
 
     for invalid_email in invalid_list:
-        assert bool(is_email_valid(invalid_email)) == False
+        assert validate_email("test@test.com")[0] == False
 
 def test_hash_password():
     from utils import hash_password

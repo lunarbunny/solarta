@@ -59,17 +59,28 @@ const Sidebar = () => {
               </Link>
             )
           }
+          {
+            user && (
+              <Link href="/account" onClick={() => setPage("account")}>
+                <SidebarItem name="Account" icon={<MdPortrait size={20} />} bolded={page == 'account'} />
+              </Link>
+            )
+          }
         </SidebarGroup>
 
-        <SidebarGroup title="PLAYLISTS" hasButton={true}>
-          <Playlists />
-        </SidebarGroup>
+        {user && (
+          <SidebarGroup title="PLAYLISTS" hasButton={true}>
+            <Playlists />
+          </SidebarGroup>
+        )}
       </Box>
       <Flex direction="column" p={4}>
         {user ? (
           <>
             <Text fontSize="md" noOfLines={1} color="gray.300">
-              You are signed in as <strong>{user.name}</strong>
+              You are signed in as <Link href="/profile">
+                <strong><u>{user.name}</u></strong>.
+              </Link>
             </Text>
             <Button size="sm" onClick={signOut} variant={"outline"}>
               Logout
