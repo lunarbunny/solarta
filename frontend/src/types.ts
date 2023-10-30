@@ -41,7 +41,7 @@ type User = {
   name: string;
   email: string;
   about: string;
-  admin: boolean | null;
+  admin: boolean;
   status: number;
 };
 

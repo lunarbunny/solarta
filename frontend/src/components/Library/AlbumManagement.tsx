@@ -2,6 +2,7 @@ import { Box, Button, Flex, FormControl, FormLabel, Input, Modal, ModalBody, Mod
 import { useState } from "react";
 import { API_URL, Album } from "@/types";
 import AlbumWrap from "../Media/AlbumWrap";
+import { useRouter } from "next/router";
 
 type Props = {
   albums: Album[],
@@ -15,6 +16,7 @@ type AlbumForm = {
 };
 
 const AlbumManagement: React.FC<Props> = ({ albums }) => {
+  const router = useRouter();
 
   // For modal
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -39,16 +41,18 @@ const AlbumManagement: React.FC<Props> = ({ albums }) => {
       formData.append('imageUrl', albumForm.imageUrl);
     }
 
-    const response = await fetch(`${API_URL}/album/create`, {
+    const res = await fetch(`${API_URL}/album/create`, {
       method: 'POST',
       body: formData,
       credentials: 'include',
     });
 
-    if (response.ok) {
-      window.location.reload();
+    if (res.ok) {
+      let data = await res.json();
+      let newAlbumId = data.id;
+      router.push(`/album/${newAlbumId}`);
     } else {
-      console.log(response);
+      alert("Error: Could not upload music.");
     }
   }
 

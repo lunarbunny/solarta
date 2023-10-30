@@ -2,6 +2,7 @@ import useFetch from "@/hooks/useFetch";
 import { Box } from "@chakra-ui/react";
 import SidebarItem from "../Sidebar/SidebarItem";
 import { Music, API_URL } from "@/types";
+import { useEffect } from "react";
 
 type Props = {
   query: string;

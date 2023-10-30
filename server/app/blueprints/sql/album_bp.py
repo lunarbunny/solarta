@@ -36,7 +36,30 @@ def album_create():
             new_album = Album(title, releaseDate, ownerId, imageUrl, description)
             session.add(new_album)
             session.commit()
-            return "Created", 201
+            return jsonify({ 'id': new_album.id }), 201
+        except:
+            session.rollback()
+            return "Error occured", 400
+        
+# Delete an album entry
+@album_bp.route("/<int:idAlbum>/delete", methods=["DELETE"])
+def album_delete(idAlbum):
+    with Session() as session:
+        try:
+            user, status = utils.check_authenticated(session, request)
+            if user is None:
+                return utils.nachoneko(), status
+
+            album = session.get(Album, idAlbum)
+            if album:
+                if album.ownerId == user.id or user.roleId == 1:
+                    session.delete(album)
+                    session.commit()
+                    return "Deleted", 200
+                else:
+                    return "Unauthorized", 401
+            else:
+                return "Album not found", 404
         except:
             session.rollback()
             return "Error occured", 400

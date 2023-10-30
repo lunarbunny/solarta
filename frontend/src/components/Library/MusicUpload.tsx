@@ -10,11 +10,12 @@ import {
   FormLabel,
   Modal,
 } from "@chakra-ui/react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { API_URL, Album, Genre, Music } from "@/types";
 import useFetch from "@/hooks/useFetch";
 import { dateToYear } from "@/utils";
+import { useRouter } from "next/router";
 
 type Props = {
   albums: Album[];
@@ -28,6 +29,9 @@ type UploadFormData = {
 };
 
 const MusicUpload: React.FC<Props> = ({ albums }) => {
+  const router = useRouter();
+  const { uploadToAlbum } = router.query;
+
   const [uploadForm, setUploadForm] = useState<UploadFormData>({
     title: "",
     albumId: "",
@@ -51,6 +55,13 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
     maxFiles: 1,
   });
 
+  useEffect(() => {
+    if (router.isReady && uploadToAlbum) {
+      setUploadForm({ ...uploadForm, albumId: uploadToAlbum as string });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uploadToAlbum]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -60,16 +71,16 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
     formData.append("albumId", uploadForm.albumId);
     formData.append("music_file", uploadForm.music_file as File);
 
-    const response = await fetch(`${API_URL}/music/create`, {
+    const res = await fetch(`${API_URL}/music/create`, {
       method: "POST",
       body: formData,
       credentials: 'include',
     });
 
-    if (response.ok) {
-      window.location.reload();
+    if (res.ok) {
+      router.push(`/album/${uploadForm.albumId}`);
     } else {
-      console.log(response);
+      alert("Error: Could not upload music.");
     }
   };
 
@@ -115,7 +126,7 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
 
           <InputGroup mt={2}>
             <FormControl>
-              <FormLabel>Artist</FormLabel>
+              <FormLabel>Album</FormLabel>
               <Select
                 value={uploadForm.albumId}
                 onChange={(e) =>

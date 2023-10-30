@@ -1,4 +1,4 @@
-import { Box, Center, Icon, SimpleGrid, Wrap } from "@chakra-ui/react";
+import { Box, Center, Icon, SimpleGrid, Wrap, WrapItem } from "@chakra-ui/react";
 import React from "react";
 import { Album } from "../../types";
 import AlbumCard from "./AlbumCard";
@@ -11,25 +11,31 @@ type Props = {
   onCreateClick?: () => void;
 };
 
+const buildAlbums = (albums: Album[], clickable: boolean) =>
+  albums.map((album, index) => {
+    if (clickable) {
+      return (
+        <Link key={index} href={`/album/${album.id}`}>
+          <AlbumCard data={album} />
+        </Link>
+      );
+    } else {
+      return (
+        <Box key={index}>
+          <AlbumCard data={album} />
+        </Box>
+      );
+    }
+  });
+
 const AlbumWrap: React.FC<Props> = ({
   items: albums,
   clickable,
   onCreateClick,
 }) => {
   return (
-    <Wrap spacing={4}>
-      {albums &&
-        albums.map((album, index) =>
-          clickable ? (
-            <Link key={index} href={`/album/${album.id}`}>
-              <AlbumCard data={album} />
-            </Link>
-          ) : (
-            <Box key={index}>
-              <AlbumCard data={album} />
-            </Box>
-          )
-        )}
+    <Wrap spacing={4} overflowY="scroll">
+      {albums && buildAlbums(albums, clickable || false)}
       {onCreateClick && (
         <Box
           onClick={onCreateClick}

@@ -10,15 +10,13 @@ interface Props {
 const Layout: React.FC<Props> = ({ children }) => {
   return (
     <Flex as="main" direction="column" bg="blackAlpha.500" h="100vh">
-      <Box flexGrow={1}>
-        <Flex direction="row" h="100%">
-          <Sidebar />
-          <Box maxH="100vh" w="100%">
-            {children}
-          </Box>
-        </Flex>
-      </Box>
-      <Box boxShadow="0px 0px 5px 0px rgba(0,0,0,0.75)" w="100%">
+      <Flex flexGrow={4} direction="row">
+        <Sidebar />
+        <Box w="100%" overflowY="scroll">
+          {children}
+        </Box>
+      </Flex>
+      <Box boxShadow="0px 0px 5px 0px rgba(0,0,0,0.75)">
         <MusicPlayer />
       </Box>
     </Flex>

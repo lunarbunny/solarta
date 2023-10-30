@@ -3,8 +3,10 @@ import useAuth from "@/hooks/useAuth";
 import useFetch from "@/hooks/useFetch";
 import { Album, API_URL, Music } from "@/types";
 import { dateToPretty } from "@/utils";
+import { DeleteIcon } from "@chakra-ui/icons";
 import {
   Box,
+  Button,
   CircularProgress,
   Divider,
   Heading,
@@ -14,6 +16,7 @@ import {
 import { NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { BiUpload } from "react-icons/bi";
 
 // Accessed via /album/[id]
 const AlbumDetailPage: NextPage = () => {
@@ -34,6 +37,22 @@ const AlbumDetailPage: NextPage = () => {
   }
 
   let isOwner = user ? user.id == album.ownerId : false;
+  let isAdmin = user ? user.admin : false;
+
+  const handleDelete = async () => {
+    if (confirm("Are you sure you want to delete this album?")) {
+      let res = await fetch(`${API_URL}/album/${album.id}/delete`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (res.ok) {
+        router.push("/library");
+      } else {
+        alert("Error: Could not delete album.");
+      }
+    }
+  }
 
   return (
     <Box w="100%" maxW={"7xl"}>
@@ -64,8 +83,26 @@ const AlbumDetailPage: NextPage = () => {
 
         <Text mt={4} color="gray.400">Released on <strong>{dateToPretty(album.releaseDate)}</strong>. {album.description}</Text>
 
-        <Divider my={4} />
+        {(isOwner || isAdmin) && (
+          <>
+            <Divider my={4} />
+            {isOwner && (
+              <Link href={`/library?uploadToAlbum=${album.id}`}>
+                <Button colorScheme="blue" size="sm"
+                  leftIcon={<BiUpload />}>
+                  Upload Music
+                </Button>
+              </Link>
+            )}
+            <Button colorScheme="red" size="sm" variant="outline" ml={4}
+              leftIcon={<DeleteIcon />}
+              onClick={handleDelete} >
+              Delete Album
+            </Button>
+          </>
+        )}
 
+        <Divider my={4} />
         <MusicList items={albumMusic} editable={isOwner} />
       </Box>
     </Box>

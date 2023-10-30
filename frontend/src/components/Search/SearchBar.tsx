@@ -21,7 +21,7 @@ const SearchBar = () => {
         onChange={(e) => setQuery(e.target.value)}
       />
 
-      <SearchResults query={query} />
+      {query && <SearchResults query={query} />}
     </Flex>
   );
 };

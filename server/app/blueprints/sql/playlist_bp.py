@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, request
 
 from ..__init__ import Session, Playlist, PlaylistMusic, Music
 from validation import clean_alphanum, clean_num_only, clean_text
+import utils
 
 playlist_bp = Blueprint("playlist_bp", __name__)
 
