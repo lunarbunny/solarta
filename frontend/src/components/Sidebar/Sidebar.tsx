@@ -78,7 +78,7 @@ const Sidebar = () => {
         {user ? (
           <>
             <Text fontSize="md" noOfLines={1} color="gray.300">
-              You are signed in as <Link href="/profile">
+              You are signed in as <Link href="/account">
                 <strong><u>{user.name}</u></strong>.
               </Link>
             </Text>
