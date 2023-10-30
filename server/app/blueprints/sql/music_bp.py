@@ -65,15 +65,17 @@ def music_delete_id(id):
                 return utils.nachoneko(), status
              
             music = session.get(Music, id)
-            if music and music.ownerId == user.id:
+            if music and (user.roleId == 1 or music.ownerId == user.id):
                 session.delete(music)
                 session.commit()
-                return '', 200
+                return 'OK', 200
             else:
-                return '', 404
+                return utils.nachoneko(), 404
         except Exception as e:
+            if utils.is_debug_mode:
+                return str(e), 400
             session.rollback()
-            return '', 400
+            return utils.nachoneko(), 400
 
 # Retrieve all music that matches (substring of) search
 @music_bp.route("/search=<string:title>", methods=["GET"])
