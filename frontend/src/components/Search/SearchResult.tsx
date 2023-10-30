@@ -1,8 +1,7 @@
 import useFetch from "@/hooks/useFetch";
+import MusicList from "../Media/MusicList";
 import { Box } from "@chakra-ui/react";
-import SidebarItem from "../Sidebar/SidebarItem";
 import { Music, API_URL } from "@/types";
-import { useEffect } from "react";
 
 type Props = {
   query: string;
@@ -23,9 +22,7 @@ const SearchResults = ({ query }: Props) => {
         >
           {/* {loading && <strong>Loading...</strong>}
           {error && <strong>Error occured</strong>} */}
-          {data && data.map((song, index) => (
-            <SidebarItem key={index} name={song.title} icon={<></>} />
-          ))}
+          <MusicList items={data} editable={false} />
         </Box>
       )}
     </>
