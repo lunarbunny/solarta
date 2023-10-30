@@ -275,3 +275,18 @@ def logout():
                 return str(e), 400
             else:
                 return utils.nachoneko(), 400
+            
+@user_bp.route('/<int:id>/ban', methods=["POST"])
+def user_ban_by_id(id):
+    with Session() as session:
+        try:
+            id = clean_num_only(str(id))
+            user = session.get(User, id)
+            if user is None:
+                return utils.nachoneko(), 400
+            user.status == 1
+            session.commit()
+        except Exception as e:
+            if utils.is_debug_mode:
+                return str(e), 400
+            return utils.nachoneko(), 400
