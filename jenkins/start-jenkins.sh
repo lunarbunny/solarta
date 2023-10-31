@@ -8,4 +8,3 @@ docker run --name jenkins --restart=on-failure --detach \
   --volume jenkins-data:/var/jenkins_home \
   --volume /var/run/docker.sock:/var/run/docker.sock \
   jenkins-blueocean:lts-jdk17
-  

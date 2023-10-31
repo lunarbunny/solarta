@@ -64,8 +64,22 @@ services:
             - /etc/letsencrypt/live/solarta.nisokkususu.com/fullchain.pem:/etc/nginx/ssl/fullchain.pem:ro
             - /etc/letsencrypt/live/solarta.nisokkususu.com/privkey.pem:/etc/nginx/ssl/privkey.pem:ro
 
+    cicd:
+        build: ./jenkins
+        image: solarta-cicd
+        container_name: solarta-cicd
+        environment:
+            - JENKINS_OPTS=--prefix=/jenkins
+        networks:
+            - proxy
+        volumes:
+            - solarta-cicd-volume:/var/jenkins_home
+            - /var/run/docker.sock:/var/run/docker.sock
+
 volumes:
     solarta-db-volume:
+        external: false
+    solarta-cicd-volume:
         external: false
 
 networks:
