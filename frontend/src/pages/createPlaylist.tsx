@@ -73,33 +73,32 @@ const CreatePlayListPage: NextPage = () => {
     });
 
     if (response.ok) {
-      const { data: allPlaylist } = useFetch<Music[]>(
-        `${API_URL}/playlist/mine`,
-        {
-          usesRouter: true,
-        }
-      );
-      let playlistID = 0;
-      if (allPlaylist) {
-        for (let i = 0; i < allPlaylist.length; i++) {
-          if (allPlaylist[i].title == playlistTitle) {
-            playlistID = allPlaylist[i].id;
-          }
-        }
-      }
-
-      for (let j = 0; j < setPlayListSongs.length; j++) {
-        const response = await fetch(
-          `${API_URL}/playlist=${playlistID}}/music=${playlistSongs[j]}`,
-          {
-            method: "POST",
-            credentials: "include",
-          }
-        );
-        if (response.ok) {
-          console.log(`added ${selectedSong[0].title} to the playlist`);
-        }
-      }
+      // const { data: allPlaylist } = useFetch<Music[]>(
+      //   `${API_URL}/playlist/mine`,
+      //   {
+      //     usesRouter: true,
+      //   }
+      // );
+      // let playlistID = 0;
+      // if (allPlaylist) {
+      //   for (let i = 0; i < allPlaylist.length; i++) {
+      //     if (allPlaylist[i].title == playlistTitle) {
+      //       playlistID = allPlaylist[i].id;
+      //     }
+      //   }
+      // }
+      // for (let j = 0; j < setPlayListSongs.length; j++) {
+      //   const response = await fetch(
+      //     `${API_URL}/playlist=${playlistID}}/music=${playlistSongs[j]}`,
+      //     {
+      //       method: "POST",
+      //       credentials: "include",
+      //     }
+      //   );
+      //   if (response.ok) {
+      //     console.log(`added ${selectedSong[0].title} to the playlist`);
+      //   }
+      // }
     } else {
       console.log(response);
     }

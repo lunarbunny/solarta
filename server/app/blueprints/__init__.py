@@ -207,10 +207,26 @@ with Session() as session:
                 "ownerId": 4,
             },
             {"title": "Mental State 0", "releaseDate": date(2023, 2, 2), "ownerId": 4},
-            {"title": "Me And You Under The Wisdom Tree", "releaseDate": date(2023, 2, 2), "ownerId": 4},
-            {"title": "Together, We Eat Apples", "releaseDate": date(2023, 2, 2), "ownerId": 5},
-            {"title": "Together, We Meow Meow Meow", "releaseDate": date(2023, 2, 2), "ownerId": 5},
-            {"title": "Emei Mountain's Hei Du She", "releaseDate": date(2023, 2, 2), "ownerId": 6},
+            {
+                "title": "Me And You Under The Wisdom Tree",
+                "releaseDate": date(2023, 2, 2),
+                "ownerId": 4,
+            },
+            {
+                "title": "Together, We Eat Apples",
+                "releaseDate": date(2023, 2, 2),
+                "ownerId": 5,
+            },
+            {
+                "title": "Together, We Meow Meow Meow",
+                "releaseDate": date(2023, 2, 2),
+                "ownerId": 5,
+            },
+            {
+                "title": "Emei Mountain's Hei Du She",
+                "releaseDate": date(2023, 2, 2),
+                "ownerId": 6,
+            },
         ]
 
         for album in album_data:
@@ -333,8 +349,8 @@ with Session() as session:
             session.commit()
 
     # Seed playlist music
-    if session.query(PlaylistMusic).count() == 0:
-        playlist_music_data = {"idPlaylist": 1, "idMusic": 1}
-        playlist_music_obj = PlaylistMusic(**playlist_music_data)
-        session.add(playlist_music_obj)
-        session.commit()
+    # if session.query(PlaylistMusic).count() == 0:
+    #     playlist_music_data = {"idPlaylist": 1, "idMusic": 1}
+    #     playlist_music_obj = PlaylistMusic(**playlist_music_data)
+    #     session.add(playlist_music_obj)
+    #     session.commit()

@@ -375,7 +375,7 @@ const AdminPage: NextPage = () => {
             <ModalCloseButton />
             <ModalBody>
               <Text>
-                Are you sure you want to delete "{selectedSong.title}" ?
+                Are you sure you want to delete {selectedSong.title} ?
               </Text>
             </ModalBody>
 
