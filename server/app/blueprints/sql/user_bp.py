@@ -61,7 +61,7 @@ def user_retrieve_by_id(id):
 def user_retrieve_top3():
     with Session() as session:
         try:
-            users = session.query(User).filter(User.roleId != 1).limit(3).all()
+            users = session.query(User).filter(User.roleId != 1).order_by(User.id.desc()).limit(3).all()
             return (
                 jsonify(
                     [
