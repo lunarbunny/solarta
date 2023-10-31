@@ -79,6 +79,32 @@ def user_retrieve_top3():
             return "", 400
 
 
+# Retrieve all users that matches (substring of) search by name
+@user_bp.route("/search=<string:name>", methods=["GET"])
+def user_search_by_name(name):
+    with Session() as session:
+        try:
+            user, status = utils.check_authenticated(session, request)
+            if user.roleId != 1: # check if admin
+                return utils.nachoneko(), status
+            name = clean_text(name)
+            user_search_results = session.query(User).filter(User.name.ilike(f"{name}%"))
+            if user_search_results:
+                return jsonify([{
+                    "id": user.id,
+                    "name": user.name,
+                    "about": user.about,
+                    "email": user.email,
+                    "status": user.status,
+                } for user in user_search_results]), 200
+            else:
+                return 'Not found', 404
+        except Exception as e:
+            if utils.is_debug_mode:
+                return str(e), 400
+            return utils.nachoneko(), 400
+
+
 # Register a new user
 @user_bp.route("/register", methods=["POST"])
 def register():
