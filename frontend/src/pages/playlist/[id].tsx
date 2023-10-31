@@ -45,7 +45,6 @@ import useAuth from "@/hooks/useAuth";
 const PlaylistPage: NextPage = () => {
   const router = useRouter();
   const { user, loading } = useAuth();
-  console.log(user);
   const { data: playlist } = useFetch<Playlist>(
     `${API_URL}/playlist/${router.query.id}`,
     { usesRouter: true }
@@ -136,8 +135,8 @@ const PlaylistPage: NextPage = () => {
     );
 
     if (response.ok) {
+      router.push("/");
       location.reload();
-      router.push("http://localhost:3000/");
     } else {
       console.log(response);
     }

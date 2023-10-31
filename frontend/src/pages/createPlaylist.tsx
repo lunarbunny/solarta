@@ -1,8 +1,6 @@
 import { API_URL, Music } from "@/types";
 import {
   Box,
-  Center,
-  CircularProgress,
   ButtonGroup,
   IconButton,
   Editable,
@@ -23,63 +21,36 @@ import {
   Td,
   Image,
   Button,
+  useToast,
+  Text,
+  Badge,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useState } from "react";
 import SearchBar from "@/components/Search/SearchBar";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { BiTime } from "react-icons/bi";
+import { FiInfo } from "react-icons/fi";
 import { formatDate, durationToTime } from "../utils";
+import { useRouter } from "next/router";
+import useFetch from "@/hooks/useFetch";
 
 const CreatePlayListPage: NextPage = () => {
-  const playlist: Music[] = [
-    {
-      id: 1,
-      title: "Yo!",
-      duration: 180,
-      ownerName: "Xandr",
-      albumName: "ICTSMC",
-      genreId: 1,
-      imageUrl: "https://picsum.photos/64?random=1",
-    },
-    {
-      id: 2,
-      title: "SoundHelix-Song-9",
-      duration: 200,
-      ownerName: "somebody",
-      albumName: "Free Music",
-      genreId: 1,
-      imageUrl: "https://bit.ly/dan-abramov",
-    },
-    {
-      id: 3,
-      title: "SoundHelix-Song-2",
-      duration: 140,
-      ownerName: "anybody",
-      albumName: "Free Music",
-      genreId: 1,
-      imageUrl: "https://bit.ly/dan-abramov",
-    },
-    {
-      id: 4,
-      title: "SoundHelix-Song-9",
-      duration: 200,
-      ownerName: "somebody",
-      albumName: "Free Music",
-      genreId: 1,
-      imageUrl: "https://bit.ly/dan-abramov",
-    },
-    {
-      id: 5,
-      title: "Yo!",
-      ownerName: "Xandr",
-      albumName: "ICTSMC",
-      duration: 180,
-      genreId: 1,
-      imageUrl: "https://picsum.photos/64?random=1",
-    },
-  ];
-  const [playlistSongs, setPlayListSongs] = useState<Music[]>(playlist);
+  const router = useRouter();
+  const toast = useToast();
+
+  const [selectedSong, setSelectedSong] = useState<
+    Array<{
+      id: number;
+      title: string;
+    }>
+  >([]);
+
+  const { data: allMusic } = useFetch<Music[]>(`${API_URL}/music`, {
+    usesRouter: true,
+  });
+
+  const [playlistSongs, setPlayListSongs] = useState<Array<number>>([]);
   const [playlistTitle, setPlaylistTitle] = useState("Playlist #4");
   const [playlistDesc, setPlaylistDesc] = useState(
     "A short description of the playlist can be written here!"
@@ -91,11 +62,10 @@ const CreatePlayListPage: NextPage = () => {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append("ownerID", "2");
     formData.append("creationDate", formatDate(new Date()));
-    console.log(formatDate(new Date()));
     formData.append("title", playlistTitle);
     formData.append("description", playlistDesc);
+
     const response = await fetch(`${API_URL}/playlist/create`, {
       method: "POST",
       body: formData,
@@ -103,7 +73,33 @@ const CreatePlayListPage: NextPage = () => {
     });
 
     if (response.ok) {
-      window.location.reload();
+      const { data: allPlaylist } = useFetch<Music[]>(
+        `${API_URL}/playlist/mine`,
+        {
+          usesRouter: true,
+        }
+      );
+      let playlistID = 0;
+      if (allPlaylist) {
+        for (let i = 0; i < allPlaylist.length; i++) {
+          if (allPlaylist[i].title == playlistTitle) {
+            playlistID = allPlaylist[i].id;
+          }
+        }
+      }
+
+      for (let j = 0; j < setPlayListSongs.length; j++) {
+        const response = await fetch(
+          `${API_URL}/playlist=${playlistID}}/music=${playlistSongs[j]}`,
+          {
+            method: "POST",
+            credentials: "include",
+          }
+        );
+        if (response.ok) {
+          console.log(`added ${selectedSong[0].title} to the playlist`);
+        }
+      }
     } else {
       console.log(response);
     }
@@ -137,6 +133,17 @@ const CreatePlayListPage: NextPage = () => {
         />
       </ButtonGroup>
     ) : null;
+  }
+
+  function addSongToList() {
+    toast({
+      title: "Song added.",
+      description: `We've added ${selectedSong[0].title} to the list!`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+    setPlayListSongs((current) => [...current, selectedSong[0].id]);
   }
 
   return (
@@ -191,11 +198,12 @@ const CreatePlayListPage: NextPage = () => {
           </Flex>
         </Editable>
       </Box>
-      {/* Search bar*/}
-      <Box display="flex" alignItems="center" h="10%" py={4} px={8}>
-        <SearchBar />
-      </Box>
-
+      <Flex direction="row" alignItems="center" mx={3} h="10%" py={5}>
+        <Icon boxSize={10} as={FiInfo} mr={2} />
+        <Text fontSize="2xl">
+          Choose songs below to add to your new playlist
+        </Text>
+      </Flex>
       {/* Music list */}
       <Box
         h="55%"
@@ -221,18 +229,19 @@ const CreatePlayListPage: NextPage = () => {
               <Th>
                 <Icon boxSize="20px" as={BiTime} />
               </Th>
+              <Th isNumeric></Th>
             </Tr>
           </Thead>
           <Tbody>
-            {playlistSongs &&
-              playlistSongs.map((info, key) => (
+            {allMusic &&
+              allMusic.map((info, key) => (
                 <Tr key={key} _hover={{ bg: "blue.700" }}>
                   <Td>{key + 1}</Td>
                   <Td>
                     <Flex direction="row">
                       <Image
                         boxSize="64px"
-                        src={info ? info.imageUrl! : ""}
+                        src={"https://picsum.photos/42?random=" + info.id}
                         mr={2}
                         alt="cover"
                       />
@@ -244,6 +253,19 @@ const CreatePlayListPage: NextPage = () => {
                   </Td>
                   <Td>{info ? info.albumName : ""}</Td>
                   <Td>{durationToTime(info ? info.duration : 0)}</Td>
+                  <Td isNumeric>
+                    <Button
+                      _hover={{ bg: "orange.600" }}
+                      bg="blue.700"
+                      color="whiteAlpha.900"
+                      onClick={addSongToList}
+                      onMouseOver={(e) =>
+                        setSelectedSong([{ id: info.id, title: info.title }])
+                      }
+                    >
+                      ADD SONG
+                    </Button>
+                  </Td>
                 </Tr>
               ))}
           </Tbody>
@@ -251,7 +273,7 @@ const CreatePlayListPage: NextPage = () => {
       </Box>
       {/* Button */}
       <Flex h="10%" w="100%" align="center" justify="end" px={5}>
-        <Button colorScheme="telegram" type="submit">
+        <Button colorScheme="messenger" type="submit">
           Create playlist
         </Button>
       </Flex>
