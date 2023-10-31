@@ -106,8 +106,7 @@ const PlaylistPage: NextPage = () => {
     );
 
     if (response.ok) {
-      // setEditTitle(playlistName);
-      // setEditDesc(playlistDesc);
+      location.reload();
     } else {
       console.log(response);
     }
@@ -131,15 +130,15 @@ const PlaylistPage: NextPage = () => {
     if (playlist != null) {
       setPlaylistName(playlist.title);
       setPlaylistDesc(playlist.description);
-      // setEditTitle(playlist.title);
-      // setEditDesc(playlist.description);
+      setEditTitle(playlist.title);
+      setEditDesc(playlist.description);
       const date = new Date(playlist.creationDate);
       const year = date.getUTCFullYear();
       const month = (date.getUTCMonth() + 1).toString().padStart(2, "0");
       const day = date.getUTCDate().toString().padStart(2, "0");
       setPlaylistDate(`${year}-${month}-${day}`);
     }
-  });
+  }, [playlist]);
 
   return (
     <Box color="whiteAlpha.800" bg="blackAlpha.700" w="100%" h="100%">
@@ -151,7 +150,7 @@ const PlaylistPage: NextPage = () => {
             onClick={onOpen}
             _hover={{ cursor: "pointer" }}
           >
-            {playlistName}
+            {editTitle}
           </Text>
           <Text
             fontSize="xl"
@@ -159,7 +158,7 @@ const PlaylistPage: NextPage = () => {
             onClick={onOpen}
             _hover={{ cursor: "pointer" }}
           >
-            {playlistDesc}
+            {editDesc}
           </Text>
         </Box>
         <Box h="30%">
@@ -232,7 +231,7 @@ const PlaylistPage: NextPage = () => {
                     px={0}
                     my={3}
                     _hover={{ bg: "whiteAlpha.300", cursor: "pointer" }}
-                    // onClick={}
+                    onClick={(e) => handlePlaylistDelete}
                   >
                     <Text px={2}>Delete playlist</Text>
                   </Box>

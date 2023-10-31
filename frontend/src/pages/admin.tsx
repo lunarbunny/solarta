@@ -35,14 +35,21 @@ const AdminPage: NextPage = () => {
     id: 0,
     ownerName: "",
   });
+  console.log(selectedUser);
   const [selectedSong, setSelectedSong] = useState({
     id: 0,
     title: "",
   });
   const {
-    isOpen: isUserOpen,
-    onOpen: onUserOpen,
-    onClose: onUserClose,
+    isOpen: isUserBanOpen,
+    onOpen: onUserBanOpen,
+    onClose: onUserBanClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isUserUnbanOpen,
+    onOpen: onUserUnbanOpen,
+    onClose: onUserUnbanClose,
   } = useDisclosure();
 
   const {
@@ -105,7 +112,6 @@ const AdminPage: NextPage = () => {
   ) => {
     e.preventDefault();
 
-    // dk if selectedSong.id needs to have toString()
     const response = await fetch(`${API_URL}/music/delete/${selectedSong.id}`, {
       method: "DELETE",
       credentials: "include",
@@ -117,16 +123,30 @@ const AdminPage: NextPage = () => {
     }
   };
 
-  const handleSubmitUserDelete = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
+  const handleSubmitUserBan = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // dk if selectedUser.id needs to have toString()
     const response = await fetch(`${API_URL}/user/${selectedUser.id}/ban`, {
-      method: "POST",
+      method: "PUT",
+      credentials: "include",
     });
     if (response.ok) {
+      console.log(response);
+      location.reload();
+    } else {
+      console.log(response);
+    }
+  };
+
+  const handleSubmitUserUnban = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const response = await fetch(`${API_URL}/user/${selectedUser.id}/unban`, {
+      method: "PUT",
+      credentials: "include",
+    });
+    if (response.ok) {
+      console.log(response);
       location.reload();
     } else {
       console.log(response);
@@ -188,17 +208,37 @@ const AdminPage: NextPage = () => {
                     <Td>{data.about}</Td>
                     <Td>{returnStatus(data.status)}</Td>
                     <Td isNumeric>
-                      <Button
-                        _hover={{ bg: "red.600" }}
-                        bg="blue.700"
-                        color="whiteAlpha.900"
-                        onClick={onUserOpen}
-                        onMouseOver={(e) =>
-                          setSelectedUser({ id: data.id, ownerName: data.name })
-                        }
-                      >
-                        BAN
-                      </Button>
+                      {data.status == 0 ? (
+                        <Button
+                          _hover={{ bg: "red.600" }}
+                          bg="blue.700"
+                          color="whiteAlpha.900"
+                          onClick={onUserBanOpen}
+                          onMouseOver={(e) =>
+                            setSelectedUser({
+                              id: data.id,
+                              ownerName: data.name,
+                            })
+                          }
+                        >
+                          BAN
+                        </Button>
+                      ) : (
+                        <Button
+                          _hover={{ bg: "green.600" }}
+                          bg="blue.700"
+                          color="whiteAlpha.900"
+                          onClick={onUserUnbanOpen}
+                          onMouseOver={(e) =>
+                            setSelectedUser({
+                              id: data.id,
+                              ownerName: data.name,
+                            })
+                          }
+                        >
+                          UNBAN
+                        </Button>
+                      )}
                     </Td>
                   </Tr>
                 ))}
@@ -268,24 +308,58 @@ const AdminPage: NextPage = () => {
       </Box>
 
       {/* BAN USER MODAL */}
-      <Modal isOpen={isUserOpen} onClose={onUserClose}>
+      <Modal isOpen={isUserBanOpen} onClose={onUserBanClose}>
         <ModalOverlay />
-        <form onSubmit={handleSubmitUserDelete}>
+        <form onSubmit={handleSubmitUserBan}>
           <ModalContent>
             <ModalHeader>Ban User</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Text>
-                Are you sure you want to ban {selectedUser.ownerName} for xxx
-                days?
+                Are you sure you want to ban {selectedUser.ownerName} ?
               </Text>
             </ModalBody>
 
             <ModalFooter>
-              <Button bg="red.500" mr={3} type="submit" onClick={onUserClose}>
+              <Button
+                bg="red.500"
+                mr={3}
+                type="submit"
+                onClick={onUserBanClose}
+              >
                 Yes
               </Button>
-              <Button colorScheme="blue" onClick={onUserClose}>
+              <Button colorScheme="blue" onClick={onUserBanClose}>
+                No
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </form>
+      </Modal>
+
+      {/* UNBAN USER MODAL */}
+      <Modal isOpen={isUserUnbanOpen} onClose={onUserUnbanClose}>
+        <ModalOverlay />
+        <form onSubmit={handleSubmitUserUnban}>
+          <ModalContent>
+            <ModalHeader>Unban User</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>
+                Are you sure you want to Unban {selectedUser.ownerName} ?
+              </Text>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button
+                bg="green.500"
+                mr={3}
+                type="submit"
+                onClick={onUserUnbanClose}
+              >
+                Yes
+              </Button>
+              <Button colorScheme="blue" onClick={onUserUnbanClose}>
                 No
               </Button>
             </ModalFooter>
