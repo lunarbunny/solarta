@@ -11,7 +11,7 @@ services:
             - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
         restart: always
         networks:
-            - db
+            - api-db
         volumes:
             - solarta-db-volume:/var/lib/mysql
 
@@ -30,8 +30,8 @@ services:
             - GOOGLE_APPLICATION_CREDENTIALS=/creds/serviceAccountKey.json
         restart: always
         networks:
-            - db
-            - proxy
+            - api-db
+            - proxy-api
         volumes:
             - ./server/app/creds:/creds:ro
             - /var/lib/solarta/assets/music:/assets/music:rw
@@ -46,7 +46,7 @@ services:
             - NEXT_PUBLIC_SOLARTA_API_URL=https://solarta.nisokkususu.com/api
         restart: always
         networks:
-            - proxy
+            - proxy-web
 
     proxy:
         build: ./nginx
@@ -55,8 +55,11 @@ services:
         depends_on:
             - api
             - web
+            - cicd
         networks:
-            - proxy
+            - proxy-api
+            - proxy-web
+            - proxy-cicd
         ports:
             - "80:80"
             - "443:443"
@@ -71,7 +74,7 @@ services:
         environment:
             - JENKINS_OPTS=--prefix=/jenkins
         networks:
-            - proxy
+            - proxy-cicd
         volumes:
             - solarta-cicd-volume:/var/jenkins_home
             - /var/run/docker.sock:/var/run/docker.sock
@@ -83,7 +86,11 @@ volumes:
         external: false
 
 networks:
-    db:
+    api-db:
         name: solarta-db-local
-    proxy:
-        name: solarta-proxy-local
+    proxy-api:
+        name: solarta-proxy-api-local
+    proxy-web:
+        name: solarta-proxy-web-local
+    proxy-cicd:
+        name: solarta-proxy-cicd-local
