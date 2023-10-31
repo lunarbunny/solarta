@@ -293,30 +293,48 @@ def user_unban_by_id(id):
                 return utils.nachoneko(), 400
             user.status = 0
             session.commit()
+            return "OK", 200
         except Exception as e:
             if utils.is_debug_mode:
                 return str(e), 400
             return utils.nachoneko(), 400
 
-
 # Allow user to delete their own account
-@user_bp.route("<int:id>/delete", methods=["DELETE"])
-def user_delete(id):
+@user_bp.route('/delete', methods=["DELETE"])
+def user_delete():
     with Session() as session:
         try:
-            id = clean_num_only(str(id))
             user, status = utils.check_authenticated(session, request)
             if user is None:
                 if utils.is_debug_mode:
-                    return "Invalid session cookie.", status
+                    return 'Invalid session cookie.', status
                 return utils.nachoneko(), 400
+            
+            data = request.form
+            password = data.get("password", None)
+            confirmPwd = data.get("cfmPassword", None)
+            mfa = data.get("mfa", None)
 
-            if user.status != 1 and user.id == id:
+            print(password)
+            print(confirmPwd)
+            print(mfa)
+
+            if password is None or confirmPwd is None or mfa is None:
+                return "Require all details.", 400
+            
+            if password != confirmPwd:
+                return "Password don't match.", 400
+            
+            if not utils.verify_otp(mfa, user.mfaSecret):
+                return utils.nachoneko(), 400
+            
+            if user.status != 1 and utils.verify_password_hash(user.hashPwd, password):
                 session.delete(user)
                 session.commit()
-            else:  # avoid deleting banned users, etc.
+            else: # avoid deleting banned users, etc.
                 return utils.nachoneko(), 405
         except Exception as e:
             if utils.is_debug_mode:
                 return str(e), 400
             return utils.nachoneko(), 400
+        

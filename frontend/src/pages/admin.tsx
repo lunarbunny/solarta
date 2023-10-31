@@ -35,7 +35,6 @@ const AdminPage: NextPage = () => {
     id: 0,
     ownerName: "",
   });
-  console.log(selectedUser);
   const [selectedSong, setSelectedSong] = useState({
     id: 0,
     title: "",
@@ -119,7 +118,7 @@ const AdminPage: NextPage = () => {
     if (response.ok) {
       location.reload();
     } else {
-      console.log(response);
+      // console.log(response);
     }
   };
 
@@ -131,10 +130,10 @@ const AdminPage: NextPage = () => {
       credentials: "include",
     });
     if (response.ok) {
-      console.log(response);
+      // console.log(response);
       location.reload();
     } else {
-      console.log(response);
+      // console.log(response);
     }
   };
 
@@ -146,10 +145,10 @@ const AdminPage: NextPage = () => {
       credentials: "include",
     });
     if (response.ok) {
-      console.log(response);
+      // console.log(response);
       location.reload();
     } else {
-      console.log(response);
+      // console.log(response);
     }
   };
 
