@@ -1,7 +1,24 @@
 import LibrarySection from "@/components/Library/LibrarySection";
 import useAuth from "@/hooks/useAuth";
 import { API_URL } from "@/types";
-import { Box, Button, FormControl, FormLabel, Heading, Input, Text, Textarea, FormHelperText, Flex } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  Flex,
+  Heading,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+  Textarea,
+} from "@chakra-ui/react";
 import { NextPage } from "next";
 import router from "next/router";
 import { FormEvent, useEffect, useState } from "react";
@@ -14,6 +31,12 @@ type ProfileFormData = {
   otp: string;
 };
 
+type ConfirmPasswordData = {
+  password: string;
+  cfmPassword: string;
+  otp: string;
+}
+
 const AccountPage: NextPage = () => {
   const { user, loading } = useAuth();
 
@@ -25,6 +48,13 @@ const AccountPage: NextPage = () => {
     newPassword: "",
     otp: "",
   });
+
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
+  const [confirmPwdForm, setConfirmPwdForm] = useState<ConfirmPasswordData>({
+    password: "",
+    cfmPassword: "",
+    otp: ""
+  })
 
   useEffect(() => {
     if (loading) return;
@@ -64,6 +94,31 @@ const AccountPage: NextPage = () => {
     } else {
       alert("Error: Could not update profile.");
     }
+  }
+
+  const handleDeleteAccount = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("password", confirmPwdForm.password);
+    formData.append("cfmPassword", confirmPwdForm.cfmPassword);
+    formData.append("mfa", confirmPwdForm.otp);
+
+    const res = await fetch(`${API_URL}/user/delete`, {
+      method: "DELETE",
+      body: formData,
+      credentials: 'include',
+    });
+
+    if (res.ok) {
+      router.push('/auth');
+    } else {
+      alert("Error: Unable to delete account.");
+    }
+  }
+
+  const handleDeleteModal = () => {
+    setDeleteModalOpen(!isDeleteModalOpen);
   }
 
   let hasChanges = user ? (
@@ -106,7 +161,31 @@ const AccountPage: NextPage = () => {
             {hasChanges && <Text color="red.300" ml={4}>Changes are highlighted in red.</Text>}
           </Flex>
         </form>
+        
+        <Flex align="center" mt={4}>
+          <Button colorScheme="red" type="submit" onClick={handleDeleteModal}>Delete Account</Button>
+        </Flex>
 
+        <Modal isOpen={isDeleteModalOpen} onClose={handleDeleteModal}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Confirm Delete?</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <form onSubmit={handleDeleteAccount}>
+                <FormControl id="confirmPassword" mt={4} isInvalid={confirmPwdForm.password != "" || confirmPwdForm.cfmPassword != "" || confirmPwdForm.otp != ""}>
+                  <FormLabel>Enter password to confirm:</FormLabel>
+                  <Input type="password" placeholder="Current Password" value={confirmPwdForm.password} onChange={(e) => setConfirmPwdForm({ ...confirmPwdForm, password: e.target.value })} />
+                  <Input type="password" placeholder="New Password" mt={2} value={confirmPwdForm.cfmPassword} onChange={(e) => setConfirmPwdForm({ ...confirmPwdForm, cfmPassword: e.target.value })} />
+                  <Input type="number" placeholder="MFA OTP" mt={2} value={confirmPwdForm.otp} onChange={(e) => setConfirmPwdForm({ ...confirmPwdForm, otp: e.target.value })} />
+                </FormControl>
+                <Flex align="center" mb={4} mt={4}>
+                  <Button colorScheme="blue" type="submit">Confirm</Button>
+                </Flex>
+              </form>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
       </LibrarySection>
     </Box>
   );
