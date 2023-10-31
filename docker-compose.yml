@@ -13,7 +13,7 @@ services:
         networks:
             - api-db
         volumes:
-            - solarta-db-volume:/var/lib/mysql
+            - db:/var/lib/mysql
 
     api:
         build: ./server
@@ -76,13 +76,15 @@ services:
         networks:
             - proxy-cicd
         volumes:
-            - solarta-cicd-volume:/var/jenkins_home
+            - cicd:/var/jenkins_home
             - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
-    solarta-db-volume:
+    db:
+        name: solarta-db-volume
         external: false
-    solarta-cicd-volume:
+    cicd:
+        name: solarta-cicd-volume
         external: false
 
 networks:
