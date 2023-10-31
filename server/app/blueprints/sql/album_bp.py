@@ -132,7 +132,7 @@ def album_retrieve(idAlbum):
 def album_retrieve_top3():
     with Session() as session:
         try:
-            albums = session.query(Album, User.name).join(User).limit(3).all()
+            albums = session.query(Album, User.name).join(User).order_by(Album.id.desc()).limit(3).all()
             return jsonify([{
                 "id": album.id,
                 "title": album.title,

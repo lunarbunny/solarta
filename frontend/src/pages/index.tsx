@@ -34,7 +34,7 @@ const HomePage: NextPage = () => {
         </GridItem>
 
         <GridItem area={"trending"}>
-          <Heading size="md">Trending today</Heading>
+          <Heading size="md">Latest Hits</Heading>
           <Box mt={4}>
             <Skeleton isLoaded={!musicLoading}>
               <MusicList items={musicTrending} />
@@ -43,7 +43,7 @@ const HomePage: NextPage = () => {
         </GridItem>
 
         <GridItem area={"artists"} mb={32}>
-          <Heading size="md">Top Artists</Heading>
+          <Heading size="md">Rising Stars</Heading>
           <Box mt={4}>
             <Skeleton isLoaded={!artistLoading}>
               <ArtistWrap items={top3Artists} clickable />
@@ -52,7 +52,7 @@ const HomePage: NextPage = () => {
         </GridItem>
 
         <GridItem area={"albums"}>
-          <Heading size="md">Top Albums</Heading>
+          <Heading size="md">Recent Releases</Heading>
           <Box mt={4}>
             <Skeleton isLoaded={!albumLoading}>
               <AlbumWrap items={top3Albums} clickable />
