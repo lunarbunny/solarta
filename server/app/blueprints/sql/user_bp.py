@@ -239,6 +239,7 @@ def authenticated():
             200,
         )
 
+
 # Log out from application
 @user_bp.route("/logout", methods=["GET"])
 def logout():
@@ -262,9 +263,10 @@ def logout():
                 return str(e), 400
             else:
                 return utils.nachoneko(), 400
-            
+
+
 # Allow admin to ban an account
-@user_bp.route('/<int:id>/ban', methods=["POST"])
+@user_bp.route("/<int:id>/ban", methods=["PUT"])
 def user_ban_by_id(id):
     with Session() as session:
         try:
@@ -272,15 +274,33 @@ def user_ban_by_id(id):
             user = session.get(User, id)
             if user is None:
                 return utils.nachoneko(), 400
-            user.status == 1
+            user.status = 1
+            session.commit()
+            return "OK", 200
+        except Exception as e:
+            if utils.is_debug_mode:
+                return str(e), 400
+            return utils.nachoneko(), 400
+
+# Allow admin to unban an account
+@user_bp.route("/<int:id>/unban", methods=["PUT"])
+def user_unban_by_id(id):
+    with Session() as session:
+        try:
+            id = clean_num_only(str(id))
+            user = session.get(User, id)
+            if user is None:
+                return utils.nachoneko(), 400
+            user.status = 0
             session.commit()
         except Exception as e:
             if utils.is_debug_mode:
                 return str(e), 400
             return utils.nachoneko(), 400
 
+
 # Allow user to delete their own account
-@user_bp.route('<int:id>/delete', methods=["DELETE"])
+@user_bp.route("<int:id>/delete", methods=["DELETE"])
 def user_delete(id):
     with Session() as session:
         try:
@@ -288,16 +308,15 @@ def user_delete(id):
             user, status = utils.check_authenticated(session, request)
             if user is None:
                 if utils.is_debug_mode:
-                    return 'Invalid session cookie.', status
+                    return "Invalid session cookie.", status
                 return utils.nachoneko(), 400
-            
+
             if user.status != 1 and user.id == id:
                 session.delete(user)
                 session.commit()
-            else: # avoid deleting banned users, etc.
+            else:  # avoid deleting banned users, etc.
                 return utils.nachoneko(), 405
         except Exception as e:
             if utils.is_debug_mode:
                 return str(e), 400
             return utils.nachoneko(), 400
-        
