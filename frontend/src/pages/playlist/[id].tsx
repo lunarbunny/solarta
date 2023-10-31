@@ -40,10 +40,12 @@ import { useSetRecoilState } from "recoil";
 import { musicPlayerAtom } from "@/atoms/musicPlayer";
 import { PlayerPlaylistItem } from "../../types";
 import { useRouter } from "next/router";
+import useAuth from "@/hooks/useAuth";
 
 const PlaylistPage: NextPage = () => {
   const router = useRouter();
-
+  const { user, loading } = useAuth();
+  console.log(user);
   const { data: playlist } = useFetch<Playlist>(
     `${API_URL}/playlist/${router.query.id}`,
     { usesRouter: true }
@@ -61,7 +63,17 @@ const PlaylistPage: NextPage = () => {
   const [editTitle, setEditTitle] = useState(playlistName);
   const [editDesc, setEditDesc] = useState(playlistDesc);
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isEditOpen,
+    onOpen: onEditOpen,
+    onClose: onEditClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isDelOpen,
+    onOpen: onDelOpen,
+    onClose: onDelClose,
+  } = useDisclosure();
 
   const setMusicPlayer = useSetRecoilState(musicPlayerAtom);
 
@@ -85,6 +97,7 @@ const PlaylistPage: NextPage = () => {
           currentTrack: 0,
         };
       });
+      console.log("play");
     }
   }
 
@@ -114,12 +127,16 @@ const PlaylistPage: NextPage = () => {
 
   const handlePlaylistDelete = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("hi");
     const response = await fetch(
-      `${API_URL}/playlist/${router.query.id}/delete`
+      `${API_URL}/playlist/${router.query.id}/delete`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      }
     );
 
     if (response.ok) {
+      location.reload();
       router.push("http://localhost:3000/");
     } else {
       console.log(response);
@@ -147,7 +164,7 @@ const PlaylistPage: NextPage = () => {
           <Text
             px={{ md: 5, lg: 8 }}
             fontSize={"75px"}
-            onClick={onOpen}
+            onClick={onEditOpen}
             _hover={{ cursor: "pointer" }}
           >
             {editTitle}
@@ -155,7 +172,7 @@ const PlaylistPage: NextPage = () => {
           <Text
             fontSize="xl"
             px={10}
-            onClick={onOpen}
+            onClick={onEditOpen}
             _hover={{ cursor: "pointer" }}
           >
             {editDesc}
@@ -179,12 +196,9 @@ const PlaylistPage: NextPage = () => {
               _active={{
                 transform: "scale(0.98)",
               }}
+              onClick={handlePlayButton}
             >
-              <Icon
-                boxSize="35px"
-                as={BsFillPlayFill}
-                onClick={handlePlayButton}
-              />
+              <Icon boxSize="35px" as={BsFillPlayFill} />
               <Text fontSize="lg">Play</Text>
             </Flex>
             <HStack
@@ -195,7 +209,9 @@ const PlaylistPage: NextPage = () => {
               justify="space-around"
               alignItems="center"
             >
-              <Link fontSize="lg">Username</Link>
+              <Link fontSize="lg" href={"/account"}>
+                {user && user.name}
+              </Link>
 
               <Text fontSize="lg" as="b">
                 .
@@ -226,12 +242,12 @@ const PlaylistPage: NextPage = () => {
                 </span>
               </PopoverTrigger>
               <PopoverContent w="100%">
-                <PopoverBody p={0}>
+                <PopoverBody p={1}>
                   <Box
                     px={0}
                     my={3}
                     _hover={{ bg: "whiteAlpha.300", cursor: "pointer" }}
-                    onClick={(e) => handlePlaylistDelete}
+                    onClick={onDelOpen}
                   >
                     <Text px={2}>Delete playlist</Text>
                   </Box>
@@ -260,7 +276,9 @@ const PlaylistPage: NextPage = () => {
       >
         <MusicTable items={playlistMusic} />
       </Box>
-      <Modal isOpen={isOpen} onClose={onClose}>
+
+      {/* EDIT TITLE & DESC MODAL*/}
+      <Modal isOpen={isEditOpen} onClose={onEditClose}>
         <ModalOverlay />
         <form onSubmit={handleSavePlaylistDetails}>
           <ModalContent>
@@ -292,11 +310,39 @@ const PlaylistPage: NextPage = () => {
             </ModalBody>
 
             <ModalFooter>
-              <Button colorScheme="blue" mr={3} type="submit" onClick={onClose}>
+              <Button
+                colorScheme="blue"
+                mr={3}
+                type="submit"
+                onClick={onEditClose}
+              >
                 Save
               </Button>
-              <Button variant="ghost" onClick={onClose}>
+              <Button variant="ghost" onClick={onEditClose}>
                 Close
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </form>
+      </Modal>
+
+      {/* DELETE PLAYLIST */}
+      <Modal isOpen={isDelOpen} onClose={onDelClose}>
+        <ModalOverlay />
+        <form onSubmit={handlePlaylistDelete}>
+          <ModalContent>
+            <ModalHeader>Delete Playlist</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>Are you sure you want to delete {playlistName} ?</Text>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button bg="red.500" mr={3} type="submit" onClick={onDelClose}>
+                Yes
+              </Button>
+              <Button colorScheme="blue" onClick={onDelClose}>
+                No
               </Button>
             </ModalFooter>
           </ModalContent>
