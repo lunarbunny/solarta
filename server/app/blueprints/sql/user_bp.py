@@ -293,11 +293,11 @@ def user_unban_by_id(id):
                 return utils.nachoneko(), 400
             user.status = 0
             session.commit()
+            return "OK", 200
         except Exception as e:
             if utils.is_debug_mode:
                 return str(e), 400
             return utils.nachoneko(), 400
-
 
 # Allow user to delete their own account
 @user_bp.route('/delete', methods=["DELETE"])
