@@ -239,7 +239,7 @@ def authenticated():
             200,
         )
 
-
+# Log out from application
 @user_bp.route("/logout", methods=["GET"])
 def logout():
     with Session() as session:
@@ -263,6 +263,7 @@ def logout():
             else:
                 return utils.nachoneko(), 400
             
+# Allow admin to ban an account
 @user_bp.route('/<int:id>/ban', methods=["POST"])
 def user_ban_by_id(id):
     with Session() as session:
@@ -277,3 +278,26 @@ def user_ban_by_id(id):
             if utils.is_debug_mode:
                 return str(e), 400
             return utils.nachoneko(), 400
+
+# Allow user to delete their own account
+@user_bp.route('<int:id>/delete', methods=["DELETE"])
+def user_delete(id):
+    with Session() as session:
+        try:
+            id = clean_num_only(str(id))
+            user, status = utils.check_authenticated(session, request)
+            if user is None:
+                if utils.is_debug_mode:
+                    return 'Invalid session cookie.', status
+                return utils.nachoneko(), 400
+            
+            if user.status != 1 and user.id == id:
+                session.delete(user)
+                session.commit()
+            else: # avoid deleting banned users, etc.
+                return utils.nachoneko(), 405
+        except Exception as e:
+            if utils.is_debug_mode:
+                return str(e), 400
+            return utils.nachoneko(), 400
+        
