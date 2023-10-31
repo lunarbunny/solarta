@@ -2,18 +2,22 @@ version: "3.9"
 
 services:
     database:
-        image: mariadb
+        build: ./mariadb
+        image: solarta-database
         container_name: solarta-database
         environment:
             - MARIADB_DATABASE=solarta
             - MARIADB_USER=${MARIADB_USER}
             - MARIADB_PASSWORD=${MARIADB_PASSWORD}
             - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
-        restart: always
         networks:
             - api-db
         volumes:
             - db:/var/lib/mysql
+        deploy:
+            restart_policy:
+                condition: always
+                delay: 3s
 
     api:
         build: ./server
@@ -28,13 +32,16 @@ services:
             - URL_SIGN_SECRET=${URL_SIGN_SECRET}
             - ONBOARDING_SALT=${ONBOARDING_SALT}
             - GOOGLE_APPLICATION_CREDENTIALS=/creds/serviceAccountKey.json
-        restart: always
         networks:
             - api-db
             - proxy-api
         volumes:
             - ./server/app/creds:/creds:ro
             - /var/lib/solarta/assets/music:/assets/music:rw
+        deploy:
+            restart_policy:
+                condition: always
+                delay: 3s
 
     web:
         build: ./frontend
@@ -44,9 +51,12 @@ services:
             - api
         environment:
             - NEXT_PUBLIC_SOLARTA_API_URL=https://solarta.nisokkususu.com/api
-        restart: always
         networks:
             - proxy-web
+        deploy:
+            restart_policy:
+                condition: always
+                delay: 1s
 
     proxy:
         build: ./nginx
@@ -66,6 +76,10 @@ services:
         volumes:
             - /etc/letsencrypt/live/solarta.nisokkususu.com/fullchain.pem:/etc/nginx/ssl/fullchain.pem:ro
             - /etc/letsencrypt/live/solarta.nisokkususu.com/privkey.pem:/etc/nginx/ssl/privkey.pem:ro
+        deploy:
+            restart_policy:
+                condition: always
+                delay: 5s
 
     cicd:
         build: ./jenkins
@@ -78,6 +92,10 @@ services:
         volumes:
             - cicd:/var/jenkins_home
             - /var/run/docker.sock:/var/run/docker.sock
+        deploy:
+            restart_policy:
+                condition: always
+                delay: 1s
 
 volumes:
     db:
