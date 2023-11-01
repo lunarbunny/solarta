@@ -36,6 +36,11 @@ def music_get_metadata(path):
         return file.info.time_secs, file.info.size_bytes
     return None
 
+def music_get_max_size():
+    # 10 MB
+    return 10 * 1024 * 1024
+
+
 def hash_password(password):
     return argon_hasher.hash(password)
 

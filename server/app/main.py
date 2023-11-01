@@ -1,10 +1,12 @@
 # Create Flask app
 from flask import Flask
 from flask_cors import CORS
-from utils import is_debug_mode
+from utils import is_debug_mode, music_get_max_size
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True) # Allow CORS for all endpoints
+
+app.config['MAX_CONTENT_LENGTH'] = music_get_max_size()
 
 # Register blueprints
 from blueprints.sql.album_bp import album_bp
