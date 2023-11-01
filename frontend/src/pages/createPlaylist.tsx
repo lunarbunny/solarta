@@ -54,7 +54,6 @@ const CreatePlayListPage: NextPage = () => {
         alignItems="center"
         w="100%"
         h="100%"
-        border="2px"
       >
         <Flex
           bg="blue.700"
@@ -64,6 +63,7 @@ const CreatePlayListPage: NextPage = () => {
           h="60%"
           w="40%"
           borderRadius="2xl"
+          boxShadow="2xl"
         >
           <Flex alignItems="center" h="20%">
             <Text px={5} as="b" fontSize="3xl">
