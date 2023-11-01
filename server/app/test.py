@@ -18,6 +18,9 @@ def client():
 def test_music_retrieve_id_history(client):
     response = client.get('api/music/history/1', follow_redirects=True)
     assert response.status_code == 200
+    
+    response = client.get('api/music/history/-1', follow_redirects=True)
+    assert response.status_code == 404
 
 # Refer to blueprints/sql/album_bp.py
 def test_album_retrieve_all_music(client):
