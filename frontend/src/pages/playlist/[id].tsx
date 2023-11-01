@@ -29,7 +29,9 @@ import {
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { BsFillPlayFill } from "react-icons/bs";
-import { BiDotsHorizontalRounded, BiTime } from "react-icons/bi";
+import { BiDotsHorizontalRounded } from "react-icons/bi";
+import { FiInfo } from "react-icons/fi";
+import { GrFormAdd } from "react-icons/gr";
 import MusicTable from "@/components/Media/MusicTable";
 import { useSetRecoilState } from "recoil";
 import { musicPlayerAtom } from "@/atoms/musicPlayer";
@@ -37,6 +39,7 @@ import { PlayerPlaylistItem } from "../../types";
 import { useRouter } from "next/router";
 import useAuth from "@/hooks/useAuth";
 import AddMusicTable from "../../components/Media/AddMusicTable";
+import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 
 const PlaylistPage: NextPage = () => {
   const router = useRouter();
@@ -67,6 +70,7 @@ const PlaylistPage: NextPage = () => {
   >([]);
 
   const [playlistSongs, setPlayListSongs] = useState<Array<number>>([]);
+  console.log(playlistSongs);
   const [addSongs, setAddSongs] = useState(false);
   const { data: allMusic } = useFetch<Music[]>(`${API_URL}/music`, {
     usesRouter: true,
@@ -143,8 +147,7 @@ const PlaylistPage: NextPage = () => {
     );
 
     if (response.ok) {
-      router.push("/");
-      location.reload();
+      location.replace("/");
     } else {
       console.log(response);
     }
@@ -154,23 +157,29 @@ const PlaylistPage: NextPage = () => {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
-    for (let j = 0; j < setPlayListSongs.length; j++) {
+
+    const playlistID: number = Number(router.query.id);
+
+    for (let j = 0; j < playlistSongs.length; j++) {
       const response = await fetch(
-        `${API_URL}/playlist=${router.query.id}}/music=${playlistSongs[j]}`,
+        `${API_URL}/playlist/playlist=${playlistID}/music=${playlistSongs[j]}`,
         {
           method: "POST",
           credentials: "include",
         }
       );
       if (response.ok) {
-        console.log(`added ${selectedSong[0].title} to the playlist`);
       } else {
         console.log(response);
       }
     }
-
     location.reload();
   };
+
+  function handleCancelAddSong() {
+    setAddSongs(false);
+    setPlayListSongs([]);
+  }
 
   useEffect(() => {
     if (playlist != null) {
@@ -264,9 +273,14 @@ const PlaylistPage: NextPage = () => {
                     <Icon boxSize={5} as={BiDotsHorizontalRounded} />
                   </MenuButton>
                   <MenuList>
-                    <MenuItem onClick={onDelOpen}>Delete playlist</MenuItem>
-                    <MenuItem onClick={(e) => setAddSongs(!addSongs)}>
+                    <MenuItem
+                      icon={<AddIcon />}
+                      onClick={(e) => setAddSongs(!addSongs)}
+                    >
                       Add songs
+                    </MenuItem>
+                    <MenuItem icon={<DeleteIcon />} onClick={onDelOpen}>
+                      Delete playlist
                     </MenuItem>
                   </MenuList>
                 </Menu>
@@ -300,7 +314,7 @@ const PlaylistPage: NextPage = () => {
           <Box
             bgGradient="linear(to-t, blackAlpha.700, blue.900)"
             w="100%"
-            h="30%"
+            h="25%"
           >
             <Box>
               <Text px={{ md: 5, lg: 8 }} fontSize={"75px"}>
@@ -311,8 +325,24 @@ const PlaylistPage: NextPage = () => {
               </Text>
             </Box>
           </Box>
+
+          <Flex
+            bgGradient="linear(to-t, blackAlpha.700, blackAlpha.900)"
+            direction="row"
+            alignItems="center"
+            mx={3}
+            h="10%"
+            py={5}
+          >
+            <Icon boxSize={10} as={FiInfo} mr={2} />
+            <Text fontSize="2xl">
+              Choose songs below to add to your new playlist
+            </Text>
+          </Flex>
+
           <Box
-            h="60%"
+            h="50%"
+            bg="blackAlpha.900"
             overflowY="auto"
             sx={{
               "&::-webkit-scrollbar": {
@@ -334,14 +364,21 @@ const PlaylistPage: NextPage = () => {
             />
           </Box>
           {/* Button */}
-          <Flex h="10%" w="100%" align="center" justify="end" px={5}>
+          <Flex
+            bg="blackAlpha.900"
+            h="15%"
+            w="100%"
+            align="center"
+            justify="end"
+            px={5}
+          >
             <Button colorScheme="messenger" type="submit" mr={2}>
               Add to playlist
             </Button>
             <Button
               bg="red.400"
               _hover={{ bg: "red.500" }}
-              onClick={(e) => setAddSongs(false)}
+              onClick={handleCancelAddSong}
             >
               Cancel
             </Button>

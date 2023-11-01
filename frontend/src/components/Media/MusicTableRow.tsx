@@ -19,12 +19,11 @@ const MusicTableRow: React.FC<Props> = ({ data, onClick, index }) => {
         `${API_URL}/playlist/playlist=${router.query.id}/music=${data.id}`,
         {
           method: "DELETE",
-          credentials: "include"
+          credentials: "include",
         }
       );
 
       if (response.ok) {
-        router.push("/");
         location.reload();
       }
     } catch (error) {
@@ -56,7 +55,13 @@ const MusicTableRow: React.FC<Props> = ({ data, onClick, index }) => {
       <Td>{data.albumName}</Td>
       <Td>{durationToTime(data.duration)}</Td>
       <Td>
-        <Button onClick={handleDeletePlaylistMusic}>Remove</Button>
+        <Button
+          bg="red.500"
+          _hover={{ bg: "red.600" }}
+          onClick={handleDeletePlaylistMusic}
+        >
+          Remove
+        </Button>
       </Td>
     </>
   );
