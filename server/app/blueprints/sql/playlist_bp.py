@@ -12,24 +12,26 @@ playlist_bp = Blueprint("playlist_bp", __name__)
 # Delete a playlist
 @playlist_bp.route("/<int:id>/delete", methods=["DELETE"])
 def playlist_delete(id):
-    from ..__init__ import PlaylistMusic
-
     with Session() as session:
         try:
+            user, status = utils.check_authenticated(session, request)
+            if user is None:
+                return utils.nachoneko(), status
+            
             id = clean_num_only(str(id))
             playlist = session.get(Playlist, id)
-            if playlist:
-                session.query(PlaylistMusic).filter(
-                    PlaylistMusic.idPlaylist == id
-                ).delete()
+            if playlist is not None and playlist.ownerId == user.id:
+                session.query(PlaylistMusic).filter(PlaylistMusic.idPlaylist == id).delete()
                 session.delete(playlist)
                 session.commit()
-                return "", 200
+                return "OK", 200
             else:
-                return "", 404
-        except:
+                return "Not found", 404
+        except Exception as e:
             session.rollback()
-            return "", 400
+            if utils.is_debug_mode:
+                return str(e), 400
+            return utils.nachoneko(), 400
 
 
 # Create a playlist
@@ -56,7 +58,6 @@ def playlist_create():
         except Exception as e:
             session.rollback()
             if utils.is_debug_mode:
-                print(str(e))
                 return str(e), 400
             return "Failed to create playlist", 400
 
