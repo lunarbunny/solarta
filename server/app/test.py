@@ -136,8 +136,8 @@ def test_music_get_save_dir():
 def test_music_get_duration():
     import os
     if os.path.exists('assets/music/yo!.mp3'):
-        from utils import music_get_duration
-        assert music_get_duration("yo!.mp3") == 6
+        from utils import music_get_metadata
+        assert music_get_metadata("yo!.mp3")[0] == 6
 
 def test_is_email_valid():
     from validation import validate_email

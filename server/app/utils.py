@@ -12,7 +12,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 is_debug_mode = True
-email_regex = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
 argon_hasher = PasswordHasher()
 sg = sendgrid.SendGridAPIClient(api_key=os.getenv("SENDGRID_API_KEY"))
 serializer = URLSafeTimedSerializer(secret_key=os.getenv("URL_SIGN_SECRET"))
@@ -30,17 +29,11 @@ def music_get_save_dir():
         sys.exit(1)
     return dir
 
-
-def music_get_duration(path):
+def music_get_metadata(path):
     file = eyed3.load(path)
     if file is not None:
-        duration = file.info.time_secs
-        return duration
-
-
-def is_email_valid(email):
-    return re.match(email_regex, email)
-
+        return file.info.time_secs, file.info.size_bytes
+    return None
 
 def hash_password(password):
     return argon_hasher.hash(password)

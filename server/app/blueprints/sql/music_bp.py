@@ -40,11 +40,13 @@ def music_create():
             save_path = os.path.join(save_dir, filename)
             
             music_file.save(save_path)
-            duration = utils.music_get_duration(save_path)
-            if duration is None:
-                return 'Cannot get duration', 422
-            
+            meta = utils.music_get_metadata(save_path)
+            if meta is None:
+                return 'Music file is invalid.', 400
+            duration, size = meta
             duration = math.ceil(duration)
+            # TODO: Check size limit and compress as necessary
+            
             new_music = Music(title, filename, duration, genreId, ownerId)
             session.add(new_music)
             session.flush()
