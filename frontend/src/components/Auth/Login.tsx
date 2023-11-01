@@ -1,6 +1,7 @@
-import { Button, Input, InputGroup, Text } from '@chakra-ui/react';
+import { Button, FormControl, FormLabel, Input, InputGroup, Text } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import useSignIn from '@/hooks/useSignIn';
+import { validateEmail, validateOTP, validatePwd } from '@/utils';
 
 type LoginProps = {
   onRegisterClick: () => void;
@@ -13,16 +14,38 @@ const Login: React.FC<LoginProps> = ({ onRegisterClick, onForgetClick }) => {
     password: '',
     otp: '',
   });
+
   const [error, setError] = useState('');
+  const [emailHasError, setEmailHasError] = useState(false);
+  const [passwordHasError, setPasswordHasError] = useState(false);
+  const [otpHasError, setOtpHasError] = useState(false);
 
   const { signIn, loggedIn, loading, error: loginError } = useSignIn();
 
   const handleLoginSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (error) setError(''); // Reset error message
 
-    if (!loginForm.email || !loginForm.password) {
-      setError('Please fill in all fields.');
+    // Reset error message
+    if (error) setError('');
+    if (emailHasError) setEmailHasError(false);
+    if (passwordHasError) setPasswordHasError(false);
+    if (otpHasError) setOtpHasError(false);
+
+    if (!validateEmail(loginForm.email)) {
+      setError('Please enter a valid email address.');
+      setEmailHasError(true);
+      return;
+    }
+
+    if (!validatePwd(loginForm.password)) {
+      setError('Password must be at least 8 characters long.');
+      setPasswordHasError(true);
+      return;
+    }
+
+    if (!validateOTP(loginForm.otp)) {
+      setError('Please enter a valid 6 digit OTP.');
+      setOtpHasError(true);
       return;
     }
 
@@ -33,34 +56,41 @@ const Login: React.FC<LoginProps> = ({ onRegisterClick, onForgetClick }) => {
     if (loggedIn) {
       window.location.href = '/';
     }
-  }
-  , [loggedIn]);
+  }, [loggedIn]);
 
   return (
     <>
       <Text textAlign="center" fontSize="20pt" color="white" mb={2}>Login to Solarta</Text>
 
       <form onSubmit={handleLoginSubmit}>
-        <Input
-          type="email"
-          placeholder="Email"
-          value={loginForm.email}
-          onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
-        />
-        <Input
-          type="password"
-          placeholder="Password"
-          value={loginForm.password}
-          onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-          mt={2}
-        />
-        <Input
-          type="number"
-          placeholder="OTP"
-          value={loginForm.otp}
-          onChange={(e) => setLoginForm({ ...loginForm, otp: e.target.value })}
-          mt={2}
-        />
+        <FormControl isInvalid={emailHasError}>
+          <Input
+            type="email"
+            placeholder="Email"
+            value={loginForm.email}
+            onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
+          />
+        </FormControl>
+
+        <FormControl isInvalid={passwordHasError}>
+          <Input
+            type="password"
+            placeholder="Password"
+            value={loginForm.password}
+            onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+            mt={2}
+          />
+        </FormControl>
+
+        <FormControl isInvalid={otpHasError}>
+          <Input
+            type="number"
+            placeholder="OTP"
+            value={loginForm.otp}
+            onChange={(e) => setLoginForm({ ...loginForm, otp: e.target.value })}
+            mt={2}
+          />
+        </FormControl>
 
         <Text textAlign="center" mt={2} fontSize="12pt" color="red.300" noOfLines={2}>
           {error || (loginError && 'Error occured while logging in.')}

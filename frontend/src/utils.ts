@@ -23,3 +23,21 @@ export function formatDate(date: Date): string {
 
   return `${year}-${month}-${day}`;
 }
+
+export function validateText(text: string): boolean {
+  return text.length >= 3 && text.length <= 64;
+}
+
+export function validateEmail(email: string): boolean {
+  // https://stackoverflow.com/a/46181/12327979
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return re.test(email);
+}
+
+export function validatePwd(pwd: string): boolean {
+  return pwd.length >= 8;
+}
+
+export function validateOTP(otp: string): boolean {
+  return otp.length == 6 && !isNaN(Number(otp));
+}

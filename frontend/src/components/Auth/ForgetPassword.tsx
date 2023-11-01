@@ -1,7 +1,8 @@
-import { Button, Input, InputGroup, Text } from '@chakra-ui/react';
+import { Button, FormControl, FormLabel, Input, InputGroup, Text } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import useSignIn from '@/hooks/useSignIn';
 import { API_URL } from '@/types';
+import { validateEmail } from '@/utils';
 
 type Props = {
   onLoginClick: () => void;
@@ -10,6 +11,7 @@ type Props = {
 const ForgetPassword: React.FC<Props> = ({ onLoginClick }) => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const [emailHasError, setEmailHasError] = useState(false);
 
   const handleRequestForgetEmail = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -18,6 +20,13 @@ const ForgetPassword: React.FC<Props> = ({ onLoginClick }) => {
 
     if (!email) {
       setError('Please enter your email.');
+      setEmailHasError(true);
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setError('Please enter a valid email address.');
+      setEmailHasError(true);
       return;
     }
 
@@ -38,7 +47,9 @@ const ForgetPassword: React.FC<Props> = ({ onLoginClick }) => {
     <>
       <Text textAlign="center" fontSize="20pt" color="white" mb={2}>Reset Password</Text>
 
-      <Input type='email' placeholder='Email' value={email} onChange={(e) => setEmail(e.target.value)} />
+      <FormControl isInvalid={emailHasError}>
+        <Input type='email' placeholder='Email' value={email} onChange={(e) => setEmail(e.target.value)} />
+      </FormControl>
 
       <Text textAlign="center" mt={2} fontSize="12pt" color="red.300" noOfLines={2}>
         {error}
