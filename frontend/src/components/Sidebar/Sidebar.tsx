@@ -4,7 +4,7 @@ import { Box, Button, Flex, Image, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import { useState } from "react";
 import { IoLibraryOutline } from "react-icons/io5";
-import { MdAlbum, MdPortrait } from "react-icons/md";
+import { MdAdminPanelSettings, MdAlbum, MdOutlineAdminPanelSettings, MdOutlineAlbum, MdPortrait } from "react-icons/md";
 import { TbMusic } from "react-icons/tb";
 import Playlists from "./Playlists";
 import SidebarGroup from "./SidebarGroup";
@@ -43,7 +43,7 @@ const Sidebar = () => {
             <SidebarItem name="Artists" icon={<MdPortrait size={20} />} bolded={page == 'artists'} />
           </Link>
           <Link href="/albums" onClick={() => setPage("albums")}>
-            <SidebarItem name="Albums" icon={<MdAlbum size={20} />} bolded={page == 'albums'} />
+            <SidebarItem name="Albums" icon={<MdOutlineAlbum size={20} />} bolded={page == 'albums'} />
           </Link>
           {
             user && (
@@ -55,7 +55,7 @@ const Sidebar = () => {
           {
             user && user.admin && (
               <Link href="/admin" onClick={() => setPage("admin")}>
-                <SidebarItem name="Admin" icon={<IoLibraryOutline size={20} />} bolded={page == 'admin'} />
+                <SidebarItem name="Admin" icon={<MdOutlineAdminPanelSettings size={20} />} bolded={page == 'admin'} />
               </Link>
             )
           }
@@ -78,10 +78,13 @@ const Sidebar = () => {
         {user ? (
           <>
             <Text fontSize="md" noOfLines={1} color="gray.300">
-              You are signed in as <Link href="/account">
-                <strong><u>{user.name}</u></strong>.
-              </Link>
+              Welcome,
             </Text>
+            <Link href="/account">
+              <Text fontWeight="bold" noOfLines={1} color="gray.300">
+                {user.name}
+              </Text>
+            </Link>
             <Button size="sm" onClick={signOut} variant={"outline"}>
               Logout
             </Button>
