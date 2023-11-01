@@ -1,0 +1,112 @@
+version: "3.9"
+
+services:
+    database:
+        build: ./mariadb
+        image: solarta-database
+        container_name: solarta-database
+        environment:
+            - MARIADB_DATABASE=solarta
+            - MARIADB_USER=solarta
+            - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+            - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+        networks:
+            - api-db
+        volumes:
+            - db:/var/lib/mysql
+        deploy:
+            restart_policy:
+                condition: always
+                delay: 3s
+
+    api:
+        build: ./server
+        image: solarta-api
+        container_name: solarta-api
+        environment:
+            - MUSIC_ASSET_DIR=/assets/music
+            - SQLALCHEMY_DATABASE_URI=mysql+pymysql://solarta:${MARIADB_PASSWORD}@database:3306/solarta
+            - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+            - URL_SIGN_SECRET=${URL_SIGN_SECRET}
+            - ONBOARDING_SALT=${ONBOARDING_SALT}
+        networks:
+            - api-db
+            - proxy-api
+        volumes:
+            - /var/lib/solarta/assets/music:/assets/music:rw
+        deploy:
+            restart_policy:
+                condition: always
+                delay: 3s
+
+    web:
+        build: ./frontend
+        image: solarta-web
+        container_name: solarta-web
+        depends_on:
+            - api
+        environment:
+            - NEXT_PUBLIC_SOLARTA_API_URL=https://solarta.nisokkususu.com/api
+        networks:
+            - proxy-web
+        deploy:
+            restart_policy:
+                condition: always
+                delay: 1s
+
+    proxy:
+        build: ./nginx
+        image: solarta-proxy
+        container_name: solarta-proxy
+        depends_on:
+            - api
+            - web
+            - cicd
+        networks:
+            - proxy-api
+            - proxy-web
+            - proxy-cicd
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - /etc/letsencrypt/live/solarta.nisokkususu.com/fullchain.pem:/etc/nginx/ssl/fullchain.pem:ro
+            - /etc/letsencrypt/live/solarta.nisokkususu.com/privkey.pem:/etc/nginx/ssl/privkey.pem:ro
+        deploy:
+            restart_policy:
+                condition: always
+                delay: 5s
+
+    cicd:
+        build: ./jenkins
+        image: solarta-cicd
+        container_name: solarta-cicd
+        environment:
+            - JENKINS_OPTS=--prefix=/jenkins
+        networks:
+            - proxy-cicd
+        volumes:
+            - cicd:/var/jenkins_home
+            - /var/run/docker.sock:/var/run/docker.sock
+        deploy:
+            restart_policy:
+                condition: always
+                delay: 1s
+
+volumes:
+    db:
+        name: solarta-db-volume
+        external: false
+    cicd:
+        name: solarta-cicd-volume
+        external: false
+
+networks:
+    api-db:
+        name: solarta-db-local
+    proxy-api:
+        name: solarta-proxy-api-local
+    proxy-web:
+        name: solarta-proxy-web-local
+    proxy-cicd:
+        name: solarta-proxy-cicd-local

@@ -154,14 +154,8 @@ def generate_session() -> str:
 def set_cookie_expiry() -> int:
     return int(time.time()) + 60 * 60 * 24
 
-
-# Check if user is authenticated, return (User | None, http status code)
-def check_authenticated(db, request) -> tuple[User | None, int]:
-    session_id = request.cookies.get("SESSIONID")
-    if session_id is None:
-        return None, 401
-
-    user = db.query(User).filter(User.sessionId == session_id).first()
+def verify_session(session, sessionId: str):
+    user = session.query(User).filter(User.sessionId==sessionId).first()
 
     if user is None:
         return None, 401

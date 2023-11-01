@@ -1,0 +1,85 @@
+pipeline {
+    agent any
+
+    environment {
+        SENDGRID_API_KEY = credentials('b7a83492-696b-4c37-8b31-3f1d469dd2f7')
+        URL_SIGN_SECRET = credentials('a0a605eb-9890-48b8-9e9a-affe921ce9cc')
+        ONBOARDING_SALT = credentials('e886f93b-8132-445e-b44f-52c8ff540637')
+        MARIADB_PASSWORD = credentials('c0e67a34-0eb6-4ad2-85f3-d28c38ab4ed1')
+        MARIADB_ROOT_PASSWORD = credentials('8373d9b7-35d9-44c3-9f33-a102153516bb')
+    }
+
+    stages {
+        stage('Build Backend') {
+            steps {
+                script {
+                    // Build Flask Application
+                    sh 'docker compose build --no-cache api'
+                }
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                script {
+                    // Build Next Application
+                    sh 'docker compose build --no-cache web'
+                }
+            }
+        }
+
+        stage('Deploy Backend') {
+            steps {
+                script {
+                    // Stop existing and deploy container
+                    sh 'docker compose stop api'
+                    sh 'docker rm -f solarta-api'
+                    sh 'docker compose up -d api'
+                }
+            }
+        }
+
+        stage('Deploy Frontend') {
+            steps {
+                script {
+                    // Stop existing and deploy container
+                    sh 'docker compose stop web'
+                    sh 'docker rm -f solarta-web'
+                    sh 'docker compose up -d web'
+                }
+            }
+        }
+
+        stage('OWASP Dependency-Check Vulnerabilities') {
+            steps {
+                // Install deps first
+                nodejs(nodeJSInstallationName: 'NodeJS 20') {
+                    sh 'npm install --prefix ./frontend'
+                }
+
+                // Run OWASP Dependency-Check
+                // https://jeremylong.github.io/DependencyCheck/dependency-check-cli/arguments.html
+                dependencyCheck additionalArguments: ''' 
+                            -o './'
+                            -s './frontend'
+                            -f 'HTML' 
+                            ''', odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
+
+                // Write report to specified file
+                dependencyCheckPublisher pattern: 'dependency-check-report.html'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Success!'
+        }
+
+        always {
+            // Remove all intermediate images and containers
+            sh 'docker system prune -f'
+        }
+    }
+}
+// vim: ft=groovy
