@@ -23,17 +23,16 @@ import {
   Button,
   useToast,
   Text,
-  Badge,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useState } from "react";
-import SearchBar from "@/components/Search/SearchBar";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { BiTime } from "react-icons/bi";
 import { FiInfo } from "react-icons/fi";
 import { formatDate, durationToTime } from "../utils";
 import { useRouter } from "next/router";
 import useFetch from "@/hooks/useFetch";
+import AddMusicTable from "../components/Media/AddMusicTable";
 
 const CreatePlayListPage: NextPage = () => {
   const router = useRouter();
@@ -73,6 +72,7 @@ const CreatePlayListPage: NextPage = () => {
     });
 
     if (response.ok) {
+      router.push("/");
       // const { data: allPlaylist } = useFetch<Music[]>(
       //   `${API_URL}/playlist/mine`,
       //   {
@@ -132,17 +132,6 @@ const CreatePlayListPage: NextPage = () => {
         />
       </ButtonGroup>
     ) : null;
-  }
-
-  function addSongToList() {
-    toast({
-      title: "Song added.",
-      description: `We've added ${selectedSong[0].title} to the list!`,
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
-    setPlayListSongs((current) => [...current, selectedSong[0].id]);
   }
 
   return (
@@ -219,56 +208,12 @@ const CreatePlayListPage: NextPage = () => {
           },
         }}
       >
-        <Table size="md" colorScheme="facebook" variant="simple">
-          <Thead>
-            <Tr>
-              <Th>#</Th>
-              <Th>Title</Th>
-              <Th>Album</Th>
-              <Th>
-                <Icon boxSize="20px" as={BiTime} />
-              </Th>
-              <Th isNumeric></Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {allMusic &&
-              allMusic.map((info, key) => (
-                <Tr key={key} _hover={{ bg: "blue.700" }}>
-                  <Td>{key + 1}</Td>
-                  <Td>
-                    <Flex direction="row">
-                      <Image
-                        boxSize="64px"
-                        src={"https://picsum.photos/42?random=" + info.id}
-                        mr={2}
-                        alt="cover"
-                      />
-                      <Flex justify="center" direction="column">
-                        <Box>{info ? info.title : ""}</Box>
-                        {info ? info.ownerName : ""}
-                      </Flex>
-                    </Flex>
-                  </Td>
-                  <Td>{info ? info.albumName : ""}</Td>
-                  <Td>{durationToTime(info ? info.duration : 0)}</Td>
-                  <Td isNumeric>
-                    <Button
-                      _hover={{ bg: "orange.600" }}
-                      bg="blue.700"
-                      color="whiteAlpha.900"
-                      onClick={addSongToList}
-                      onMouseOver={(e) =>
-                        setSelectedSong([{ id: info.id, title: info.title }])
-                      }
-                    >
-                      ADD SONG
-                    </Button>
-                  </Td>
-                </Tr>
-              ))}
-          </Tbody>
-        </Table>
+        <AddMusicTable
+          musicArray={allMusic}
+          selectedSong={selectedSong}
+          setSelectedSong={setSelectedSong}
+          setPlaylistSongs={setPlayListSongs}
+        />
       </Box>
       {/* Button */}
       <Flex h="10%" w="100%" align="center" justify="end" px={5}>
