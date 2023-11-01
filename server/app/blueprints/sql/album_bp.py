@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request
 
 from ..__init__ import Session, Album, AlbumMusic, Music, User
 import utils
-from validation import clean_alphanum, clean_num_only, clean_text
+from validation import clean_text
 
 album_bp = Blueprint("album_bp", __name__)
 
@@ -20,16 +20,17 @@ def album_create():
             ownerId = user.id
             
             data = request.form
-            title = clean_text(data.get("title", ""))
-            releaseDateStr = data.get("releaseDate", "") # Format: YYYY-MM-DD
+            title = data.get("title", None)
+            releaseDateStr = data.get("releaseDate", None) # Format: YYYY-MM-DD
             description = data.get("description", "") # Optional
             imageUrl = data.get("imageUrl", None) # Optional
 
+            if title is None or releaseDateStr is None:
+                return "Missing parameters", 400
+            
+            title = clean_text(title)
             if description != "":
                 description = clean_text(description)
-
-            if title == "" or releaseDateStr == "":
-                return "Missing parameters", 400
 
             releaseDate = datetime.strptime(releaseDateStr, "%Y-%m-%d")
 

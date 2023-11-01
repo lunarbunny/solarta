@@ -83,7 +83,7 @@ def send_onboarding_email(username, email):
 
 
 def generate_resetting_token(email):
-    return serializer.dumps(email, salt=os.getenv("RESET_SALT"))
+    return serializer.dumps(email, salt=os.getenv("RESETTING_SALT"))
 
 def send_resetting_email(username, email):
     reset_link = (
@@ -111,7 +111,7 @@ def verify_resetting_email(token, expiration=15 * 60) -> str:
     verifying_email = ""
     try:
         verifying_email = serializer.loads(
-            token, salt=os.environ.get("RESET_SALT"), max_age=expiration
+            token, salt=os.environ.get("RESETTING_SALT"), max_age=expiration
         )
     except Exception as e:
         print(e.message)

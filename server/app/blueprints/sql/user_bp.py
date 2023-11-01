@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, make_response
 from markupsafe import escape
-from validation import clean_email, clean_num_only, clean_text, validate_about, validate_email, validate_name
+from validation import clean_email, clean_text, validate_about, validate_email, validate_mfa, validate_name, validate_password
 
 from .. import Session, User, Role
 import utils
@@ -38,7 +38,6 @@ def user_retrieve_all():
 def user_retrieve_by_id(id):
     with Session() as session:
         try:
-            id = clean_num_only(str(id))
             user = session.query(User).filter(User.id == id).first()
             if user is None:
                 return "", 404
@@ -105,46 +104,6 @@ def user_search_by_name(name):
             return utils.nachoneko(), 400
 
 
-# Register a new user
-@user_bp.route("/register", methods=["POST"])
-def register():
-    with Session() as session:
-        try:
-            data = request.form
-            name = clean_text(data.get("name"))
-            email = clean_email(data.get("email"))
-            password = data.get("password")
-            if name is None:
-                return "Name is required.", 400
-            
-            if email is None:
-                return "Email is required.", 400
-            
-            name_valid, name_error = validate_name(name)
-            if not name_valid:
-                return name_error, 400
-            
-            email_valid, email_error = validate_email(email)
-            if not email_valid:
-                return email_error, 400
-            
-            #if confirmPassword != password:
-            #    return "Check that you entered both passwords correctly.", 400
-            
-            # Fields are valid, proceed to generate user
-            hashPwd = utils.hash_password(password)
-            newUser = User(name, email, hashPwd, status=2, roleId=2, mfaSecret=None, sessionId=None, sessionExpiry=None, about=None)
-            session.add(newUser)
-            session.commit()
-            utils.send_onboarding_email(name, email)
-            return "ok!", 200
-        except Exception as e:
-            session.rollback()
-            if utils.is_debug_mode:
-                return str(e), 400
-            else:
-                return utils.nachoneko(), 400
-
 # Update user profile
 @user_bp.route("/update", methods=["POST"])
 def update():
@@ -197,68 +156,45 @@ def update():
             else:
                 return utils.nachoneko(), 400
 
-# Request password reset email
-@user_bp.route("/reset", methods=["POST"])
-def request_reset_password():
+
+# Register a new user
+@user_bp.route("/register", methods=["POST"])
+def register():
     with Session() as session:
         try:
             data = request.form
+            name = data.get("name", None)
             email = data.get("email", None)
-
-            if email is None:
-                return "Email is required.", 400
-
+            password = data.get("password", None)
+            
+            # Validation
+            name = clean_text(name)
+            name_valid, name_error = validate_name(name)
+            if not name_valid:
+                return name_error, 400
+            
             email = clean_email(email)
-
-            user = session.query(User).filter(User.email == email).first()
-
-            if user is None:
-                return "ok!", 200 # Don't tell user that email is not found
+            email_valid, email_error = validate_email(email)
+            if not email_valid:
+                return email_error, 400
             
-            utils.send_resetting_email(user.name, email)
-            return "ok!", 200
-        except Exception as e:
-            if utils.is_debug_mode:
-                return str(e), 400
-            else:
-                return utils.nachoneko(), 400
-
-
-
-# Reset password and MFA
-@user_bp.route("/reset/<string:token>", methods=["POST"])
-def reset_password(token):
-    with Session() as session:
-        try:
-            verify_reset_email = utils.verify_resetting_email(token)
-            if verify_reset_email is None:
-                return utils.nachoneko(), 400
+            pwd_valid, pwd_error = validate_password(password)
+            if not pwd_valid:
+                return pwd_error, 400
             
-            # Check if user exists and is active (status == 0)
-            user = session.query(User).filter(User.email == verify_reset_email).first()
-            if user is None or user.status != 0:
-                return utils.nachoneko(), 400
-
-            data = request.form
-            password = data.get("newPassword", None)
-
-            if password is None:
-                return "Password is required.", 400
-
-            user.hashPwd = utils.hash_password(password)
-            
-            # Reset MFA
-            user.mfaSecret = utils.generate_otp_secret()
-
+            # Fields are valid, proceed to generate user
+            hashPwd = utils.hash_password(password)
+            newUser = User(name, email, hashPwd, status=2, roleId=2, mfaSecret=None, sessionId=None, sessionExpiry=None, about=None)
+            session.add(newUser)
             session.commit()
-            return utils.generate_otp_qr_string(user.name, user.mfaSecret), 200
+            utils.send_onboarding_email(name, email)
+            return "ok!", 200
         except Exception as e:
             session.rollback()
             if utils.is_debug_mode:
                 return str(e), 400
             else:
                 return utils.nachoneko(), 400
-
 
 # Verify email and setup MFA
 @user_bp.route("/onboarding/<string:token>", methods=["GET"])
@@ -292,21 +228,21 @@ def login():
             email = data.get("email", None)
             password = data.get("password", None)
             mfa = data.get("mfa", None)
-
-            cleaned_email = clean_email(email)
-            email_valid, email_error = validate_email(cleaned_email)
+            
+            email = clean_email(email)
+            email_valid, email_error = validate_email(email)
             if not email_valid:
                 return email_error, 400
 
-            if mfa is None:
-                return "MFA is required.", 400
-            elif not mfa.isdigit() or len(mfa) != 6:
-                return "MFA is incorrect.", 400
-
-            if password is None:
-                return "Password is required.", 400
+            pwd_valid, pwd_error = validate_password(password)
+            if not pwd_valid:
+                return pwd_error, 400
+            
+            mfa_valid, mfa_error = validate_mfa(mfa)
+            if not mfa_valid:
+                return mfa_error, 400
         
-            user = session.query(User).filter(User.email==cleaned_email).first()
+            user = session.query(User).filter(User.email==email).first()
 
             if user is None: # User does not exist
                 return utils.nachoneko(), 401
@@ -373,6 +309,67 @@ def authenticated():
         )
 
 
+# Request password reset email
+@user_bp.route("/reset", methods=["POST"])
+def request_reset_password():
+    with Session() as session:
+        try:
+            data = request.form
+            email = data.get("email", None)
+
+            if email is None:
+                return "Email is required.", 400
+
+            email = clean_email(email)
+
+            user = session.query(User).filter(User.email == email).first()
+
+            if user is None:
+                return "ok!", 200 # Don't tell user that email is not found
+            
+            utils.send_resetting_email(user.name, email)
+            return "ok!", 200
+        except Exception as e:
+            if utils.is_debug_mode:
+                return str(e), 400
+            else:
+                return utils.nachoneko(), 400
+
+
+# Reset password and MFA
+@user_bp.route("/reset/<string:token>", methods=["POST"])
+def reset_password(token):
+    with Session() as session:
+        try:
+            verify_reset_email = utils.verify_resetting_email(token)
+            if verify_reset_email is None:
+                return utils.nachoneko(), 400
+            
+            # Check if user exists and is active (status == 0)
+            user = session.query(User).filter(User.email == verify_reset_email).first()
+            if user is None or user.status != 0:
+                return utils.nachoneko(), 400
+
+            data = request.form
+            password = data.get("newPassword", None)
+
+            if password is None:
+                return "Password is required.", 400
+
+            user.hashPwd = utils.hash_password(password)
+            
+            # Reset MFA
+            user.mfaSecret = utils.generate_otp_secret()
+
+            session.commit()
+            return utils.generate_otp_qr_string(user.name, user.mfaSecret), 200
+        except Exception as e:
+            session.rollback()
+            if utils.is_debug_mode:
+                return str(e), 400
+            else:
+                return utils.nachoneko(), 400
+
 # Log out from application
 @user_bp.route("/logout", methods=["GET"])
 def logout():
@@ -403,7 +400,6 @@ def logout():
 def user_ban_by_id(id):
     with Session() as session:
         try:
-            id = clean_num_only(str(id))
             user = session.get(User, id)
             if user is None:
                 return utils.nachoneko(), 400
@@ -420,7 +416,6 @@ def user_ban_by_id(id):
 def user_unban_by_id(id):
     with Session() as session:
         try:
-            id = clean_num_only(str(id))
             user = session.get(User, id)
             if user is None:
                 return utils.nachoneko(), 400

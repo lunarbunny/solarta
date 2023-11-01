@@ -3,7 +3,7 @@ from email import utils
 from flask import Blueprint, jsonify, request
 
 from ..__init__ import Session, Playlist, PlaylistMusic, Music
-from validation import clean_alphanum, clean_num_only, clean_text
+from validation import clean_text
 import utils
 
 playlist_bp = Blueprint("playlist_bp", __name__)
@@ -18,7 +18,6 @@ def playlist_delete(id):
             if user is None:
                 return utils.nachoneko(), status
             
-            id = clean_num_only(str(id))
             playlist = session.get(Playlist, id)
             if playlist is not None and playlist.ownerId == user.id:
                 session.query(PlaylistMusic).filter(PlaylistMusic.idPlaylist == id).delete()
@@ -71,8 +70,6 @@ def playlist_modify_song(idPlaylist, idMusic):
             if user is None:
                 return utils.nachoneko(), status
             
-            idPlaylist = clean_num_only(str(idPlaylist))
-            idMusic = clean_num_only(str(idMusic))
             playlist = session.get(Playlist, idPlaylist)
 
             if request.method == "POST":
@@ -105,7 +102,6 @@ def playlist_modify_song(idPlaylist, idMusic):
 def playlist_update(id):
     with Session() as session:
         try:
-            id = clean_num_only(str(id))
             music = session.get(Playlist, id)
             if music:
                 data = request.form
@@ -127,7 +123,6 @@ def playlist_update(id):
 def playlist_retrieve_all_music(idPlaylist):
     with Session() as session:
         try:
-            idPlaylist = clean_num_only(str(idPlaylist))
             playlist = session.get(Playlist, idPlaylist)
             if playlist:
                 playlist_music = (
@@ -191,7 +186,6 @@ def playlist_retrieve_user():
 def playlist_retrieve_details(idPlaylist):
     with Session() as session:
         try:
-            idPlaylist = clean_num_only(str(idPlaylist))
             playlist = session.get(Playlist, idPlaylist)
             if playlist:
                 return (
