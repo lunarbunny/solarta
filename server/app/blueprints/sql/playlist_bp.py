@@ -38,23 +38,26 @@ def playlist_create():
     with Session() as session:
         try:
             user, status = utils.check_authenticated(session, request)
-            ownerId = user.id
+            if user is None:
+                return utils.nachoneko(), status
 
             data = request.form
-            creationDateStr = data.get("creationDate", "")  # Format: YYYY-MM-DD
-            title = clean_text(data["title"])
+            creationDateStr = data.get("creationDate", None)  # Format: YYYY-MM-DD
+            title = clean_text(data.get("title", None))
             description = clean_text(data.get("description", None))  # Optional
-
-            if ownerId == "" or title == "" or creationDateStr == "":
+            if title is None or creationDateStr is None:
                 return "Missing parameters", 400
 
-            creationDate = datetime.strptime(creationDateStr, "%Y-%m-%d")
-            new_playlist = Playlist(ownerId, creationDate, title, description)
+            creationDate = datetime.strptime(creationDateStr, "%Y-%m-%d").date()
+            new_playlist = Playlist(user.id, creationDate, title, description)
             session.add(new_playlist)
             session.commit()
             return "Created", 201
-        except:
+        except Exception as e:
             session.rollback()
+            if utils.is_debug_mode:
+                print(str(e))
+                return str(e), 400
             return "Failed to create playlist", 400
 
 

@@ -52,7 +52,7 @@ const CreatePlayListPage: NextPage = () => {
   const [playlistSongs, setPlayListSongs] = useState<Array<number>>([]);
   const [playlistTitle, setPlaylistTitle] = useState("Playlist #4");
   const [playlistDesc, setPlaylistDesc] = useState(
-    "A short description of the playlist can be written here!"
+    "Maximum 45 characters!"
   );
 
   const bgColour = useColorModeValue("gray.600", "gray.700");
