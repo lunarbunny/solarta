@@ -12,7 +12,7 @@ import React from "react";
 import { API_URL, Music, PlayerPlaylistItem } from "../../types";
 import { useSetRecoilState } from "recoil";
 import { musicPlayerAtom } from "@/atoms/musicPlayer";
-import { BiTime } from "react-icons/bi";
+import { BiTime, BiTrash } from "react-icons/bi";
 import MusicTableRow from "./MusicTableRow";
 
 type Props = {
@@ -64,6 +64,9 @@ const MusicTable: React.FC<Props> = ({ items }) => {
             <Th>Album</Th>
             <Th>
               <Icon boxSize="20px" as={BiTime} />
+            </Th>
+            <Th>
+              <Icon boxSize="20px" as={BiTrash} />
             </Th>
           </Tr>
         </Thead>

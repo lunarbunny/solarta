@@ -58,26 +58,42 @@ def playlist_create():
             return "Failed to create playlist", 400
 
 
-# Add song to playlist
-@playlist_bp.route("/playlist=<int:idPlaylist>/music=<int:idMusic>", methods=["POST"])
-def playlist_add_song(idPlaylist, idMusic):
+# Add/Delete songs in playlist
+@playlist_bp.route("/playlist=<int:idPlaylist>/music=<int:idMusic>", methods=["POST", "DELETE"])
+def playlist_modify_song(idPlaylist, idMusic):
     with Session() as session:
         try:
-            idPlaylist = int(clean_num_only(idPlaylist))
-            idMusic = int(clean_num_only(idMusic))
+            user, status = utils.check_authenticated(session, request)
+            if user is None:
+                return utils.nachoneko(), status
+            
+            idPlaylist = clean_num_only(str(idPlaylist))
+            idMusic = clean_num_only(str(idMusic))
             playlist = session.get(Playlist, idPlaylist)
-            music = session.get(Music, idMusic)
 
-            if playlist and music:
-                new_playlist_music = PlaylistMusic(idPlaylist, idMusic)
-                session.add(new_playlist_music)
-                session.commit()
-                return "Created", 201
-            else:
-                return "", 404
-        except:
+            if request.method == "POST":
+                music = session.get(Music, idMusic)
+                if playlist and music and playlist.ownerId == user.id:
+                    new_playlist_music = PlaylistMusic(idPlaylist, idMusic)
+                    session.add(new_playlist_music)
+                    session.commit()
+                    return "Created", 201
+                else:
+                    return "Not found", 404
+                
+            elif request.method == "DELETE":
+                if playlist:
+                    playlistMusic = session.query(PlaylistMusic).filter(PlaylistMusic.idPlaylist == playlist.id, PlaylistMusic.idMusic == idMusic).one_or_none()
+                    if playlistMusic:
+                        session.delete(playlistMusic)
+                        session.commit()
+                        return "OK", 200
+                return "Not found", 404
+        except Exception as e:
             session.rollback()
-            return "", 400
+            if utils.is_debug_mode:
+                return str(e), 400
+            return utils.nachoneko(), 400
 
 
 # Update a playlist (title and/or description)
