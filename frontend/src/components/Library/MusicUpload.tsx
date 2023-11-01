@@ -64,7 +64,7 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
 
   useEffect(() => {
     // Check file size <= 10MB
-    const sizeLimit = 1 * 1024 * 1024;
+    const sizeLimit = 10 * 1024 * 1024;
     if (uploadForm.music_file && uploadForm.music_file.size > sizeLimit) {
       alert("Error: Music file size must be less than 10MB.");
       setUploadForm(old => ({ ...old, music_file: null }));
