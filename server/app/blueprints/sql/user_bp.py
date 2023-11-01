@@ -186,8 +186,7 @@ def update():
                     return utils.nachoneko(), 401
                 if not utils.verify_password_hash(user.hashPwd, password):
                     return utils.nachoneko(), 401
-                hashPwd = utils.hash_password(newPassword)
-                user.hashPwd = hashPwd
+                user.hashPwd = utils.hash_password(newPassword)
             
             session.commit()
             return "ok!", 200
@@ -198,9 +197,9 @@ def update():
             else:
                 return utils.nachoneko(), 400
 
-# Resetting password
-@user_bp.route("/reset", methods=["GET"])
-def apply_for_reset():
+# Request password reset email
+@user_bp.route("/reset", methods=["POST"])
+def request_reset_password():
     with Session() as session:
         try:
             data = request.form
@@ -214,15 +213,11 @@ def apply_for_reset():
             user = session.query(User).filter(User.email == email).first()
 
             if user is None:
-                return "No User found"
-
-            name = user.name
-
-            session.commit()
-            utils.send_resetting_email(name, email)
+                return "ok!", 200 # Don't tell user that email is not found
+            
+            utils.send_resetting_email(user.name, email)
             return "ok!", 200
         except Exception as e:
-            session.rollback()
             if utils.is_debug_mode:
                 return str(e), 400
             else:
@@ -230,27 +225,30 @@ def apply_for_reset():
 
 
 
-# Verify reset email and resetup MFA
+# Reset password and MFA
 @user_bp.route("/reset/<string:token>", methods=["POST"])
-def resetting(token):
+def reset_password(token):
     with Session() as session:
         try:
             verify_reset_email = utils.verify_resetting_email(token)
             if verify_reset_email is None:
                 return utils.nachoneko(), 400
+            
+            # Check if user exists and is active (status == 0)
             user = session.query(User).filter(User.email == verify_reset_email).first()
-            if user.status != 0:
+            if user is None or user.status != 0:
                 return utils.nachoneko(), 400
-            user.mfaSecret = utils.generate_otp_secret()
 
             data = request.form
-            password = data.get("password", None)
+            password = data.get("newPassword", None)
 
             if password is None:
                 return "Password is required.", 400
 
-            if not utils.verify_password_hash(user.hashPwd, password):
-                return utils.nachoneko(), 400
+            user.hashPwd = utils.hash_password(password)
+            
+            # Reset MFA
+            user.mfaSecret = utils.generate_otp_secret()
 
             session.commit()
             return utils.generate_otp_qr_string(user.name, user.mfaSecret), 200

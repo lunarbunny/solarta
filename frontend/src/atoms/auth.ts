@@ -2,7 +2,7 @@ import { User } from '@/types';
 import { atom } from 'recoil';
 
 export interface AuthState {
-    view: 'login' | 'register';
+    view: 'login' | 'register' | 'forgot';
     user: User | null;
 }
 

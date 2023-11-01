@@ -83,7 +83,7 @@ def send_onboarding_email(username, email):
 
 
 def generate_resetting_token(email):
-    return serializer.dumps(email, salt=os.getenv("RESETTING_SALT"))
+    return serializer.dumps(email, salt=os.getenv("RESET_SALT"))
 
 def send_resetting_email(username, email):
     reset_link = (
@@ -94,7 +94,7 @@ def send_resetting_email(username, email):
         to_emails=email,
         subject="[Solarta] Reset your password",
         html_content=f"""
-        <h3>Hello There, {username}!</h3>
+        <h3>Hello, {username}!</h3>
         <p>Use <a href={reset_link}>this link</a> to reset your password</p>
         <p>If that doesn't work, open the following link in your browser</p>
         <code>{reset_link}</code>
@@ -111,7 +111,7 @@ def verify_resetting_email(token, expiration=15 * 60) -> str:
     verifying_email = ""
     try:
         verifying_email = serializer.loads(
-            token, salt=os.environ.get("RESETTING_SALT"), max_age=expiration
+            token, salt=os.environ.get("RESET_SALT"), max_age=expiration
         )
     except Exception as e:
         print(e.message)
@@ -154,20 +154,22 @@ def generate_session() -> str:
 def set_cookie_expiry() -> int:
     return int(time.time()) + 60 * 60 * 24
 
-def verify_session(session, sessionId: str):
-    user = session.query(User).filter(User.sessionId==sessionId).first()
+# Check if user is authenticated, return (User | None, http status code)
+def check_authenticated(db, request) -> tuple[User | None, int]:
+    session_id = request.cookies.get("SESSIONID")
+    if session_id is None:
+        return None, 401
+
+    user = db.query(User).filter(User.sessionId == session_id).first()
 
     if user is None:
         return None, 401
-
     if user.sessionExpiry < int(time.time()):
         user.sessionId = None
         user.sessionExpiry = None
         db.commit()
         return None, 401
-
     return user, 200
-
 
 def nachoneko() -> str:
     return "<br>".join(

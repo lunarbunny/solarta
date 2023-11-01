@@ -4,9 +4,10 @@ import useSignIn from '@/hooks/useSignIn';
 
 type LoginProps = {
   onRegisterClick: () => void;
+  onForgetClick: () => void;
 }
 
-const Login: React.FC<LoginProps> = ({ onRegisterClick }) => {
+const Login: React.FC<LoginProps> = ({ onRegisterClick, onForgetClick }) => {
   const [loginForm, setLoginForm] = useState({
     email: '',
     password: '',
@@ -68,13 +69,22 @@ const Login: React.FC<LoginProps> = ({ onRegisterClick }) => {
         <Button
           width="100%"
           borderRadius={32}
-          mt={1}
+          mt={2}
           type="submit"
           isLoading={loading}
         >
           Log In
         </Button>
       </form>
+
+      <Button
+        variant={'link'}
+        width="100%"
+        onClick={onForgetClick}
+        mt={4}
+      >
+        Forgot password?
+      </Button>
 
       <Button
         variant={'link'}
