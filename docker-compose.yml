@@ -31,7 +31,6 @@ services:
             - SENDGRID_API_KEY=${SENDGRID_API_KEY}
             - URL_SIGN_SECRET=${URL_SIGN_SECRET}
             - ONBOARDING_SALT=${ONBOARDING_SALT}
-            - GOOGLE_APPLICATION_CREDENTIALS=/creds/serviceAccountKey.json
         networks:
             - api-db
             - proxy-api
