@@ -7,7 +7,7 @@ services:
         container_name: solarta-database
         environment:
             - MARIADB_DATABASE=solarta
-            - MARIADB_USER=${MARIADB_USER}
+            - MARIADB_USER=solarta
             - MARIADB_PASSWORD=${MARIADB_PASSWORD}
             - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
         networks:
@@ -23,11 +23,9 @@ services:
         build: ./server
         image: solarta-api
         container_name: solarta-api
-        depends_on:
-            - database
         environment:
             - MUSIC_ASSET_DIR=/assets/music
-            - SQLALCHEMY_DATABASE_URI=mysql+pymysql://${MARIADB_USER}:${MARIADB_PASSWORD}@database:3306/solarta
+            - SQLALCHEMY_DATABASE_URI=mysql+pymysql://solarta:${MARIADB_PASSWORD}@database:3306/solarta
             - SENDGRID_API_KEY=${SENDGRID_API_KEY}
             - URL_SIGN_SECRET=${URL_SIGN_SECRET}
             - ONBOARDING_SALT=${ONBOARDING_SALT}
@@ -35,7 +33,6 @@ services:
             - api-db
             - proxy-api
         volumes:
-            - ./server/app/creds:/creds:ro
             - /var/lib/solarta/assets/music:/assets/music:rw
         deploy:
             restart_policy:
