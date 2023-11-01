@@ -25,6 +25,7 @@ def music_get_save_dir():
         print("MUSIC_ASSET_DIR not set", file=sys.stderr)
         sys.exit(1)
     elif not os.path.isdir(dir):
+        os.makedirs(dir, exist_ok=True)
         print(f"{dir} is not a directory", file=sys.stderr)
         sys.exit(1)
     return dir

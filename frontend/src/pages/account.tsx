@@ -18,6 +18,7 @@ import {
   ModalOverlay,
   Text,
   Textarea,
+  Spacer,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -74,14 +75,22 @@ const AccountPage: NextPage = () => {
   const handleProfileSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (!user) return;
+
     if (!confirm("Are you sure you want to update your profile?")) return;
 
     const formData = new FormData();
-    formData.append("name", form.name);
-    formData.append("about", form.about);
-    formData.append("password", form.password);
-    formData.append("newPassword", form.newPassword);
-    formData.append("mfa", form.otp);
+    if (form.name != user.name) {
+      formData.append("name", form.name);
+    }
+    if (form.about != user.about) {
+      formData.append("about", form.about);
+    }
+    if (form.password != "" && form.newPassword != "" && form.otp != "") {
+      formData.append("password", form.password);
+      formData.append("newPassword", form.newPassword);
+      formData.append("mfa", form.otp);
+    }
 
     const res = await fetch(`${API_URL}/user/update`, {
       method: "POST",
@@ -123,10 +132,10 @@ const AccountPage: NextPage = () => {
 
   let hasChanges = user
     ? form.name != user.name ||
-      form.about != user.about ||
-      form.password != "" ||
-      form.newPassword != "" ||
-      form.otp != ""
+    form.about != user.about ||
+    form.password != "" ||
+    form.newPassword != "" ||
+    form.otp != ""
     : false;
 
   return (
@@ -207,7 +216,7 @@ const AccountPage: NextPage = () => {
           </FormControl>
 
           <Flex align="center" mt={4}>
-            <Button colorScheme="blue" type="submit" disabled={!hasChanges}>
+            <Button colorScheme="blue" type="submit">
               Save Changes
             </Button>
             {hasChanges && (
@@ -217,11 +226,22 @@ const AccountPage: NextPage = () => {
             )}
           </Flex>
         </form>
+      </LibrarySection>
 
-        <Flex align="center" mt={4}>
-          <Button colorScheme="red" type="submit" onClick={handleDeleteModal}>
+      <Spacer h={2} />
+
+      <LibrarySection title="Account Management">
+        <Flex mt={4} p={2}
+          flexDir="column"
+          align="flex-start"
+          border="2px dotted"
+          borderColor="red.300"
+          borderRadius="md">
+          <Heading size="sm" color="red.300">Danger Zone</Heading>
+          <Button mt={4} alignSelf="flex-start" colorScheme="red" type="submit" onClick={handleDeleteModal}>
             Delete Account
           </Button>
+          <Text mt={1} color="gray.300">Deleting your account is permanent and cannot be undone.</Text>
         </Flex>
 
         <Modal isOpen={isDeleteModalOpen} onClose={handleDeleteModal}>

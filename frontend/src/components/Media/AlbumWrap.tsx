@@ -34,7 +34,7 @@ const AlbumWrap: React.FC<Props> = ({
   onCreateClick,
 }) => {
   return (
-    <Wrap spacing={4} overflowY="scroll">
+    <Wrap spacing={4}>
       {albums && buildAlbums(albums, clickable || false)}
       {onCreateClick && (
         <Box
