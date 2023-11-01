@@ -27,15 +27,16 @@ const ResetPasswordPage: NextPage = () => {
 
     let res = await fetch(`${API_URL}/user/reset/${resetToken}`, {
       method: "POST",
+      body: formData,
     });
 
     if (!res.ok) {
-      setResetError("Invalid token");
+      setResetError("Reset password failed, please try requesting another reset email.");
       return;
     } else {
       let otpToken = await res.text();
       setOtpToken(otpToken);
-      setResetError("");
+      setResetError("Password reset successful!");
     }
   }
 
@@ -74,8 +75,7 @@ const ResetPasswordPage: NextPage = () => {
             </Box>
             <Flex p={4} direction="column">
               <Box flexGrow={1}>
-                <Text>To complete onboarding, please scan the QR code on the left with your authenticator app.</Text>
-                <Text>You need it generate a one-time password (OTP) that you will use to log in.</Text>
+                <Text>Your password has been reset, please scan the QR code on the left with your authenticator app to setup MFA again.</Text>
               </Box>
               <Link href="/auth">
                 <Text color="blue.300" cursor="pointer" textDecoration="underline">

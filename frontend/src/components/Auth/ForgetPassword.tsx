@@ -39,7 +39,7 @@ const ForgetPassword: React.FC<Props> = ({ onLoginClick }) => {
     });
 
     if (res.ok) {
-      setError('An email with the password reset lik has been sent.');
+      setError('An email with the password reset link has been sent.');
     }
   }
 

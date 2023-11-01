@@ -77,9 +77,21 @@ def send_onboarding_email(username, email):
     )
     try:
         response = sg.send(message)
+        return response
     except Exception as e:
         print(e.message)
-    return response
+
+
+def verify_onboarding_email(token, expiration=2 * 60 * 60) -> str | None:
+    verifying_email = None
+    try:
+        verifying_email = serializer.loads(
+            token, salt=os.environ.get("ONBOARDING_SALT"), max_age=expiration
+        )
+    except Exception as e:
+        print(e.message)
+        
+    return verifying_email
 
 
 def generate_resetting_token(email):
@@ -102,34 +114,20 @@ def send_resetting_email(username, email):
     )
     try:
         response = sg.send(message)
+        return response
     except Exception as e:
         print(e.message)
-    return response
-
 
 def verify_resetting_email(token, expiration=15 * 60) -> str:
-    verifying_email = ""
+    verifying_email = None
     try:
         verifying_email = serializer.loads(
             token, salt=os.environ.get("RESETTING_SALT"), max_age=expiration
         )
     except Exception as e:
         print(e.message)
-        return verifying_email
+
     return verifying_email
-
-
-def verify_onboarding_email(token, expiration=2 * 60 * 60) -> str:
-    verifying_email = ""
-    try:
-        verifying_email = serializer.loads(
-            token, salt=os.environ.get("ONBOARDING_SALT"), max_age=expiration
-        )
-    except Exception as e:
-        print(e.message)
-        return verifying_email
-    return verifying_email
-
 
 def generate_otp_secret() -> str:
     return pyotp.random_base32()
