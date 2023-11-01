@@ -154,6 +154,70 @@ def register():
                 return utils.nachoneko(), 400
 
 
+# Resetting password
+@user_bp.route("/reset", methods=["GET"])
+def apply_for_reset():
+    with Session() as session:
+        try:
+            data = request.form
+            email = data.get("email", None)
+
+            if email is None:
+                return "Email is required.", 400
+
+            email = clean_email(email)
+
+            user = session.query(User).filter(User.email == email).first()
+
+            if user is None:
+                return "No User found"
+
+            name = user.name
+
+            session.commit()
+            utils.send_resetting_email(name, email)
+            return "ok!", 200
+        except Exception as e:
+            session.rollback()
+            if utils.is_debug_mode:
+                return str(e), 400
+            else:
+                return utils.nachoneko(), 400
+
+
+
+# Verify reset email and resetup MFA
+@user_bp.route("/reset/<string:token>", methods=["POST"])
+def resetting(token):
+    with Session() as session:
+        try:
+            verify_reset_email = utils.verify_resetting_email(token)
+            if verify_reset_email is None:
+                return utils.nachoneko(), 400
+            user = session.query(User).filter(User.email == verify_reset_email).first()
+            if user.status != 0:
+                return utils.nachoneko(), 400
+            user.mfaSecret = utils.generate_otp_secret()
+
+            data = request.form
+            password = data.get("password", None)
+
+            if password is None:
+                return "Password is required.", 400
+
+            if not utils.verify_password_hash(user.hashPwd, password):
+                return utils.nachoneko(), 400
+
+            session.commit()
+            return utils.generate_otp_qr_string(user.name, user.mfaSecret), 200
+        except Exception as e:
+            session.rollback()
+            if utils.is_debug_mode:
+                return str(e), 400
+            else:
+                return utils.nachoneko(), 400
+
+
 # Verify email and setup MFA
 @user_bp.route("/onboarding/<string:token>", methods=["GET"])
 def onboarding(token):
