@@ -36,6 +36,11 @@ def music_get_metadata(path):
         return file.info.time_secs, file.info.size_bytes
     return None
 
+def music_get_max_size():
+    # 10 MB
+    return 10 * 1024 * 1024
+
+
 def hash_password(password):
     return argon_hasher.hash(password)
 
@@ -75,6 +80,43 @@ def send_onboarding_email(username, email):
     except Exception as e:
         print(e.message)
     return response
+
+
+def generate_resetting_token(email):
+    return serializer.dumps(email, salt=os.getenv("RESETTING_SALT"))
+
+def send_resetting_email(username, email):
+    reset_link = (
+        f"https://solarta.nisokkususu.com/reset/{generate_resetting_token(email)}"
+    )
+    message = Mail(
+        from_email="solarta@nisokkususu.com",
+        to_emails=email,
+        subject="[Solarta] Reset your password",
+        html_content=f"""
+        <h3>Hello There, {username}!</h3>
+        <p>Use <a href={reset_link}>this link</a> to reset your password</p>
+        <p>If that doesn't work, open the following link in your browser</p>
+        <code>{reset_link}</code>
+    """,
+    )
+    try:
+        response = sg.send(message)
+    except Exception as e:
+        print(e.message)
+    return response
+
+
+def verify_resetting_email(token, expiration=15 * 60) -> str:
+    verifying_email = ""
+    try:
+        verifying_email = serializer.loads(
+            token, salt=os.environ.get("RESETTING_SALT"), max_age=expiration
+        )
+    except Exception as e:
+        print(e.message)
+        return verifying_email
+    return verifying_email
 
 
 def verify_onboarding_email(token, expiration=2 * 60 * 60) -> str:

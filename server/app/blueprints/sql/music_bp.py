@@ -3,8 +3,8 @@ import os
 from flask import Blueprint, jsonify, request, send_file
 from werkzeug.utils import secure_filename
 
-from ..__init__ import Session, Music, User, AlbumMusic, PlaylistMusic, Album
-from validation import clean_num_only, clean_text
+from ..__init__ import Session, Music, User, AlbumMusic, Album
+from validation import clean_text
 import utils
 
 music_bp = Blueprint("music_bp", __name__)
@@ -45,7 +45,6 @@ def music_create():
                 return 'Music file is invalid.', 400
             duration, size = meta
             duration = math.ceil(duration)
-            # TODO: Check size limit and compress as necessary
             
             new_music = Music(title, filename, duration, genreId, ownerId)
             session.add(new_music)

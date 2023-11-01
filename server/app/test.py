@@ -40,11 +40,17 @@ def test_album_by_artist(client):
 def test_album_retrieve_all(client):
     response = client.get('/album', follow_redirects=True)
     assert response.status_code == 200
+    
+    response = client.get('/noalbum', follow_redirects=True)
+    assert response.status_code == 404
 
 # Refer to blueprints/sql/genre_bp.py
 def test_genre_retrieve_all(client):
     response = client.get('/genre', follow_redirects=True)
     assert response.status_code == 200
+    
+    response = client.get('/nogenre', follow_redirects=True)
+    assert response.status_code == 404
 
 # Refer to blueprints/sql/music_bp.py
 def test_music_create(client):
