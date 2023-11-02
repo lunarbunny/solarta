@@ -20,15 +20,16 @@ services:
                 delay: 3s
 
     api:
-        build: ./server
+        build: ./backend
         image: solarta-api
         container_name: solarta-api
         environment:
-            - MUSIC_ASSET_DIR=/assets/music
             - SQLALCHEMY_DATABASE_URI=mysql+pymysql://solarta:${MARIADB_PASSWORD}@database:3306/solarta
             - SENDGRID_API_KEY=${SENDGRID_API_KEY}
             - URL_SIGN_SECRET=${URL_SIGN_SECRET}
             - ONBOARDING_SALT=${ONBOARDING_SALT}
+            - RESETTING_SALT=${RESETTING_SALT}
+            - WTF_CSRF_SECRET_KEY=${WTF_CSRF_SECRET_KEY}
         networks:
             - api-db
             - proxy-api
@@ -43,10 +44,6 @@ services:
         build: ./frontend
         image: solarta-web
         container_name: solarta-web
-        depends_on:
-            - api
-        environment:
-            - NEXT_PUBLIC_SOLARTA_API_URL=https://solarta.nisokkususu.com/api
         networks:
             - proxy-web
         deploy:
