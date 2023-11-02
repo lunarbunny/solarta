@@ -455,10 +455,6 @@ def user_delete():
             confirmPwd = data.get("cfmPassword", None)
             mfa = data.get("mfa", None)
 
-            print(password)
-            print(confirmPwd)
-            print(mfa)
-
             if password is None or confirmPwd is None or mfa is None:
                 return "Require all details.", 400
             
@@ -471,6 +467,7 @@ def user_delete():
             if user.status != 1 and helpers.verify_password_hash(user.hashPwd, password):
                 session.delete(user)
                 session.commit()
+                return "OK", 200
             else: # avoid deleting banned users, etc.
                 return helpers.nachoneko(), 405
         except Exception as e:
