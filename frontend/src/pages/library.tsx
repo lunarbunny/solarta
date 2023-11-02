@@ -4,7 +4,7 @@ import MusicUpload from "@/components/Library/MusicUpload";
 import useAuth from "@/hooks/useAuth";
 import useFetch from "@/hooks/useFetch";
 import { API_URL, Album } from "@/types";
-import { Box, CircularProgress, Heading, Spacer } from "@chakra-ui/react";
+import { Box, Center, CircularProgress, Heading, Spacer } from "@chakra-ui/react";
 import { NextPage } from "next";
 import router from "next/router";
 
@@ -13,7 +13,7 @@ const LibraryPage: NextPage = () => {
   const { data: myAlbums } = useFetch<Album[]>(`${API_URL}/album/mine`, { includeCred: true });
 
   if (userLoading) {
-    return <CircularProgress isIndeterminate color="blue.300" />;
+    return <Center><CircularProgress isIndeterminate color="blue.300" /></Center>;
   } else if (!user || user.admin) {
     router.push("/"); // redirect to home page if not authorized
     return <>Redirecting to home page...</>;

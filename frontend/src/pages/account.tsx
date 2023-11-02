@@ -19,6 +19,8 @@ import {
   Text,
   Textarea,
   Spacer,
+  CircularProgress,
+  Center,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -39,7 +41,7 @@ type ConfirmPasswordData = {
 };
 
 const AccountPage: NextPage = () => {
-  const { user, loading } = useAuth();
+  const { user, loading: userLoading } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState<string>("");
   const [form, setForm] = useState<ProfileFormData>({
@@ -58,7 +60,7 @@ const AccountPage: NextPage = () => {
   });
 
   useEffect(() => {
-    if (loading) return;
+    if (userLoading) return;
     if (!user) {
       router.push("/auth");
     } else {
@@ -70,7 +72,14 @@ const AccountPage: NextPage = () => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, loading]);
+  }, [user, userLoading]);
+
+  if (userLoading) {
+    return <Center><CircularProgress isIndeterminate color="blue.300" /></Center>;
+  } else if (!user) {
+    router.push("/auth"); // redirect to home page if not authenticated
+    return <>Redirecting to login page...</>;
+  }
 
   const handleProfileSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -28,6 +28,7 @@ import {
   InputLeftElement,
   Tooltip,
   CircularProgress,
+  Center,
 } from "@chakra-ui/react";
 import { MdAlbum } from "react-icons/md";
 import UserStats from "../components/Admin/UserStats";
@@ -87,7 +88,7 @@ const AdminPage: NextPage = () => {
   });
 
   if (userLoading) {
-    return <CircularProgress isIndeterminate color="blue.300" />;
+    return <Center><CircularProgress isIndeterminate color="blue.300" /></Center>;
   } else if (!user || !user.admin) {
     router.push("/"); // redirect to home page if not authorized
     return <>Redirecting to home page...</>;
