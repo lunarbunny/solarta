@@ -22,14 +22,16 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
+  Input,
 } from "@chakra-ui/react";
 import { MdAlbum } from "react-icons/md";
 import UserStats from "../components/Admin/UserStats";
-import { durationToTime, formatDate } from "@/utils";
+import { durationToTime } from "@/utils";
 import { AiOutlineUser } from "react-icons/ai";
 import { IoMdMusicalNote } from "react-icons/io";
 
 const AdminPage: NextPage = () => {
+  const [query, setQuery] = useState("");
   const [selectedTable, setSelectedTable] = useState("Users");
   const [selectedUser, setSelectedUser] = useState({
     id: 0,
@@ -57,9 +59,13 @@ const AdminPage: NextPage = () => {
     onClose: onSongClose,
   } = useDisclosure();
 
-  const { data: users } = useFetch<User[]>(`${API_URL}/user/`, {
-    includeCred: true,
-  });
+  const { data: users } = query == "" ?
+    useFetch<User[]>(`${API_URL}/user/`, {
+      includeCred: true,
+    }) :
+    useFetch<User[]>(`${API_URL}/user/search=${query}`, {
+      includeCred: true
+    });
   const { data: songs } = useFetch<Music[]>(`${API_URL}/music/`, {
     includeCred: true,
   });
@@ -171,6 +177,21 @@ const AdminPage: NextPage = () => {
           onClick={setSelectedTable}
         />
       </Flex>
+
+      {selectedTable && selectedTable == "Users" &&
+        <Flex>
+          <Input
+            ml={2}
+            mr={2}
+            type="text"
+            placeholder="Search for users"
+            _placeholder={{ color: 'gray.200' }}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </Flex>
+      }
+
       <Box
         my={2}
         h="70%"
