@@ -3,8 +3,8 @@ from email import utils
 from flask import Blueprint, jsonify, request
 
 from ..__init__ import Session, Album, AlbumMusic, Music, User
-import utils
-from validation import clean_text
+import helpers
+from validation import clean_text, validate_name
 
 album_bp = Blueprint("album_bp", __name__)
 
@@ -13,28 +13,32 @@ album_bp = Blueprint("album_bp", __name__)
 def album_create():
     with Session() as session:
         try:
-            user, status = utils.check_authenticated(session, request)
+            user, status = helpers.check_authenticated(session, request)
             if user is None:
-                return utils.nachoneko(), status
+                return helpers.nachoneko(), status
 
             ownerId = user.id
-            
+
             data = request.form
             title = data.get("title", None)
             releaseDateStr = data.get("releaseDate", None) # Format: YYYY-MM-DD
-            description = data.get("description", "") # Optional
+            description = data.get("description", None) # Optional
             imageUrl = data.get("imageUrl", None) # Optional
 
-            if title is None or releaseDateStr is None:
-                return "Missing parameters", 400
-            
             title = clean_text(title)
-            if description != "":
+            title_valid, title_error = validate_name(title)
+            if not title_valid:
+                return title_error, 400
+
+            if description is not None and description != '':
                 description = clean_text(description)
 
+            if releaseDateStr is None:
+                return "Missing parameters", 400
             releaseDate = datetime.strptime(releaseDateStr, "%Y-%m-%d")
 
             new_album = Album(title, releaseDate, ownerId, imageUrl, description)
+
             session.add(new_album)
             session.commit()
             return jsonify({ 'id': new_album.id }), 201
@@ -47,9 +51,9 @@ def album_create():
 def album_delete(idAlbum):
     with Session() as session:
         try:
-            user, status = utils.check_authenticated(session, request)
+            user, status = helpers.check_authenticated(session, request)
             if user is None:
-                return utils.nachoneko(), status
+                return helpers.nachoneko(), status
 
             album = session.get(Album, idAlbum)
             if album:
@@ -151,9 +155,9 @@ def album_retrieve_top3():
 def album_retrieve_mine():
     with Session() as session:
         try:
-            user, status = utils.check_authenticated(session, request)
+            user, status = helpers.check_authenticated(session, request)
             if user is None:
-                return utils.nachoneko(), status
+                return helpers.nachoneko(), status
 
             ownerId = user.id
             albums = session.query(Album, User.name).filter(Album.ownerId == ownerId).join(User).all()

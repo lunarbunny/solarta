@@ -139,13 +139,13 @@ from argon2 import PasswordHasher
 
 # Refer to utils.py
 def test_music_get_save_dir():
-    from utils import music_get_save_dir
+    from helpers import music_get_save_dir
     assert music_get_save_dir() == 'assets/music'
 
 def test_music_get_duration():
     import os
     if os.path.exists('assets/music/yo!.mp3'):
-        from utils import music_get_metadata
+        from helpers import music_get_metadata
         assert music_get_metadata("yo!.mp3")[0] == 6
 
 def test_is_email_valid():
@@ -162,16 +162,16 @@ def test_is_email_valid():
         assert validate_email("test@test.com")[0] == False
 
 def test_hash_password():
-    from utils import hash_password
+    from helpers import hash_password
     test_pwd = 'test'
     assert PasswordHasher().hash(test_pwd) != hash_password(test_pwd)
 
 def test_check_needs_rehash():
-    from utils import check_needs_rehash
+    from helpers import check_needs_rehash
     test_pwd = PasswordHasher().hash('test')
     assert PasswordHasher().check_needs_rehash(test_pwd) == check_needs_rehash(test_pwd)
 
 def test_verify_password_hash():
-    from utils import verify_password_hash
+    from helpers import verify_password_hash
     test_pwd = PasswordHasher().hash('test')
     assert verify_password_hash(test_pwd, 'test') == True

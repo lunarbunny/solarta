@@ -1,7 +1,5 @@
-import { authAtom } from "@/atoms/auth";
 import { API_URL } from "@/types";
 import { useState } from "react";
-import { useRecoilState } from "recoil";
 
 interface SignOutState {
   signOut: () => void;
@@ -10,7 +8,6 @@ interface SignOutState {
 }
 
 const useSignOut = (): SignOutState => {
-  const [authState, setAuthState] = useRecoilState(authAtom);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,7 +26,6 @@ const useSignOut = (): SignOutState => {
         return;
       }
 
-      setAuthState({ ...authState, user: null });
       console.log('Signed out successfully');
       window.location.href = '/auth';
     } catch (e) {

@@ -1,10 +1,9 @@
 from datetime import datetime
-from email import utils
 from flask import Blueprint, jsonify, request
 
 from ..__init__ import Session, Playlist, PlaylistMusic, Music
 from validation import clean_text
-import utils
+import helpers
 
 playlist_bp = Blueprint("playlist_bp", __name__)
 
@@ -14,9 +13,9 @@ playlist_bp = Blueprint("playlist_bp", __name__)
 def playlist_delete(id):
     with Session() as session:
         try:
-            user, status = utils.check_authenticated(session, request)
+            user, status = helpers.check_authenticated(session, request)
             if user is None:
-                return utils.nachoneko(), status
+                return helpers.nachoneko(), status
             
             playlist = session.get(Playlist, id)
             if playlist is not None and playlist.ownerId == user.id:
@@ -28,9 +27,9 @@ def playlist_delete(id):
                 return "Not found", 404
         except Exception as e:
             session.rollback()
-            if utils.is_debug_mode:
+            if helpers.is_debug_mode:
                 return str(e), 400
-            return utils.nachoneko(), 400
+            return helpers.nachoneko(), 400
 
 
 # Create a playlist
@@ -38,9 +37,9 @@ def playlist_delete(id):
 def playlist_create():
     with Session() as session:
         try:
-            user, status = utils.check_authenticated(session, request)
+            user, status = helpers.check_authenticated(session, request)
             if user is None:
-                return utils.nachoneko(), status
+                return helpers.nachoneko(), status
 
             data = request.form
             creationDateStr = data.get("creationDate", None)  # Format: YYYY-MM-DD
@@ -56,7 +55,7 @@ def playlist_create():
             return "Created", 201
         except Exception as e:
             session.rollback()
-            if utils.is_debug_mode:
+            if helpers.is_debug_mode:
                 return str(e), 400
             return "Failed to create playlist", 400
 
@@ -66,9 +65,9 @@ def playlist_create():
 def playlist_modify_song(idPlaylist, idMusic):
     with Session() as session:
         try:
-            user, status = utils.check_authenticated(session, request)
+            user, status = helpers.check_authenticated(session, request)
             if user is None:
-                return utils.nachoneko(), status
+                return helpers.nachoneko(), status
             
             playlist = session.get(Playlist, idPlaylist)
 
@@ -92,9 +91,9 @@ def playlist_modify_song(idPlaylist, idMusic):
                 return "Not found", 404
         except Exception as e:
             session.rollback()
-            if utils.is_debug_mode:
+            if helpers.is_debug_mode:
                 return str(e), 400
-            return utils.nachoneko(), 400
+            return helpers.nachoneko(), 400
 
 
 # Update a playlist (title and/or description)
@@ -155,9 +154,9 @@ def playlist_retrieve_all_music(idPlaylist):
 def playlist_retrieve_user():
     with Session() as session:
         try:
-            user, status = utils.check_authenticated(session, request)
+            user, status = helpers.check_authenticated(session, request)
             if user is None:
-                return utils.nachoneko(), status
+                return helpers.nachoneko(), status
 
             ownerId = user.id
             playlists = (

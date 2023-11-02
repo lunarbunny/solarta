@@ -1,24 +1,22 @@
 import { Center, Container } from '@chakra-ui/react';
 import React from 'react';
-import { useRecoilState } from 'recoil';
-import { authAtom } from '../../atoms/auth';
 import Login from './Login';
 import Register from './Register';
 import ForgetPassword from './ForgetPassword';
 
-const Auth: React.FC = () => {
-  const [authState, setAuthState] = useRecoilState(authAtom);
+export interface AuthState {
+  view: 'login' | 'register' | 'forgot';
+}
 
-  const onViewChange = (view: 'login' | 'register' | 'forgot') => {
-    setAuthState({ ...authState, view });
-  }
+const Auth: React.FC = () => {
+  const [view, setView] = React.useState<'login' | 'register' | 'forgot'>('login');
 
   return (
     <Center width="100%" height="90vh">
       <Container bg="#364259" borderRadius={8} padding={4}>
-        {authState.view == 'login' && <Login onRegisterClick={() => onViewChange('register')} onForgetClick={() => onViewChange('forgot')} />}
-        {authState.view == 'register' && <Register onLoginClick={() => onViewChange('login')} />}
-        {authState.view == 'forgot' && <ForgetPassword onLoginClick={() => onViewChange('login')} />}
+        {view == 'login' && <Login onRegisterClick={() => setView('register')} onForgetClick={() => setView('forgot')} />}
+        {view == 'register' && <Register onLoginClick={() => setView('login')} />}
+        {view == 'forgot' && <ForgetPassword onLoginClick={() => setView('login')} />}
       </Container>
     </Center>
   )

@@ -37,8 +37,9 @@ const Login: React.FC<LoginProps> = ({ onRegisterClick, onForgetClick }) => {
       return;
     }
 
-    if (!validatePwd(loginForm.password)) {
-      setError('Password must be at least 8 characters long.');
+    // Don't enforce password length for login
+    if (!validatePwd(loginForm.password, false)) {
+      setError('Password cannot be empty or consist of only spaces.');
       setPasswordHasError(true);
       return;
     }
@@ -93,7 +94,7 @@ const Login: React.FC<LoginProps> = ({ onRegisterClick, onForgetClick }) => {
         </FormControl>
 
         <Text textAlign="center" mt={2} fontSize="12pt" color="red.300" noOfLines={2}>
-          {error || (loginError && 'Error occured while logging in.')}
+          {error || loginError}
         </Text>
 
         <Button

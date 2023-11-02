@@ -34,8 +34,11 @@ export function validateEmail(email: string): boolean {
   return re.test(email);
 }
 
-export function validatePwd(pwd: string): boolean {
-  return pwd.length >= 8;
+export function validatePwd(pwd: string, checkLength?: boolean): boolean {
+  // Length >= 12 and not empty spaces
+  if (pwd.trim().length == 0) return false;
+  if (checkLength) return pwd.length >= 12;
+  return true;
 }
 
 export function validateOTP(otp: string): boolean {

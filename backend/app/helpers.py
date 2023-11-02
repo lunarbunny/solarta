@@ -1,6 +1,5 @@
 from argon2 import PasswordHasher
 import os
-import re
 import sendgrid
 import pyotp
 import time
@@ -8,6 +7,8 @@ from models.User import User
 from sendgrid.helpers.mail import *
 from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
+import eyed3
+import sys
 
 load_dotenv()
 
@@ -15,9 +16,6 @@ is_debug_mode = True
 argon_hasher = PasswordHasher()
 sg = sendgrid.SendGridAPIClient(api_key=os.getenv("SENDGRID_API_KEY"))
 serializer = URLSafeTimedSerializer(secret_key=os.getenv("URL_SIGN_SECRET"))
-import eyed3
-import sys
-
 
 def music_get_save_dir():
     dir = os.environ.get("MUSIC_ASSET_DIR")

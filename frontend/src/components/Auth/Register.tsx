@@ -50,7 +50,7 @@ const Register: React.FC<RegisterProps> = ({ onLoginClick }) => {
     }
 
     if (!validatePwd(registerForm.password)) {
-      setError('Password must be at least 8 characters long.');
+      setError('Password must be at least 12 characters long.');
       setPasswordHasError(true);
       return;
     }

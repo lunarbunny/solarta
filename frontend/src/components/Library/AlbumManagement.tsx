@@ -52,7 +52,7 @@ const AlbumManagement: React.FC<Props> = ({ albums }) => {
       let newAlbumId = data.id;
       router.push(`/album/${newAlbumId}`);
     } else {
-      alert("Error: Could not upload music.");
+      alert("Error: Could not create album.");
     }
   }
 

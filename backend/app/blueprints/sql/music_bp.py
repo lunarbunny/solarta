@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 
 from ..__init__ import Session, Music, User, AlbumMusic, Album
 from validation import clean_text
-import utils
+import helpers
 
 music_bp = Blueprint("music_bp", __name__)
 
@@ -14,9 +14,9 @@ music_bp = Blueprint("music_bp", __name__)
 def music_create():
     with Session() as session:
         try:
-            user, status = utils.check_authenticated(session, request)
+            user, status = helpers.check_authenticated(session, request)
             if user is None:
-                return utils.nachoneko(), status
+                return helpers.nachoneko(), status
 
             ownerId = user.id
             data = request.form
@@ -36,11 +36,11 @@ def music_create():
             # Limit title to 28 characters, leave 6 characters for owner ID prefix, and 5 characters for extension
             # XXXXXX-<title>.mp3
             filename = f"{ownerId:06}-{secure_filename(filename)[:28]}{ext}"
-            save_dir = utils.music_get_save_dir()
+            save_dir = helpers.music_get_save_dir()
             save_path = os.path.join(save_dir, filename)
             
             music_file.save(save_path)
-            meta = utils.music_get_metadata(save_path)
+            meta = helpers.music_get_metadata(save_path)
             if meta is None:
                 return 'Music file is invalid.', 400
             duration, size = meta
@@ -54,18 +54,18 @@ def music_create():
             return 'Created', 201
         except Exception as e:
             session.rollback()
-            if utils.is_debug_mode:
+            if helpers.is_debug_mode:
                 return str(e), 400
-            return utils.nachoneko(), 400
+            return helpers.nachoneko(), 400
         
 # Delete music, and remove from all playlists and albums
 @music_bp.route("/delete/<int:id>", methods=["DELETE"])
 def music_delete_id(id):
     with Session() as session:
         try:
-            user, status = utils.check_authenticated(session, request)
+            user, status = helpers.check_authenticated(session, request)
             if user is None:
-                return utils.nachoneko(), status
+                return helpers.nachoneko(), status
              
             music = session.get(Music, id)
             if music and (user.roleId == 1 or music.ownerId == user.id):
@@ -73,12 +73,12 @@ def music_delete_id(id):
                 session.commit()
                 return 'OK', 200
             else:
-                return utils.nachoneko(), 404
+                return helpers.nachoneko(), 404
         except Exception as e:
             session.rollback()
-            if utils.is_debug_mode:
+            if helpers.is_debug_mode:
                 return str(e), 400
-            return utils.nachoneko(), 400
+            return helpers.nachoneko(), 400
 
 # Retrieve all music that matches (substring of) search
 @music_bp.route("/search=<string:title>", methods=["GET"])
@@ -97,9 +97,9 @@ def music_search_string(title):
             else:
                 return 'Not found', 404
         except Exception as e:
-            if utils.is_debug_mode:
+            if helpers.is_debug_mode:
                 return str(e), 400
-            return utils.nachoneko(), 400
+            return helpers.nachoneko(), 400
 
 # Retrieve music file based on ID
 @music_bp.route("/play/<int:id>", methods=["GET"])
@@ -108,13 +108,13 @@ def music_play_id(id):
         try:
             music = session.query(Music).filter(Music.id==id).first()
             if music:
-                return send_file(os.path.join(utils.music_get_save_dir(), music.filename), as_attachment=False), 200
+                return send_file(os.path.join(helpers.music_get_save_dir(), music.filename), as_attachment=False), 200
             else:
                 return 'Not found', 404
         except Exception as e:
-            if utils.is_debug_mode:
+            if helpers.is_debug_mode:
                 return str(e), 400
-            return utils.nachoneko(), 400
+            return helpers.nachoneko(), 400
         
 # Retrieve top 10 music
 @music_bp.route("/trending", methods=["GET"])
@@ -134,16 +134,19 @@ def music_retrieve_trending():
             else:
                 return 'Not found', 404
         except Exception as e:
-            if utils.is_debug_mode:
+            if helpers.is_debug_mode:
                 return str(e), 400
-            return utils.nachoneko(), 400
+            return helpers.nachoneko(), 400
         
 # Retrieve music owned by caller
 @music_bp.route("/mine", methods=["GET"])
 def music_retrieve_mine():
     with Session() as session:
         try:
-            user, status = utils.check_authenticated(session, request)
+            user, status = helpers.check_authenticated(session, request)
+            if user is None:
+                return helpers.nachoneko(), status
+
             ownerId = user.id
 
             musics = session.query(Music, User.name, Album.title).filter(Music.ownerId == ownerId).join(User, Music.ownerId == User.id).join(AlbumMusic, Music.id == AlbumMusic.idMusic).join(Album, AlbumMusic.idAlbum == Album.id).all()
@@ -159,9 +162,9 @@ def music_retrieve_mine():
             else:
                 return 'Not found', 404
         except Exception as e:
-            if utils.is_debug_mode:
+            if helpers.is_debug_mode:
                 return str(e), 400
-            return utils.nachoneko(), 400
+            return helpers.nachoneko(), 400
 
 # Retrieve all music
 @music_bp.route("/", methods=["GET"])
@@ -178,7 +181,7 @@ def music_retrieve_all():
                 "albumName": album_name
             } for music, owner_name, album_name in musics]), 200
         except Exception as e:
-            if utils.is_debug_mode:
+            if helpers.is_debug_mode:
                 return str(e), 400
-            return utils.nachoneko(), 400
+            return helpers.nachoneko(), 400
     

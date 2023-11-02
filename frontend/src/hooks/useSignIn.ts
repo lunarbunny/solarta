@@ -1,7 +1,5 @@
-import { authAtom } from "@/atoms/auth";
 import { API_URL } from "@/types";
 import { useState } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
 
 interface SignInState {
   signIn: (email: string, password: string, otp: string) => Promise<void>;
@@ -30,10 +28,8 @@ const useSignIn = (): SignInState => {
         body: formData,
       });
 
-      let msg = await res.text();
-
       if (!res.ok) {
-        setError(msg || 'Invalid credentials.');
+        setError('Sign-in failed, please try again.');
         return;
       }
 

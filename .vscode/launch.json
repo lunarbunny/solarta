@@ -12,8 +12,8 @@
       "name": "Python: flask API",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/server/app/main.py",
-      "cwd": "${workspaceFolder}/server/app",
+      "program": "${workspaceFolder}/backend/app/main.py",
+      "cwd": "${workspaceFolder}/backend/app",
       "console": "integratedTerminal",
       "justMyCode": true
     },
