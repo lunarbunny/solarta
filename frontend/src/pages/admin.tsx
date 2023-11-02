@@ -59,13 +59,12 @@ const AdminPage: NextPage = () => {
     onClose: onSongClose,
   } = useDisclosure();
 
-  const { data: users } = query == "" ?
-    useFetch<User[]>(`${API_URL}/user/`, {
-      includeCred: true,
-    }) :
-    useFetch<User[]>(`${API_URL}/user/search=${query}`, {
-      includeCred: true
-    });
+  const { data: users } = useFetch<User[]>(`${API_URL}/user/`, {
+    includeCred: true,
+  });
+  const { data: searches } = useFetch<User[]>(`${API_URL}/user/search=${query}`, {
+    includeCred: true
+  });
   const { data: songs } = useFetch<Music[]>(`${API_URL}/music/`, {
     includeCred: true,
   });
@@ -158,6 +157,35 @@ const AdminPage: NextPage = () => {
     }
   };
 
+  function renderUserRow(data: User, index: number) {
+    return (
+      <Tr key={index}>
+        <Td>{data.name}</Td>
+        <Td>{data.email}</Td>
+        <Td>{data.about}</Td>
+        <Td>{returnStatus(data.status)}</Td>
+        <Td isNumeric>
+          <Button
+            _hover={{ bg: data.status === 0 ? "red.600" : "green.600" }}
+            bg="blue.700"
+            color="whiteAlpha.900"
+            onClick={
+              data.status === 0 ? onUserBanOpen : onUserUnbanOpen
+            }
+            onMouseOver={(e) =>
+              setSelectedUser({
+                id: data.id,
+                ownerName: data.name,
+              })
+            }
+          >
+            {data.status === 0 ? "BAN" : "UNBAN"}
+          </Button>
+        </Td>
+      </Tr>
+    );
+  }
+
   return (
     <Box h="100%" w="100%" py={8} px={0}>
       <Flex h="30%" justify="space-evenly">
@@ -220,48 +248,9 @@ const AdminPage: NextPage = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {users &&
-                users.map((data, index) => (
-                  <Tr key={index}>
-                    <Td>{data.name}</Td>
-                    <Td>{data.email}</Td>
-                    <Td>{data.about}</Td>
-                    <Td>{returnStatus(data.status)}</Td>
-                    <Td isNumeric>
-                      {data.status == 0 ? (
-                        <Button
-                          _hover={{ bg: "red.600" }}
-                          bg="blue.700"
-                          color="whiteAlpha.900"
-                          onClick={onUserBanOpen}
-                          onMouseOver={(e) =>
-                            setSelectedUser({
-                              id: data.id,
-                              ownerName: data.name,
-                            })
-                          }
-                        >
-                          BAN
-                        </Button>
-                      ) : (
-                        <Button
-                          _hover={{ bg: "green.600" }}
-                          bg="blue.700"
-                          color="whiteAlpha.900"
-                          onClick={onUserUnbanOpen}
-                          onMouseOver={(e) =>
-                            setSelectedUser({
-                              id: data.id,
-                              ownerName: data.name,
-                            })
-                          }
-                        >
-                          UNBAN
-                        </Button>
-                      )}
-                    </Td>
-                  </Tr>
-                ))}
+              {query == "" ?
+                users?.map((data, index) => renderUserRow(data, index)) :
+                searches?.map((data, index) => renderUserRow(data, index))}
             </Tbody>
           </Table>
         ) : selectedTable && selectedTable == "Songs" ? (
