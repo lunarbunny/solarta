@@ -274,7 +274,7 @@ const AccountPage: NextPage = () => {
                   />
                   <Input
                     type="password"
-                    placeholder="New Password"
+                    placeholder="Confirm Password"
                     mt={2}
                     value={confirmPwdForm.cfmPassword}
                     onChange={(e) =>
