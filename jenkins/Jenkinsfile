@@ -7,6 +7,8 @@ pipeline {
         ONBOARDING_SALT = credentials('e886f93b-8132-445e-b44f-52c8ff540637')
         MARIADB_PASSWORD = credentials('c0e67a34-0eb6-4ad2-85f3-d28c38ab4ed1')
         MARIADB_ROOT_PASSWORD = credentials('8373d9b7-35d9-44c3-9f33-a102153516bb')
+        RESETTING_SALT = credentials('961a213b-8863-479d-b760-9cfb3fadbc80')
+        WTF_CSRF_SECRET_KEY = credentials('7f3e9675-cfdb-44d1-8df3-b80ea3322bd7')
     }
 
     stages {
