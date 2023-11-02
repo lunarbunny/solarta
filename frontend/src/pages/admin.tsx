@@ -27,6 +27,7 @@ import {
   InputGroup,
   InputLeftElement,
   Tooltip,
+  CircularProgress,
 } from "@chakra-ui/react";
 import { MdAlbum } from "react-icons/md";
 import UserStats from "../components/Admin/UserStats";
@@ -35,8 +36,12 @@ import { AiOutlineUser } from "react-icons/ai";
 import { IoMdMusicalNote } from "react-icons/io";
 import { SearchIcon } from "@chakra-ui/icons";
 import { FiInfo } from "react-icons/fi";
+import useAuth from "@/hooks/useAuth";
+import router from "next/router";
 
 const AdminPage: NextPage = () => {
+  const { user, loading: userLoading } = useAuth();
+
   const [query, setQuery] = useState("");
   const [selectedTable, setSelectedTable] = useState("Users");
   const [selectedUser, setSelectedUser] = useState({
@@ -80,6 +85,13 @@ const AdminPage: NextPage = () => {
   const { data: albums } = useFetch<Album[]>(`${API_URL}/album/`, {
     includeCred: true,
   });
+
+  if (userLoading) {
+    return <CircularProgress isIndeterminate color="blue.300" />;
+  } else if (!user || !user.admin) {
+    router.push("/"); // redirect to home page if not authorized
+    return <>Redirecting to home page...</>;
+  }
 
   let numOfUsers: number = 0;
   if (users) {
