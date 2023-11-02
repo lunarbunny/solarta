@@ -20,7 +20,7 @@ services:
                 delay: 3s
 
     api:
-        build: ./server
+        build: ./backend
         image: solarta-api
         container_name: solarta-api
         environment:
