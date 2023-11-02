@@ -31,7 +31,6 @@ import { NextPage } from "next";
 import { BsFillPlayFill } from "react-icons/bs";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
 import { FiInfo } from "react-icons/fi";
-import { GrFormAdd } from "react-icons/gr";
 import MusicTable from "@/components/Media/MusicTable";
 import { useSetRecoilState } from "recoil";
 import { musicPlayerAtom } from "@/atoms/musicPlayer";

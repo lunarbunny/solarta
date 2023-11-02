@@ -22,13 +22,19 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
+  Icon,
   Input,
+  InputGroup,
+  InputLeftElement,
+  Tooltip,
 } from "@chakra-ui/react";
 import { MdAlbum } from "react-icons/md";
 import UserStats from "../components/Admin/UserStats";
 import { durationToTime } from "@/utils";
 import { AiOutlineUser } from "react-icons/ai";
 import { IoMdMusicalNote } from "react-icons/io";
+import { SearchIcon } from "@chakra-ui/icons";
+import { FiInfo } from "react-icons/fi";
 
 const AdminPage: NextPage = () => {
   const [query, setQuery] = useState("");
@@ -62,9 +68,12 @@ const AdminPage: NextPage = () => {
   const { data: users } = useFetch<User[]>(`${API_URL}/user/`, {
     includeCred: true,
   });
-  const { data: searches } = useFetch<User[]>(`${API_URL}/user/search=${query}`, {
-    includeCred: true
-  });
+  const { data: searches } = useFetch<User[]>(
+    `${API_URL}/user/search=${query}`,
+    {
+      includeCred: true,
+    }
+  );
   const { data: songs } = useFetch<Music[]>(`${API_URL}/music/`, {
     includeCred: true,
   });
@@ -169,9 +178,7 @@ const AdminPage: NextPage = () => {
             _hover={{ bg: data.status === 0 ? "red.600" : "green.600" }}
             bg="blue.700"
             color="whiteAlpha.900"
-            onClick={
-              data.status === 0 ? onUserBanOpen : onUserUnbanOpen
-            }
+            onClick={data.status === 0 ? onUserBanOpen : onUserUnbanOpen}
             onMouseOver={(e) =>
               setSelectedUser({
                 id: data.id,
@@ -206,23 +213,36 @@ const AdminPage: NextPage = () => {
         />
       </Flex>
 
-      {selectedTable && selectedTable == "Users" &&
-        <Flex>
-          <Input
-            ml={2}
-            mr={2}
-            type="text"
-            placeholder="Search for users"
-            _placeholder={{ color: 'gray.200' }}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
+      {selectedTable && selectedTable == "Users" && (
+        <Flex alignItems="center">
+          <InputGroup>
+            <InputLeftElement>
+              <Icon color="whiteAlpha.600" ml={3} as={SearchIcon} />
+            </InputLeftElement>
+            <Input
+              ml={2}
+              mr={2}
+              w="20%"
+              type="text"
+              placeholder="Search for users"
+              _placeholder={{ color: "gray.200" }}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <Tooltip
+              label="Search for users by name only"
+              aria-label="Admin search bar tooltip"
+              shouldWrapChildren={true}
+            >
+              <Icon boxSize={7} as={FiInfo} mt={1.5} />
+            </Tooltip>
+          </InputGroup>
         </Flex>
-      }
+      )}
 
       <Box
-        my={2}
-        h="70%"
+        my={5}
+        h="65%"
         overflowY="auto"
         sx={{
           "&::-webkit-scrollbar": {
@@ -248,9 +268,9 @@ const AdminPage: NextPage = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {query == "" ?
-                users?.map((data, index) => renderUserRow(data, index)) :
-                searches?.map((data, index) => renderUserRow(data, index))}
+              {query == ""
+                ? users?.map((data, index) => renderUserRow(data, index))
+                : searches?.map((data, index) => renderUserRow(data, index))}
             </Tbody>
           </Table>
         ) : selectedTable && selectedTable == "Songs" ? (
