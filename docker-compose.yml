@@ -44,10 +44,6 @@ services:
         build: ./frontend
         image: solarta-web
         container_name: solarta-web
-        depends_on:
-            - api
-        environment:
-            - NEXT_PUBLIC_SOLARTA_API_URL=https://solarta.nisokkususu.com/api
         networks:
             - proxy-web
         deploy:
