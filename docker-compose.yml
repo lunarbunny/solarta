@@ -96,7 +96,6 @@ services:
             - proxy-api
             - proxy-web
             - proxy-cicd
-        read_only: true
         ports:
             - "80:80"
             - "443:443"
