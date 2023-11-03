@@ -13,9 +13,11 @@ services:
         networks:
             - api-db
         volumes:
-            - db:/var/lib/mysql
+            - db:/var/lib/mysql:rw
         cap_drop:
             - ALL
+        ulimits:
+            nproc: 256
         deploy:
             resources:
                 limits:
@@ -42,6 +44,10 @@ services:
             - proxy-api
         volumes:
             - /var/lib/solarta/assets/music:/assets/music:rw
+        cap_drop:
+            - ALL
+        ulimits:
+            nproc: 256
         deploy:
             resources:
                 limits:
@@ -58,6 +64,10 @@ services:
         container_name: solarta-web
         networks:
             - proxy-web
+        cap_drop:
+            - ALL
+        ulimits:
+            nproc: 256
         deploy:
             resources:
                 limits:
@@ -86,6 +96,10 @@ services:
         volumes:
             - /etc/letsencrypt/live/solarta.nisokkususu.com/fullchain.pem:/etc/nginx/ssl/fullchain.pem:ro
             - /etc/letsencrypt/live/solarta.nisokkususu.com/privkey.pem:/etc/nginx/ssl/privkey.pem:ro
+        cap_drop:
+            - ALL
+        ulimits:
+            nproc: 256
         deploy:
             resources:
                 limits:
@@ -105,7 +119,7 @@ services:
         networks:
             - proxy-cicd
         volumes:
-            - cicd:/var/jenkins_home
+            - cicd:/var/jenkins_home:rw
             - /var/run/docker.sock:/var/run/docker.sock
         deploy:
             resources:
