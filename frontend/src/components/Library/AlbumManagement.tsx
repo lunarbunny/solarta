@@ -1,8 +1,9 @@
-import { Box, Button, Flex, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from "@chakra-ui/react";
+import { Text, Button, Flex, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from "@chakra-ui/react";
 import { useState } from "react";
 import { API_URL, Album } from "@/types";
 import AlbumWrap from "../Media/AlbumWrap";
 import { useRouter } from "next/router";
+import { validateDescription, validateName } from "@/utils";
 
 type Props = {
   albums: Album[],
@@ -26,10 +27,38 @@ const AlbumManagement: React.FC<Props> = ({ albums }) => {
     description: '',
   });
 
+  const [error, setError] = useState('');
+  const [titleHasError, setTitleHasError] = useState(false);
+  const [relDateHasError, setReleDateHasError] = useState(false);
+  const [descHasError, setDescHasError] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log(albumForm);
+    // Reset error message
+    if (error) setError('');
+    if (titleHasError) setTitleHasError(false);
+    if (relDateHasError) setReleDateHasError(false);
+    if (descHasError) setDescHasError(false);
+
+    // Validatation
+    if (!validateName(albumForm.title)) {
+      setError('Please enter a title that is 3-64 chars long.');
+      setTitleHasError(true);
+      return;
+    }
+
+    if (!albumForm.releaseDate) {
+      setError('Please enter a release date.');
+      setReleDateHasError(true);
+      return;
+    }
+
+    if (!validateDescription(albumForm.description)) {
+      setError('Please enter a description that is 3-64 chars long.');
+      setDescHasError(true);
+      return;
+    }
 
     const formData = new FormData();
     formData.append('title', albumForm.title);
@@ -47,7 +76,8 @@ const AlbumManagement: React.FC<Props> = ({ albums }) => {
       let newAlbumId = data.id;
       router.push(`/album/${newAlbumId}`);
     } else {
-      alert("Error: Could not create album.");
+      let resText = await res.text();
+      alert("Error: Could not create album. Reason: " + resText);
     }
   }
 
@@ -65,7 +95,7 @@ const AlbumManagement: React.FC<Props> = ({ albums }) => {
             <ModalHeader>New Album</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <FormControl>
+              <FormControl isInvalid={titleHasError}>
                 <FormLabel>Album Name</FormLabel>
                 <Input
                   value={albumForm.title}
@@ -73,7 +103,7 @@ const AlbumManagement: React.FC<Props> = ({ albums }) => {
                   placeholder="Provide a name for the new album"
                 />
               </FormControl>
-              <FormControl mt={4}>
+              <FormControl mt={4} isInvalid={relDateHasError}>
                 <FormLabel>Release Date</FormLabel>
                 <Input
                   type="date"
@@ -82,7 +112,7 @@ const AlbumManagement: React.FC<Props> = ({ albums }) => {
                   placeholder="Provide a release date for the new album"
                 />
               </FormControl>
-              <FormControl mt={4}>
+              <FormControl mt={4} isInvalid={descHasError}>
                 <FormLabel>Description</FormLabel>
                 <Input
                   value={albumForm.description}
@@ -90,6 +120,10 @@ const AlbumManagement: React.FC<Props> = ({ albums }) => {
                   placeholder="Describe the new album"
                 />
               </FormControl>
+
+              <Text mt={2} fontSize="12pt" color="red.300">
+                {error}
+              </Text>
             </ModalBody>
 
             <ModalFooter>

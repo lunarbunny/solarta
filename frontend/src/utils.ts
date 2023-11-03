@@ -29,6 +29,11 @@ export function validateName(text: string): boolean {
   return text.length >= 3 && text.length <= 64;
 }
 
+// For album description, artist about
+export function validateDescription(text: string): boolean {
+  return text.length <= 255;
+}
+
 export function validateEmail(email: string): boolean {
   // https://stackoverflow.com/a/46181/12327979
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
