@@ -14,6 +14,10 @@ services:
             - api-db
         volumes:
             - db:/var/lib/mysql:rw
+        read_only: true
+        tmpfs:
+            - /tmp
+            - /run/mysqld
         cap_drop:
             - ALL
         ulimits:
@@ -44,6 +48,7 @@ services:
             - proxy-api
         volumes:
             - /var/lib/solarta/assets/music:/assets/music:rw
+        read_only: true
         cap_drop:
             - ALL
         ulimits:
@@ -64,6 +69,7 @@ services:
         container_name: solarta-web
         networks:
             - proxy-web
+        read_only: true
         cap_drop:
             - ALL
         ulimits:
@@ -90,6 +96,7 @@ services:
             - proxy-api
             - proxy-web
             - proxy-cicd
+        read_only: true
         ports:
             - "80:80"
             - "443:443"
