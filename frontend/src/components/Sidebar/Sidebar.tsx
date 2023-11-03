@@ -46,7 +46,7 @@ const Sidebar = () => {
             <SidebarItem name="Albums" icon={<MdOutlineAlbum size={20} />} bolded={page == 'albums'} />
           </Link>
           {
-            user && (
+            user && !user.admin && (
               <Link href="/library" onClick={() => setPage("library")}>
                 <SidebarItem name="My Library" icon={<IoLibraryOutline size={20} />} bolded={page == 'library'} />
               </Link>
