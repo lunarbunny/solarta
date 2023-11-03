@@ -32,8 +32,8 @@ def user_retrieve_all_full():
             user, status = helpers.check_authenticated(session, request)
             if user is None:
                 return helpers.nachoneko(), status
-            if user.roleId != 1: # ensure caller is admin
-                return helpers.nachoneko(), status
+            if user.roleId != 1: # only admin can query
+                return helpers.nachoneko(), 403
 
             users = session.query(User).all()
             # Full user info
@@ -101,8 +101,8 @@ def user_search_by_name(name):
             user, status = helpers.check_authenticated(session, request)
             if user is None:
                 return helpers.nachoneko(), status
-            if user.roleId == 1: # check if admin
-                return helpers.nachoneko(), status
+            if user.roleId != 2: # only users can search
+                return helpers.nachoneko(), 403
             name = clean_text(name)
             user_search_results = session.query(User).filter(User.name.ilike(f"{name}%"))
             if user_search_results:

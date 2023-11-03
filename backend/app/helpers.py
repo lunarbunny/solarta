@@ -167,11 +167,18 @@ def check_authenticated(db, request) -> tuple[User | None, int]:
 
     if user is None:
         return None, 401
+
+    # Check if user is banned or unverified
+    if user.status != 0: # 0 = active, 1 = banned, 2 = unverified
+        return None, 403
+
+    # If session expired, clear session
     if user.sessionExpiry < int(time.time()):
         user.sessionId = None
         user.sessionExpiry = None
         db.commit()
         return None, 401
+    
     return user, 200
 
 def nachoneko() -> str:
