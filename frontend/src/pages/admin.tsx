@@ -71,7 +71,7 @@ const AdminPage: NextPage = () => {
     onClose: onSongClose,
   } = useDisclosure();
 
-  const { data: users } = useFetch<User[]>(`${API_URL}/user/`, {
+  const { data: users } = useFetch<User[]>(`${API_URL}/user/full`, {
     includeCred: true,
   });
   const { data: searches } = useFetch<User[]>(
@@ -125,11 +125,11 @@ const AdminPage: NextPage = () => {
 
   function returnStatus(status: number) {
     if (status == 0) {
-      return "OK";
+      return "ACTIVE";
     } else if (status == 1) {
       return "BANNED";
     } else {
-      return "NOT_VERIFIED";
+      return "NOT VERIFIED";
     }
   }
 
@@ -185,7 +185,7 @@ const AdminPage: NextPage = () => {
         <Td>{data.name}</Td>
         <Td>{data.email}</Td>
         <Td>{data.about}</Td>
-        <Td>{returnStatus(data.status)}</Td>
+        <Td>{returnStatus(data.status as number)}</Td>
         <Td isNumeric>
           <Button
             _hover={{ bg: data.status === 0 ? "red.600" : "green.600" }}

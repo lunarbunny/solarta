@@ -13,25 +13,34 @@ user_bp = Blueprint("user_bp", __name__)
 def user_retrieve_all():
     with Session() as session:
         try:
-            users = session.query(User).join(Role).filter(User.roleId != 1).all()
-            return (
-                jsonify(
-                    [
-                        {
-                            "id": user.id,
-                            "name": user.name,
-                            "about": user.about,
-                            "email": user.email,
-                            "status": user.status,
-                        }
-                        for user in users
-                    ]
-                ),
-                200,
-            )
+            users = session.query(User).filter(User.roleId != 1).all()
+            # Public user info
+            result = [{
+                "id": user.id,
+                "name": user.name,
+                "about": user.about,
+            } for user in users]
+            return jsonify(result), 200
         except:
             return "", 400
 
+# Retrieve all users with email and account status (for admin)
+@user_bp.route("/full", methods=["GET"])
+def user_retrieve_all_list():
+    with Session() as session:
+        try:
+            users = session.query(User).all()
+            # Full user info
+            result = [{
+                "id": user.id,
+                "name": user.name,
+                "about": user.about,
+                "email": user.email,
+                "status": user.status,
+            } for user in users]
+            return jsonify(result), 200
+        except:
+            return "", 400
 
 # Retrieve user by id
 @user_bp.route("/<int:id>", methods=["GET"])
@@ -95,8 +104,6 @@ def user_search_by_name(name):
                     "id": user.id,
                     "name": user.name,
                     "about": user.about,
-                    "email": user.email,
-                    "status": user.status,
                 } for user in user_search_results]), 200
             else:
                 return 'Not found', 404
@@ -307,19 +314,18 @@ def authenticated():
                 return "Invalid session cookie.", status
             else:
                 return helpers.nachoneko(), status
+            
+        data = {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "about": "" if user.about is None else user.about,
+        }
 
-        return (
-            jsonify(
-                {
-                    "id": user.id,
-                    "name": user.name,
-                    "email": user.email,
-                    "about": "" if user.about is None else user.about,
-                    "admin": user.roleId == 1,
-                }
-            ),
-            200,
-        )
+        if user.roleId == 1:
+            data["admin"] = True
+
+        return jsonify(data), 200
 
 
 # Request password reset email

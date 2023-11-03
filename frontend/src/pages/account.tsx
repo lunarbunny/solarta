@@ -56,7 +56,7 @@ const AccountPage: NextPage = () => {
       setForm({
         ...form,
         name: user.name,
-        about: user.about,
+        about: user.about || "",
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

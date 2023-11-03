@@ -39,9 +39,9 @@ type User = {
   id: number;
   name: string;
   email: string;
-  about: string;
-  admin: boolean;
-  status: number;
+  about: string | null;
+  status: number | null;
+  admin: boolean | null;
 };
 
 type Genre = {
