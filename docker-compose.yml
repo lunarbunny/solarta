@@ -149,9 +149,13 @@ volumes:
 networks:
     api-db:
         name: solarta-db-local
+        internal: true
     proxy-api:
         name: solarta-proxy-api-local
+        internal: true
     proxy-web:
         name: solarta-proxy-web-local
+        internal: true
     proxy-cicd:
         name: solarta-proxy-cicd-local
+        internal: true
