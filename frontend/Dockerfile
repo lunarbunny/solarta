@@ -53,6 +53,8 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+RUN apk add --no-cache curl
+
 USER nextjs
 
 EXPOSE 3000
@@ -60,5 +62,8 @@ EXPOSE 3000
 ENV PORT 3000
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
+
+HEALTHCHECK --interval=10s --timeout=3s \
+    CMD curl --fail http://localhost:3000 || exit 1
 
 CMD ["node", "server.js"]
