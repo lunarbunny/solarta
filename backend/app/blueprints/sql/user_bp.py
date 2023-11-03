@@ -26,9 +26,15 @@ def user_retrieve_all():
 
 # Retrieve all users with email and account status (for admin)
 @user_bp.route("/full", methods=["GET"])
-def user_retrieve_all_list():
+def user_retrieve_all_full():
     with Session() as session:
         try:
+            user, status = helpers.check_authenticated(session, request)
+            if user is None:
+                return helpers.nachoneko(), status
+            if user.roleId != 1: # ensure caller is admin
+                return helpers.nachoneko(), status
+
             users = session.query(User).all()
             # Full user info
             result = [{
