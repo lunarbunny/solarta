@@ -46,6 +46,7 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
   const [songnameHasError, setSongnameHasError] = useState(false);
   const [albumIdHasError, setAlbumIdHasError] = useState(false);
   const [genreIdHasError, setGenreIdHasError] = useState(false);
+  const [musicFileHasError, setMusicFileHasError] = useState(false);
 
   // Dropzone for music file
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -84,6 +85,7 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
     if (songnameHasError) setSongnameHasError(false);
     if (albumIdHasError) setAlbumIdHasError(false);
     if (genreIdHasError) setGenreIdHasError(false);
+    if (musicFileHasError) setMusicFileHasError(false);
 
     // Validations
     if (!validateName(uploadForm.title)) {
@@ -106,6 +108,7 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
 
     if (!uploadForm.music_file) {
       setError('Please choose a music file to upload.');
+      setMusicFileHasError(true);
       return;
     }
 
@@ -137,7 +140,7 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
           w="30%"
           p={4}
           border="2px dashed"
-          borderColor="gray.300"
+          borderColor={musicFileHasError ? "red.300" : "gray.300"}
           borderRadius="md"
           display="flex"
           flexDirection="column"
@@ -158,7 +161,7 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
         </Box>
 
         <Flex flexGrow={1} ms={4} direction="column" align="flex-end">
-          <FormControl>
+          <FormControl isInvalid={songnameHasError}>
             <FormLabel>Song name</FormLabel>
             <Input
               type="text"
@@ -170,7 +173,7 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
           </FormControl>
 
           <InputGroup mt={2}>
-            <FormControl>
+            <FormControl isInvalid={albumIdHasError}>
               <FormLabel>Album</FormLabel>
               <Select
                 value={uploadForm.albumId}
@@ -187,7 +190,7 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
                   ))}
               </Select>
             </FormControl>
-            <FormControl ms={4}>
+            <FormControl ms={4} isInvalid={genreIdHasError}>
               <FormLabel>Genre</FormLabel>
               <Select
                 value={uploadForm.genreId}
