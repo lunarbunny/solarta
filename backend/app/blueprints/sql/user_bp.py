@@ -437,7 +437,11 @@ def user_unban_by_id(id):
             user = session.get(User, id)
             if user is None:
                 return helpers.nachoneko(), 400
-            user.status = 0
+            # If a user do not have mfa secret, they are not verified yet
+            if user.mfaSecret is None:
+                user.status = 2 # Unverified
+            else:
+                user.status = 0 # Active
             session.commit()
             return "OK", 200
         except Exception as e:
