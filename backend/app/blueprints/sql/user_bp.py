@@ -8,12 +8,12 @@ import helpers
 user_bp = Blueprint("user_bp", __name__)
 
 
-# Retrieve all users
+# Retrieve all users (also artists)
 @user_bp.route("/", methods=["GET"])
 def user_retrieve_all():
     with Session() as session:
         try:
-            users = session.query(User).filter(User.roleId != 1).all()
+            users = session.query(User).filter(User.roleId == 2).all()
             # Public user info
             result = [{
                 "id": user.id,
