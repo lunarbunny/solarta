@@ -6,12 +6,13 @@ class Music(Base):
     __tablename__ = 'Music'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    title: Mapped[str] = mapped_column(String(45), nullable=False)
+    title: Mapped[str] = mapped_column(String(64), nullable=False)
     filename: Mapped[str] = mapped_column(String(45), nullable=False)
     duration: Mapped[int] = mapped_column(Integer, nullable=False)
     genreId: Mapped[int] = mapped_column(Integer, ForeignKey('Genre.id'), nullable=False)
     ownerId: Mapped[int] = mapped_column(Integer, ForeignKey('User.id'), nullable=False)
 
+    # If a music is deleted, it is disassociated from all albums and playlists
     albums = relationship('AlbumMusic', backref='Music', cascade='all, delete-orphan') # Disassociate Music from Album when deleted
     playlists = relationship('PlaylistMusic', backref='Music', cascade='all, delete-orphan') # Disassociate Music from Playlist when deleted
 

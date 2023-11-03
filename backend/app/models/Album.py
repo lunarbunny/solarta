@@ -6,13 +6,14 @@ class Album(Base):
     __tablename__ = 'Album'
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    title: Mapped[str] = mapped_column(String(45), nullable=False)
-    imageUrl: Mapped[str] = mapped_column(String(45), nullable=True)
+    title: Mapped[str] = mapped_column(String(64), nullable=False)
+    imageUrl: Mapped[str] = mapped_column(String(255), nullable=True)
     releaseDate: Mapped[Date] = mapped_column(Date, nullable=False)
     ownerId: Mapped[int] = mapped_column(Integer, ForeignKey('User.id'), nullable=False)
-    description: Mapped[str] = mapped_column(String(45), nullable=True)
+    description: Mapped[str] = mapped_column(String(255), nullable=True)
 
-    musics = relationship('AlbumMusic', backref='Album')
+    # If an album is deleted, all of its musics will be deleted as well
+    musics = relationship('AlbumMusic', backref='Album', cascade='all, delete-orphan')
 
     def __init__(self, title, releaseDate, ownerId, imageUrl=None, description=None):
         self.title = title

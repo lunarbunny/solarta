@@ -65,7 +65,7 @@ def album_delete(idAlbum):
                     return "Unauthorized", 401
             else:
                 return "Album not found", 404
-        except:
+        except Exception as e:
             session.rollback()
             return "Error occured", 400
 

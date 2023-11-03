@@ -8,8 +8,8 @@ class Playlist(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False, autoincrement=True)
     ownerId: Mapped[int] = mapped_column(Integer, ForeignKey('User.id'), nullable=False)
     creationDate: Mapped[Date] = mapped_column(Date, nullable=False)
-    title: Mapped[str] = mapped_column(String(45), nullable=False)
-    description: Mapped[str] = mapped_column(String(45), nullable=True)
+    title: Mapped[str] = mapped_column(String(64), nullable=False)
+    description: Mapped[str] = mapped_column(String(255), nullable=True)
 
     musics = relationship('PlaylistMusic', backref='Playlist')
 
