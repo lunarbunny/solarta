@@ -275,8 +275,10 @@ def login():
             if not helpers.verify_password_hash(user.hashPwd, password):
                 return helpers.nachoneko(), 401
 
-            if user.sessionId == None:
-                user.sessionId = helpers.generate_session()
+            sessionId = None
+            if user.sessionId is None:
+                sessionId = helpers.generate_session()
+                user.sessionId = helpers.hash_session_id(sessionId)
 
             cookie_expiry = helpers.set_cookie_expiry()
             user.sessionExpiry = cookie_expiry
@@ -285,7 +287,7 @@ def login():
             response = make_response("ok!")
             response.status = 200
             response.set_cookie("SESSIONID",
-                                value=user.sessionId,
+                                value=sessionId,
                                 max_age=None,
                                 expires=cookie_expiry,
                                 secure=False,

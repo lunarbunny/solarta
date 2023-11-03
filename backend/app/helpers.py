@@ -147,6 +147,13 @@ def generate_session() -> str:
     return os.urandom(43).hex()
 
 
+def hash_session_id(sessionId: str) -> str:
+    import hashlib
+    sha256 = hashlib.sha256()
+    sha256.update(sessionId.encode('utf-8'))
+    return sha256.hexdigest()
+
+
 def set_cookie_expiry() -> int:
     return int(time.time()) + 60 * 60 * 24
 
@@ -156,7 +163,7 @@ def check_authenticated(db, request) -> tuple[User | None, int]:
     if session_id is None:
         return None, 401
 
-    user = db.query(User).filter(User.sessionId == session_id).first()
+    user = db.query(User).filter(User.sessionId == hash_session_id(session_id)).first()
 
     if user is None:
         return None, 401
