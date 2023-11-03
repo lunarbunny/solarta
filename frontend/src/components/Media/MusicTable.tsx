@@ -43,7 +43,7 @@ const MusicTable: React.FC<Props> = ({ items }) => {
           title: m.title,
           artist: m.ownerName || "Unknown artist",
           src: `${API_URL}/music/play/${m.id}`,
-          imageUrl: m.imageUrl || "https://picsum.photos/42?random=" + m.id,
+          imageUrl: "https://picsum.photos/42?random=" + m.id,
         };
         return {
           ...prevState,
