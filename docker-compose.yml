@@ -20,6 +20,8 @@ services:
             - /run/mysqld
         cap_drop:
             - ALL
+        security_opt:
+            - no-new-privileges:true
         ulimits:
             nproc: 256
         deploy:
@@ -51,6 +53,8 @@ services:
         read_only: true
         cap_drop:
             - ALL
+        security_opt:
+            - no-new-privileges:true
         ulimits:
             nproc: 256
         deploy:
@@ -72,6 +76,8 @@ services:
         read_only: true
         cap_drop:
             - ALL
+        security_opt:
+            - no-new-privileges:true
         ulimits:
             nproc: 256
         deploy:
@@ -104,6 +110,8 @@ services:
             - /etc/letsencrypt/live/solarta.nisokkususu.com/privkey.pem:/etc/nginx/ssl/privkey.pem:ro
         cap_drop:
             - ALL
+        security_opt:
+            - no-new-privileges:true
         ulimits:
             nproc: 256
         deploy:
@@ -126,7 +134,7 @@ services:
             - proxy-cicd
         volumes:
             - cicd:/var/jenkins_home:rw
-            - /var/run/docker.sock:/var/run/docker.sock
+            - /var/run/docker.sock:/var/run/docker.sock:ro
         deploy:
             resources:
                 limits:
