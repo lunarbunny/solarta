@@ -1,26 +1,22 @@
+import AccountManagement from "@/components/Auth/AccountManagement";
 import LibrarySection from "@/components/Library/LibrarySection";
 import useAuth from "@/hooks/useAuth";
 import { API_URL } from "@/types";
+import { validateDescription, validateName, validatePwd } from "@/utils";
 import {
   Box,
   Button,
+  Center,
+  CircularProgress,
+  Flex,
   FormControl,
   FormHelperText,
   FormLabel,
-  Flex,
   Heading,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
+  Spacer,
   Text,
   Textarea,
-  Spacer,
-  CircularProgress,
-  Center,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -31,12 +27,6 @@ type ProfileFormData = {
   about: string;
   password: string;
   newPassword: string;
-  otp: string;
-};
-
-type ConfirmPasswordData = {
-  password: string;
-  cfmPassword: string;
   otp: string;
 };
 
@@ -52,12 +42,10 @@ const AccountPage: NextPage = () => {
     otp: "",
   });
 
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
-  const [confirmPwdForm, setConfirmPwdForm] = useState<ConfirmPasswordData>({
-    password: "",
-    cfmPassword: "",
-    otp: "",
-  });
+  const [error, setError] = useState<string>("");
+  const [nameHasError, setNameHasError] = useState<boolean>(false);
+  const [aboutHasError, setAboutHasError] = useState<boolean>(false);
+  const [pwdHasError, setPwdHasError] = useState<boolean>(false);
 
   useEffect(() => {
     if (userLoading) return;
@@ -86,20 +74,42 @@ const AccountPage: NextPage = () => {
 
     if (!user) return;
 
-    if (!confirm("Are you sure you want to update your profile?")) return;
-
     const formData = new FormData();
     if (form.name != user.name) {
+      if (!validateName(form.name)) {
+        setError("Please enter a name that is 3-64 chars long.");
+        setNameHasError(true);
+        return;
+      }
       formData.append("name", form.name);
     }
     if (form.about != user.about) {
+      if (!validateDescription(form.about)) {
+        setError("Please enter an about that is 3-250 chars long.");
+        setAboutHasError(true);
+        return;
+      }
       formData.append("about", form.about);
     }
     if (form.password != "" && form.newPassword != "" && form.otp != "") {
+      if (!validatePwd(form.password)) {
+        setError("Your current password is empty.");
+        setPwdHasError(true);
+        return;
+      }
+      if (!validatePwd(form.newPassword, true)) {
+        setError("Please enter a password that is >= 12 chars long.");
+        setPwdHasError(true);
+        return;
+      }
       formData.append("password", form.password);
       formData.append("newPassword", form.newPassword);
       formData.append("mfa", form.otp);
     }
+
+    if (formData.keys.length == 0) return; // no changes
+
+    if (!confirm("Are you sure you want to update your profile?")) return;
 
     const res = await fetch(`${API_URL}/user/update`, {
       method: "POST",
@@ -112,31 +122,6 @@ const AccountPage: NextPage = () => {
     } else {
       alert("Error: Could not update profile.");
     }
-  };
-
-  const handleDeleteAccount = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const formData = new FormData();
-    formData.append("password", confirmPwdForm.password);
-    formData.append("cfmPassword", confirmPwdForm.cfmPassword);
-    formData.append("mfa", confirmPwdForm.otp);
-
-    const res = await fetch(`${API_URL}/user/delete`, {
-      method: "DELETE",
-      body: formData,
-      credentials: "include",
-    });
-
-    if (res.ok) {
-      router.push("/auth");
-    } else {
-      alert("Error: Unable to delete account.");
-    }
-  };
-
-  const handleDeleteModal = () => {
-    setDeleteModalOpen(!isDeleteModalOpen);
   };
 
   let hasChanges = user
@@ -228,7 +213,12 @@ const AccountPage: NextPage = () => {
             <Button colorScheme="blue" type="submit">
               Save Changes
             </Button>
-            {hasChanges && (
+            {error && (
+              <Text color="red.300" ml={4}>
+                {error}
+              </Text>
+            )}
+            {!error && hasChanges && (
               <Text color="red.300" ml={4}>
                 Changes are highlighted in red.
               </Text>
@@ -240,81 +230,7 @@ const AccountPage: NextPage = () => {
       <Spacer h={2} />
 
       <LibrarySection title="Account Management">
-        <Flex mt={4} p={2}
-          flexDir="column"
-          align="flex-start"
-          border="2px dotted"
-          borderColor="red.300"
-          borderRadius="md">
-          <Heading size="sm" color="red.300">Danger Zone</Heading>
-          <Button mt={4} alignSelf="flex-start" colorScheme="red" type="submit" onClick={handleDeleteModal}>
-            Delete Account
-          </Button>
-          <Text mt={1} color="gray.300">Deleting your account is permanent and cannot be undone.</Text>
-        </Flex>
-
-        <Modal isOpen={isDeleteModalOpen} onClose={handleDeleteModal}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Confirm Delete?</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <form onSubmit={handleDeleteAccount}>
-                <FormControl
-                  id="confirmPassword"
-                  mt={4}
-                  isInvalid={
-                    confirmPwdForm.password != "" ||
-                    confirmPwdForm.cfmPassword != "" ||
-                    confirmPwdForm.otp != ""
-                  }
-                >
-                  <FormLabel>Enter password to confirm:</FormLabel>
-                  <Input
-                    type="password"
-                    placeholder="Current Password"
-                    value={confirmPwdForm.password}
-                    onChange={(e) =>
-                      setConfirmPwdForm({
-                        ...confirmPwdForm,
-                        password: e.target.value,
-                      })
-                    }
-                  />
-                  <Input
-                    type="password"
-                    placeholder="Confirm Password"
-                    mt={2}
-                    value={confirmPwdForm.cfmPassword}
-                    onChange={(e) =>
-                      setConfirmPwdForm({
-                        ...confirmPwdForm,
-                        cfmPassword: e.target.value,
-                      })
-                    }
-                  />
-                  <Input
-                    type="number"
-                    placeholder="MFA OTP"
-                    mt={2}
-                    value={confirmPwdForm.otp}
-                    onChange={(e) =>
-                      setConfirmPwdForm({
-                        ...confirmPwdForm,
-                        otp: e.target.value,
-                      })
-                    }
-                  />
-                </FormControl>
-                <Flex align="center" mb={4} mt={4}>
-                  <Button colorScheme="blue" type="submit">
-                    Confirm
-                  </Button>
-                </Flex>
-              </form>
-            </ModalBody>
-          </ModalContent>
-        </Modal>
+        <AccountManagement />
       </LibrarySection>
     </Box>
   );
