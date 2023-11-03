@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import Blueprint, jsonify, request
 
-from ..__init__ import Session, Playlist, PlaylistMusic, Music
+from ..__init__ import Session, Playlist, PlaylistMusic, Music, User
 from validation import clean_text
 import helpers
 
@@ -125,28 +125,27 @@ def playlist_retrieve_all_music(idPlaylist):
             playlist = session.get(Playlist, idPlaylist)
             if playlist:
                 playlist_music = (
-                    session.query(Music)
+                    session.query(Music, User.name)
                     .join(PlaylistMusic)
                     .filter(PlaylistMusic.idPlaylist == idPlaylist)
+                    .join(User, User.id == Music.ownerId)
+                    .all()
                 )
                 return (
-                    jsonify(
-                        [
-                            {
-                                "id": music.id,
-                                "title": music.title,
-                                "duration": music.duration,
-                                "genreId": music.genreId,
-                            }
-                            for music in playlist_music
-                        ]
-                    ),
-                    200,
+                    jsonify([{
+                        "id": music.id,
+                        "title": music.title,
+                        "duration": music.duration,
+                        "genreId": music.genreId,
+                        "ownerName": owner_name
+                    } for music, owner_name in playlist_music]), 200
                 )
             else:
-                return "", 404
-        except:
-            return "", 400
+                return "Not found", 404
+        except Exception as e:
+            if helpers.is_debug_mode:
+                return str(e), 400
+            return helpers.nachoneko(), 400
 
 
 # Retrieve all playlists of a user
