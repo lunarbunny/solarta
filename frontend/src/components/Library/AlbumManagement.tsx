@@ -12,7 +12,6 @@ type AlbumForm = {
   title: string;
   releaseDate: string;
   description: string;
-  imageUrl: string | null;
 };
 
 const AlbumManagement: React.FC<Props> = ({ albums }) => {
@@ -25,7 +24,6 @@ const AlbumManagement: React.FC<Props> = ({ albums }) => {
     title: '',
     releaseDate: new Date().toISOString().slice(0, 10),
     description: '',
-    imageUrl: null,
   });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -37,9 +35,6 @@ const AlbumManagement: React.FC<Props> = ({ albums }) => {
     formData.append('title', albumForm.title);
     formData.append('releaseDate', albumForm.releaseDate);
     formData.append('description', albumForm.description);
-    if (albumForm.imageUrl) {
-      formData.append('imageUrl', albumForm.imageUrl);
-    }
 
     const res = await fetch(`${API_URL}/album/create`, {
       method: 'POST',
@@ -93,14 +88,6 @@ const AlbumManagement: React.FC<Props> = ({ albums }) => {
                   value={albumForm.description}
                   onChange={(e) => setAlbumForm({ ...albumForm, description: e.target.value })}
                   placeholder="Describe the new album"
-                />
-              </FormControl>
-              <FormControl mt={4}>
-                <FormLabel>Cover URL</FormLabel>
-                <Input
-                  value={albumForm.imageUrl || ''}
-                  onChange={(e) => setAlbumForm({ ...albumForm, imageUrl: e.target.value })}
-                  placeholder="Provide a URL for the album cover"
                 />
               </FormControl>
             </ModalBody>

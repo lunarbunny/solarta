@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request, send_file
 from werkzeug.utils import secure_filename
 
 from ..__init__ import Session, Music, User, AlbumMusic, Album
-from validation import clean_text
+from validation import clean_text, validate_name
 import helpers
 
 music_bp = Blueprint("music_bp", __name__)
@@ -23,18 +23,28 @@ def music_create():
             title = data.get("title", "")
             genreId = data.get("genreId", "")
             albumId = data.get("albumId", "")
-            music_file = request.files["music_file"]
 
-            if title == "" or genreId == "" or ownerId == "" or albumId == "" or music_file == "":
-                return 'Missing parameters', 400
+            title_valid, title_error = validate_name(title)
+            if not title_valid:
+                return title_error, 400
+            
+            if not genreId.isdigit():
+                return 'Invalid genre ID', 400
+            
+            if not albumId.isdigit():
+                return 'Invalid album ID', 400
+            
+            if request.files is None or "music_file" not in request.files:
+                return 'No music file', 400
+            music_file = request.files["music_file"]
             
             filename, ext = os.path.splitext(music_file.filename)
             if ext.lower() != '.mp3':
                 return 'Invalid file type', 400
             
             # Clean filename
-            # Limit title to 28 characters, leave 6 characters for owner ID prefix, and 5 characters for extension
-            # XXXXXX-<title>.mp3
+            # Limit title to 28 characters, leave 6 characters for owner ID prefix, and 4 characters for extension
+            # XXXXXX-<title>.mp3 (Typically 6 + 28 + 4 = 38 characters, max db support is 45 characters)
             filename = f"{ownerId:06}-{secure_filename(filename)[:28]}{ext}"
             save_dir = helpers.music_get_save_dir()
             save_path = os.path.join(save_dir, filename)

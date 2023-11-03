@@ -14,7 +14,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { API_URL, Album, Genre, Music } from "@/types";
 import useFetch from "@/hooks/useFetch";
-import { dateToYear } from "@/utils";
+import { dateToYear, validateName } from "@/utils";
 import { useRouter } from "next/router";
 
 type Props = {
@@ -41,6 +41,11 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
 
   // Fetch albums and genres to populate the dropdowns
   const { data: genres } = useFetch<Genre[]>(`${API_URL}/genre`);
+
+  const [error, setError] = useState('');
+  const [songnameHasError, setSongnameHasError] = useState(false);
+  const [albumIdHasError, setAlbumIdHasError] = useState(false);
+  const [genreIdHasError, setGenreIdHasError] = useState(false);
 
   // Dropzone for music file
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -74,6 +79,36 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // Reset errors
+    if (error) setError('');
+    if (songnameHasError) setSongnameHasError(false);
+    if (albumIdHasError) setAlbumIdHasError(false);
+    if (genreIdHasError) setGenreIdHasError(false);
+
+    // Validations
+    if (!validateName(uploadForm.title)) {
+      setError('Please enter a song name that is 3-64 chars long.');
+      setSongnameHasError(true);
+      return;
+    }
+
+    if (uploadForm.albumId == "none") {
+      setError('Please select an album.');
+      setAlbumIdHasError(true);
+      return;
+    }
+
+    if (uploadForm.genreId == "none") {
+      setError('Please select a genre.');
+      setGenreIdHasError(true);
+      return;
+    }
+
+    if (!uploadForm.music_file) {
+      setError('Please choose a music file to upload.');
+      return;
+    }
+
     const formData = new FormData();
     formData.append("title", uploadForm.title);
     formData.append("genreId", uploadForm.genreId);
@@ -89,7 +124,8 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
     if (res.ok) {
       router.push(`/album/${uploadForm.albumId}`);
     } else {
-      alert("Error: Could not upload music.");
+      let resText = await res.text();
+      alert("Error: Could not upload music. Reason: " + resText);
     }
   };
 
@@ -170,9 +206,15 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
             </FormControl>
           </InputGroup>
 
-          <Button mt={4} colorScheme="blue" type="submit">
-            Upload
-          </Button>
+          <Flex direction="row" align="center" mt={4} w="100%" >
+            <Text fontSize="12pt" color="red.300" flexGrow={1}>
+              {error}
+            </Text>
+
+            <Button colorScheme="blue" type="submit">
+              Upload
+            </Button>
+          </Flex>
         </Flex>
       </Flex>
     </form>

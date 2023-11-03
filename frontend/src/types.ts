@@ -9,7 +9,6 @@ type Music = {
   ownerName: string; // Artist name
   albumName: string;
   genreId: number;
-  imageUrl: string | null;
 };
 
 type Album = {

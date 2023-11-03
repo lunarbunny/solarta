@@ -1,7 +1,7 @@
 import { Button, FormControl, Input, InputGroup, Text } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import useRegister from '@/hooks/useRegister';
-import { validateEmail, validatePwd, validateText } from '@/utils';
+import { validateEmail, validatePwd, validateName } from '@/utils';
 
 type RegisterProps = {
   onLoginClick: () => void;
@@ -37,7 +37,7 @@ const Register: React.FC<RegisterProps> = ({ onLoginClick }) => {
     if (emailHasError) setEmailHasError(false);
     if (passwordHasError) setPasswordHasError(false);
 
-    if (!validateText(registerForm.name)) {
+    if (!validateName(registerForm.name)) {
       setError('Please enter a name that is 3-64 chars long.');
       setNameHasError(true);
       return;

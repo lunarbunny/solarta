@@ -24,7 +24,8 @@ export function formatDate(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-export function validateText(text: string): boolean {
+// For song names, album names
+export function validateName(text: string): boolean {
   return text.length >= 3 && text.length <= 64;
 }
 

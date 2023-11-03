@@ -38,7 +38,7 @@ const MusicTableRow: React.FC<Props> = ({ data, onClick, index }) => {
         <Flex direction="row">
           <Image
             boxSize="64px"
-            src={data.imageUrl || "https://picsum.photos/42?random=" + data.id}
+            src={"https://picsum.photos/42?random=" + data.id}
             mr={4}
             alt="cover"
           />

@@ -22,7 +22,7 @@ const MusicItem: React.FC<Props> = ({ data, onClick }) => {
         alt="cover"
         boxSize="42px"
         borderRadius="full"
-        src={data.imageUrl || "https://picsum.photos/42?random=" + data.id}
+        src={"https://picsum.photos/42?random=" + data.id}
       />
       <Box flexGrow={1} ml={3}>
         <Text fontWeight="semibold" noOfLines={1}>{data.title}</Text>
