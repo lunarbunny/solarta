@@ -117,6 +117,37 @@ def playlist_update(id):
             return "", 400
 
 
+# Retrieve all music not added into current playlist
+@playlist_bp.route("<int:idPlaylist>/music/notadded", methods=["GET"])
+def playlist_retrieve_notadded_music(idPlaylist):
+    with Session() as session:
+        try:
+            playlist = session.get(Playlist, idPlaylist)
+            if playlist:
+                to_exclude = session.query(PlaylistMusic.idMusic).filter(PlaylistMusic.idPlaylist == playlist.id)
+                excluded_playlist = (
+                    session.query(Music, User.name)
+                    .join(User, User.id == Music.ownerId)
+                    .filter(~Music.id.in_(to_exclude))
+                    .all()
+                )
+                return (
+                    jsonify([{
+                        "id": music.id,
+                        "title": music.title,
+                        "duration": music.duration,
+                        "genreId": music.genreId,
+                        "ownerName": owner_name
+                    } for music, owner_name in excluded_playlist]), 200
+                )
+            else:
+                return "Not found", 404
+        except Exception as e:
+            if helpers.is_debug_mode:
+                return str(e), 400
+            return helpers.nachoneko(), 400
+
+
 # Retrieve all music based on Playlist ID
 @playlist_bp.route("/<int:idPlaylist>/music", methods=["GET"])
 def playlist_retrieve_all_music(idPlaylist):

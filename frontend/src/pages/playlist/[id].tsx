@@ -71,7 +71,7 @@ const PlaylistPage: NextPage = () => {
   const [playlistSongs, setPlayListSongs] = useState<Array<number>>([]);
   console.log(playlistSongs);
   const [addSongs, setAddSongs] = useState(false);
-  const { data: allMusic } = useFetch<Music[]>(`${API_URL}/music`, {
+  const { data: notAddedMusic } = useFetch<Music[]>(`${API_URL}/playlist/${router.query.id}/music/notadded`, {
     usesRouter: true,
   });
   const {
@@ -356,7 +356,7 @@ const PlaylistPage: NextPage = () => {
             }}
           >
             <AddMusicTable
-              musicArray={allMusic}
+              musicArray={notAddedMusic}
               selectedSong={selectedSong}
               setSelectedSong={setSelectedSong}
               setPlaylistSongs={setPlayListSongs}
