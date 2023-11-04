@@ -28,9 +28,12 @@ def music_get_save_dir():
         sys.exit(1)
     return dir
 
-def music_get_metadata(path):
+def music_strip_tags_and_get_metadata(path):
     file = eyed3.load(path)
     if file is not None:
+        # Remove ID3 tags
+        file.initTag()
+        file.tag.save()
         return file.info.time_secs, file.info.size_bytes
     return None
 

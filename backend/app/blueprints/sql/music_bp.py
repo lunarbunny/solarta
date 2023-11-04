@@ -50,9 +50,10 @@ def music_create():
             save_path = os.path.join(save_dir, filename)
             
             music_file.save(save_path)
-            meta = helpers.music_get_metadata(save_path)
+            meta = helpers.music_strip_tags_and_get_metadata(save_path)
             if meta is None:
                 return 'Music file is invalid.', 400
+            # Size constrained with Max-Content-Length header, no need to check here
             duration, size = meta
             duration = math.ceil(duration)
             
