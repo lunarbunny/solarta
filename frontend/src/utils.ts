@@ -64,7 +64,7 @@ async function getCsrfToken() {
   return data.token;
 }
 
-export async function postWithCsrfToken(endpoint: string, data: any): Promise<boolean> {
+export async function postWithCsrfToken(endpoint: string, data: any): Promise<Response> {
   const csrfToken = await getCsrfToken();
   const headers = {
     'X-CSRFToken': csrfToken,
@@ -77,10 +77,10 @@ export async function postWithCsrfToken(endpoint: string, data: any): Promise<bo
     body: JSON.stringify(data)
   });
 
-  return response.ok;
+  return response;
 }
 
-export async function putWithCsrfToken(endpoint: string, data: any): Promise<boolean> {
+export async function putWithCsrfToken(endpoint: string, data: any): Promise<Response> {
   const csrfToken = await getCsrfToken();
   const headers = {
     'X-CSRFToken': csrfToken,
@@ -93,10 +93,10 @@ export async function putWithCsrfToken(endpoint: string, data: any): Promise<boo
     body: JSON.stringify(data)
   });
 
-  return response.ok;
+  return response;
 }
 
-export async function deleteWithCsrfToken(endpoint: string): Promise<boolean> {
+export async function deleteWithCsrfToken(endpoint: string): Promise<Response> {
   const csrfToken = await getCsrfToken();
   const headers = {
     'X-CSRFToken': csrfToken,
@@ -107,5 +107,5 @@ export async function deleteWithCsrfToken(endpoint: string): Promise<boolean> {
     headers
   });
 
-  return response.ok;
+  return response;
 }

@@ -26,7 +26,7 @@ const useSignIn = (): SignInState => {
 
       const res = await postWithCsrfToken(`${API_URL}/user/login`, formData);
 
-      if (!res) {
+      if (!res.ok) {
         setError('Sign-in failed, please try again.');
         return;
       }
