@@ -64,7 +64,7 @@ async function getCsrfToken() {
   return data.token;
 }
 
-export async function postWithCsrfToken(endpoint: string, data: FormData): Promise<Response> {
+export async function postWithCsrfToken(endpoint: string, data: any): Promise<Response> {
   const csrfToken = await getCsrfToken();
   const headers = {
     'X-CSRFToken': csrfToken
@@ -72,6 +72,7 @@ export async function postWithCsrfToken(endpoint: string, data: FormData): Promi
 
   const response = await fetch(endpoint, {
     method: 'POST',
+    credentials: "include",
     headers,
     body: data
   });
@@ -79,7 +80,7 @@ export async function postWithCsrfToken(endpoint: string, data: FormData): Promi
   return response;
 }
 
-export async function putWithCsrfToken(endpoint: string, data: FormData): Promise<Response> {
+export async function putWithCsrfToken(endpoint: string, data: any): Promise<Response> {
   const csrfToken = await getCsrfToken();
   const headers = {
     'X-CSRFToken': csrfToken
@@ -87,6 +88,7 @@ export async function putWithCsrfToken(endpoint: string, data: FormData): Promis
 
   const response = await fetch(endpoint, {
     method: 'PUT',
+    credentials: "include",
     headers,
     body: data
   });
@@ -94,7 +96,7 @@ export async function putWithCsrfToken(endpoint: string, data: FormData): Promis
   return response;
 }
 
-export async function deleteWithCsrfToken(endpoint: string): Promise<Response> {
+export async function deleteWithCsrfToken(endpoint: string, data: any): Promise<Response> {
   const csrfToken = await getCsrfToken();
   const headers = {
     'X-CSRFToken': csrfToken,
@@ -102,7 +104,9 @@ export async function deleteWithCsrfToken(endpoint: string): Promise<Response> {
 
   const response = await fetch(endpoint, {
     method: 'DELETE',
-    headers
+    credentials: "include",
+    headers,
+    body: data
   });
 
   return response;

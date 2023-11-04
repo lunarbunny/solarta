@@ -1,4 +1,5 @@
 import { API_URL } from '@/types';
+import { deleteWithCsrfToken } from '@/utils';
 import { Button, Divider, Flex, FormControl, FormLabel, Heading, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, useDisclosure } from '@chakra-ui/react';
 import router from 'next/router';
 import React, { FormEvent, useState } from 'react';
@@ -23,11 +24,7 @@ const AccountManagement: React.FC = () => {
     formData.append("password", confirmPwdForm.password);
     formData.append("mfa", confirmPwdForm.otp);
 
-    const res = await fetch(`${API_URL}/user/delete`, {
-      method: "DELETE",
-      body: formData,
-      credentials: "include",
-    });
+    const res = await deleteWithCsrfToken(`${API_URL}/user/delete`, formData);
 
     if (res.ok) {
       router.push("/auth");

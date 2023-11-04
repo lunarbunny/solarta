@@ -2,7 +2,7 @@ import AccountManagement from "@/components/Auth/AccountManagement";
 import LibrarySection from "@/components/Library/LibrarySection";
 import useAuth from "@/hooks/useAuth";
 import { API_URL } from "@/types";
-import { validateDescription, validateName, validatePwd } from "@/utils";
+import { postWithCsrfToken, validateDescription, validateName, validatePwd } from "@/utils";
 import {
   Box,
   Button,
@@ -111,11 +111,7 @@ const AccountPage: NextPage = () => {
 
     if (!confirm("Are you sure you want to update your profile?")) return;
 
-    const res = await fetch(`${API_URL}/user/update`, {
-      method: "POST",
-      body: formData,
-      credentials: "include",
-    });
+    const res = await postWithCsrfToken(`${API_URL}/user/update`, formData);
 
     if (res.ok) {
       router.reload();

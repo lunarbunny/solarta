@@ -14,7 +14,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { API_URL, Album, Genre, Music } from "@/types";
 import useFetch from "@/hooks/useFetch";
-import { dateToYear, validateName } from "@/utils";
+import { dateToYear, postWithCsrfToken, validateName } from "@/utils";
 import { useRouter } from "next/router";
 
 type Props = {
@@ -118,11 +118,7 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
     formData.append("albumId", uploadForm.albumId);
     formData.append("music_file", uploadForm.music_file as File);
 
-    const res = await fetch(`${API_URL}/music/create`, {
-      method: "POST",
-      body: formData,
-      credentials: 'include',
-    });
+    const res = await postWithCsrfToken(`${API_URL}/music/create`, formData);
 
     if (res.ok) {
       router.push(`/album/${uploadForm.albumId}`);

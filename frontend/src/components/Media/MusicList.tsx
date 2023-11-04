@@ -11,6 +11,7 @@ import MusicItem from "./MusicItem";
 import { useSetRecoilState } from "recoil";
 import { musicPlayerAtom } from "@/atoms/musicPlayer";
 import { FiTrash } from "react-icons/fi";
+import { deleteWithCsrfToken } from "@/utils";
 
 type Props = {
   items: Music[] | null;
@@ -63,10 +64,7 @@ const MusicList: React.FC<Props> = ({ items, editable }) => {
     }
 
     // DELETE /music/:id
-    let res = await fetch(`${API_URL}/music/delete/${m.id}`, {
-      method: "DELETE",
-      credentials: "include",
-    })
+    let res = await deleteWithCsrfToken(`${API_URL}/music/delete/${m.id}`, null);
 
     if (res.ok) {
       // Remove the music from the playlist

@@ -14,7 +14,7 @@ import { useState } from "react";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { BiTime } from "react-icons/bi";
 import { FiInfo } from "react-icons/fi";
-import { formatDate, durationToTime } from "../utils";
+import { formatDate, durationToTime, postWithCsrfToken } from "../utils";
 import { useRouter } from "next/router";
 import useFetch from "@/hooks/useFetch";
 import AddMusicTable from "../components/Media/AddMusicTable";
@@ -33,11 +33,7 @@ const CreatePlayListPage: NextPage = () => {
     formData.append("title", playlistTitle);
     formData.append("description", playlistDesc);
 
-    const response = await fetch(`${API_URL}/playlist/create`, {
-      method: "POST",
-      body: formData,
-      credentials: "include",
-    });
+    const response = await postWithCsrfToken(`${API_URL}/playlist/create`, formData);
 
     if (response.ok) {
       location.replace("/");
