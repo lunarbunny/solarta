@@ -133,7 +133,7 @@ def user_search_by_name(name):
 # Update user profile
 @user_bp.route("/update", methods=["POST"])
 def update():
-    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
     
     with Session() as session:
@@ -199,7 +199,7 @@ def update():
 # Register a new user
 @user_bp.route("/register", methods=["POST"])
 def register():
-    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
     
     with Session() as session:
@@ -267,7 +267,7 @@ def onboarding(token):
 # Login with email, password and OTP
 @user_bp.route("/login", methods=["POST"])
 def login():
-    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
     
     with Session() as session:
@@ -369,7 +369,7 @@ def authenticated():
 # Request password reset email
 @user_bp.route("/reset", methods=["POST"])
 def request_reset_password():
-    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
     
     with Session() as session:
@@ -410,7 +410,7 @@ def request_reset_password():
 # Reset password and MFA
 @user_bp.route("/reset/<string:token>", methods=["POST"])
 def reset_password(token):
-    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
     
     with Session() as session:
@@ -470,7 +470,7 @@ def logout():
 # Allow admin to ban an account
 @user_bp.route("/<int:id>/ban", methods=["PUT"])
 def user_ban_by_id(id):
-    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
     
     with Session() as session:
@@ -489,7 +489,7 @@ def user_ban_by_id(id):
 # Allow admin to unban an account
 @user_bp.route("/<int:id>/unban", methods=["PUT"])
 def user_unban_by_id(id):
-    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
     
     with Session() as session:
@@ -512,7 +512,7 @@ def user_unban_by_id(id):
 # Allow user to delete their own account
 @user_bp.route('/delete', methods=["DELETE"])
 def user_delete():
-    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
     
     with Session() as session:

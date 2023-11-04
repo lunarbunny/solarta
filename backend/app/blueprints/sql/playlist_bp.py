@@ -12,7 +12,7 @@ playlist_bp = Blueprint("playlist_bp", __name__)
 # Delete a playlist
 @playlist_bp.route("/<int:id>/delete", methods=["DELETE"])
 def playlist_delete(id):
-    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
     
     with Session() as session:
@@ -44,7 +44,7 @@ def playlist_delete(id):
 # Create a playlist
 @playlist_bp.route("/create", methods=["POST"])
 def playlist_create():
-    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
     
     with Session() as session:
@@ -87,7 +87,7 @@ def playlist_create():
 # Add/Delete songs in playlist
 @playlist_bp.route("/playlist=<int:idPlaylist>/music=<int:idMusic>", methods=["POST", "DELETE"])
 def playlist_modify_song(idPlaylist, idMusic):
-    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
     
     with Session() as session:
@@ -130,7 +130,7 @@ def playlist_modify_song(idPlaylist, idMusic):
 # Update a playlist (title and/or description)
 @playlist_bp.route("/<int:id>/update", methods=["PUT"])
 def playlist_update(id):
-    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
     
     with Session() as session:

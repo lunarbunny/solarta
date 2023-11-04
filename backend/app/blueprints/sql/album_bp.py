@@ -11,7 +11,7 @@ album_bp = Blueprint("album_bp", __name__)
 # Create a new album entry
 @album_bp.route("/create", methods=["POST"])
 def album_create():
-    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
     
     with Session() as session:
@@ -57,7 +57,7 @@ def album_create():
 # Delete an album entry
 @album_bp.route("/<int:idAlbum>/delete", methods=["DELETE"])
 def album_delete(idAlbum):
-    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
     
     with Session() as session:
