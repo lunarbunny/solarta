@@ -1,12 +1,15 @@
 # Create Flask app
 from flask import Flask, jsonify
+from flask_wtf.csrf import CSRFProtect, generate_csrf
 from flask_cors import CORS
-from helpers import is_debug_mode, music_get_max_size, generate_csrf_token
+from helpers import is_debug_mode, music_get_max_size
 import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv("WTF_CSRF_SECRET_KEY")
+csrf = CSRFProtect(app)
 app.config['MAX_CONTENT_LENGTH'] = music_get_max_size()
+app.config['SECRET_KEY'] = os.getenv("WTF_CSRF_SECRET_KEY")
+csrf.init_app(app)
 
 CORS(app, supports_credentials=True) # Allow CORS for all endpoints
 
@@ -26,7 +29,7 @@ app.register_blueprint(user_bp, url_prefix="/user")
 # Base endpoints
 @app.route("/csrf_token", methods=["GET"])
 def get_csrf_token():
-    token = generate_csrf_token()
+    token = generate_csrf()
     return jsonify({ 'token': token })
 
 @app.route("/")

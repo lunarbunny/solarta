@@ -1,5 +1,6 @@
 import time
-from flask import Blueprint, jsonify, request, make_response, session as flask_session
+from flask import Blueprint, jsonify, request, make_response
+from flask_wtf.csrf import validate_csrf
 from markupsafe import escape
 from validation import clean_text, validate_desc, validate_email, validate_mfa, validate_name, validate_password
 
@@ -218,8 +219,7 @@ def register():
     if not csrf_token:
         return helpers.nachoneko(), 400
 
-    if helpers.validate_csrf_token(csrf_token):
-        return "Skill issue", 403
+    # TODO: Validate CSRF session token
 
     with Session() as session:
         try:

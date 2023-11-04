@@ -1,16 +1,14 @@
-from flask import session
 from argon2 import PasswordHasher
-from models.User import User
-from sendgrid.helpers.mail import *
-from secrets import token_urlsafe
-from itsdangerous import URLSafeTimedSerializer
-from dotenv import load_dotenv
-import eyed3
-import sys
 import os
 import sendgrid
 import pyotp
 import time
+from models.User import User
+from sendgrid.helpers.mail import *
+from itsdangerous import URLSafeTimedSerializer
+from dotenv import load_dotenv
+import eyed3
+import sys
 
 load_dotenv()
 
@@ -42,17 +40,6 @@ def music_strip_tags_and_get_metadata(path):
 def music_get_max_size():
     # 10 MB
     return 10 * 1024 * 1024
-
-def generate_csrf_token():
-    if 'csrf_token' not in session:
-        session['csrf_token'] = token_urlsafe(32)
-    return session['csrf_token']
-
-
-def validate_csrf_token(token) -> bool:
-    if 'csrf_token' not in session:
-        return False
-    return session['csrf_token'] == token
 
 
 def hash_password(password):
