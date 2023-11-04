@@ -56,6 +56,8 @@ def verify_password_hash(hash, password):
     except:
         return False
 
+def is_timestamp_within(timestamp, seconds):
+    return int(time.time()) - timestamp < seconds
 
 def generate_onboarding_token(email):
     return serializer.dumps(email, salt=os.getenv("ONBOARDING_SALT"))

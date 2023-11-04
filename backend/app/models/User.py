@@ -15,12 +15,16 @@ class User(Base):
     sessionId: Mapped[str] = mapped_column(String(86), nullable=True)
     sessionExpiry: Mapped[int] = mapped_column(Integer, nullable=True)
     about: Mapped[str] = mapped_column(String(255), nullable=True)
+    lastLoginAttempt: Mapped[int] = mapped_column(Integer, nullable=True)
+    loginAttempts: Mapped[int] = mapped_column(Integer, nullable=False)
+    lastResetAttempt: Mapped[int] = mapped_column(Integer, nullable=True)
+    resetAttempts: Mapped[int] = mapped_column(Integer, nullable=False)
 
     albums = relationship('Album', backref='User')
     musics = relationship('Music', backref='User')
     playlists = relationship('Playlist', backref='User')
 
-    def __init__(self, name, email, hashPwd, status, roleId, mfaSecret, sessionId, sessionExpiry, about):
+    def __init__(self, name, email, hashPwd, status, roleId, mfaSecret, sessionId, sessionExpiry, about, lastLoginAttempt=None, loginAttempts=0, lastResetAttempt=None, resetAttempts=0):
         self.name = name
         self.email = email
         self.hashPwd = hashPwd
@@ -30,3 +34,7 @@ class User(Base):
         self.sessionId = sessionId
         self.sessionExpiry = sessionExpiry
         self.about = about
+        self.lastLoginAttempt = lastLoginAttempt
+        self.loginAttempts = loginAttempts
+        self.lastResetAttempt = lastResetAttempt
+        self.resetAttempts = resetAttempts
