@@ -327,7 +327,7 @@ def login():
                                 secure=True,
                                 httponly=True,
                                 samesite='strict',
-                                domain="nisokkususu.com")
+                                domain="solarta.nisokkususu.com")
 
             return response
 
