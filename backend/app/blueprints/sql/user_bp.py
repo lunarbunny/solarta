@@ -308,7 +308,7 @@ def login():
                                 expires=cookie_expiry,
                                 secure=True,
                                 httponly=True,
-                                samesite=None,
+                                samesite='strict',
                                 domain="nisokkususu.com")
 
             return response
