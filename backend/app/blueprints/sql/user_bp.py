@@ -417,7 +417,7 @@ def logout():
             session.commit()
 
             response = make_response("ok")
-            response.set_cookie("SESSIONID", value="", expires=0)
+            response.set_cookie("SESSIONID", value="", expires=0, httponly=True, secure=True)
 
             return response
         except Exception as e:
