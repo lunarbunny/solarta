@@ -48,7 +48,10 @@ def music_create():
             filename = f"{ownerId:06}-{secure_filename(filename)[:28]}{ext}"
             save_dir = helpers.music_get_save_dir()
             save_path = os.path.join(save_dir, filename)
-            
+
+            if os.path.commonprefix((os.path.realpath(save_path), save_dir)) != save_dir:
+                return 'Invalid file name', 400
+
             music_file.save(save_path)
             meta = helpers.music_strip_tags_and_get_metadata(save_path)
             if meta is None:
