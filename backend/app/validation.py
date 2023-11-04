@@ -1,4 +1,7 @@
+from passwordstrength.passwordmeter import PasswordStrength
 import re
+
+REQUIRED_PASSWORD_STRENGTH = 150
 
 # Remove characters except alphanumberic, space, and common punctuations.
 ptn_text = re.compile(r'[^0-9A-Za-z .,?!\'\"]+')
@@ -32,8 +35,18 @@ def validate_email(email: str):
 def validate_password(pwd: str, check_complexity: bool = True):
     if pwd is None or pwd == '':
         return False, 'Password is required.'
-    if check_complexity and (len(pwd) < 12 or pwd.isspace()):
-        return False, 'Password does not meet complexity requirements. (Minimum 12 characters)'
+
+    if not check_complexity:
+        return True, None
+
+    if len(pwd) < 12:
+        return False, 'Password needs to be more than 12 characters.'
+
+    strength = PasswordStrength(pwd).strength()
+    if strength < REQUIRED_PASSWORD_STRENGTH:
+        percentage = int(strength / REQUIRED_PASSWORD_STRENGTH * 100)
+        return False, f"Password is {percentage}% of the required complexity."
+
     return True, None
 
 def validate_mfa(mfa: str):
