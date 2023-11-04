@@ -287,12 +287,12 @@ def login():
             if not helpers.verify_password_hash(user.hashPwd, password):
                 return helpers.nachoneko(), 401
 
-            sessionId = None
-            if user.sessionId is None:
-                sessionId = helpers.generate_session()
-                user.sessionId = helpers.hash_session_id(sessionId)
-
+            # Generate session id and set cookie expiry
+            sessionId = helpers.generate_session()
             cookie_expiry = helpers.set_cookie_expiry()
+
+            # Store hashed session id and expiry in database
+            user.sessionId = helpers.hash_session_id(sessionId)
             user.sessionExpiry = cookie_expiry
             session.commit()
 
