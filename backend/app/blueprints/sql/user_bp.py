@@ -296,7 +296,7 @@ def login():
                                 value=sessionId,
                                 max_age=None,
                                 expires=cookie_expiry,
-                                secure=False,
+                                secure=True,
                                 httponly=True,
                                 samesite=None,
                                 domain="nisokkususu.com")
