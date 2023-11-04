@@ -12,7 +12,7 @@ import sys
 
 load_dotenv()
 
-is_debug_mode = True
+is_debug_mode = os.getenv("DEBUG") is not None
 argon_hasher = PasswordHasher()
 sg = sendgrid.SendGridAPIClient(api_key=os.getenv("SENDGRID_API_KEY"))
 serializer = URLSafeTimedSerializer(secret_key=os.getenv("URL_SIGN_SECRET"))

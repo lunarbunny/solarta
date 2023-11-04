@@ -28,8 +28,8 @@ def playlist_delete(id):
         except Exception as e:
             session.rollback()
             if helpers.is_debug_mode:
-                return str(e), 400
-            return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 
 # Create a playlist
@@ -56,8 +56,8 @@ def playlist_create():
         except Exception as e:
             session.rollback()
             if helpers.is_debug_mode:
-                return str(e), 400
-            return "Failed to create playlist", 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 
 # Add/Delete songs in playlist
@@ -92,8 +92,8 @@ def playlist_modify_song(idPlaylist, idMusic):
         except Exception as e:
             session.rollback()
             if helpers.is_debug_mode:
-                return str(e), 400
-            return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 
 # Update a playlist (title and/or description)
@@ -111,10 +111,12 @@ def playlist_update(id):
                 session.commit()
                 return "OK", 200
             else:
-                return "", 404
-        except:
+                return "Not found", 404
+        except Exception as e:
             session.rollback()
-            return "", 400
+            if helpers.is_debug_mode:
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 
 # Retrieve all music not added into current playlist
@@ -144,8 +146,8 @@ def playlist_retrieve_notadded_music(idPlaylist):
                 return "Not found", 404
         except Exception as e:
             if helpers.is_debug_mode:
-                return str(e), 400
-            return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 
 # Retrieve all music based on Playlist ID
@@ -175,8 +177,8 @@ def playlist_retrieve_all_music(idPlaylist):
                 return "Not found", 404
         except Exception as e:
             if helpers.is_debug_mode:
-                return str(e), 400
-            return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 
 # Retrieve all playlists of a user
@@ -206,8 +208,10 @@ def playlist_retrieve_user():
                 ),
                 200,
             )
-        except:
-            return "", 400
+        except Exception as e:
+            if helpers.is_debug_mode:
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 
 # Retrieve a certain playlist
@@ -230,5 +234,7 @@ def playlist_retrieve_details(idPlaylist):
                 )
             else:
                 return "Playlist not found.", 404
-        except:
-            return "Error occured when retrieving playlist.", 400
+        except Exception as e:
+            if helpers.is_debug_mode:
+                return str(e), 500
+            return helpers.nachoneko(), 500

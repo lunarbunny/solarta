@@ -23,7 +23,7 @@ def album_create():
             title = data.get("title", None)
             releaseDateStr = data.get("releaseDate", None) # Format: YYYY-MM-DD
             description = data.get("description", None) # Optional
-            imageUrl = data.get("imageUrl", None) # Optional
+            # imageUrl = data.get("imageUrl", None) # Optional
 
             title = clean_text(title)
             title_valid, title_error = validate_name(title)
@@ -34,17 +34,19 @@ def album_create():
                 description = clean_text(description)
 
             if releaseDateStr is None:
-                return "Missing parameters", 400
+                return "Release date is required", 400
             releaseDate = datetime.strptime(releaseDateStr, "%Y-%m-%d")
 
-            new_album = Album(title, releaseDate, ownerId, imageUrl, description)
+            new_album = Album(title, releaseDate, ownerId, None, description)
 
             session.add(new_album)
             session.commit()
             return jsonify({ 'id': new_album.id }), 201
-        except:
+        except Exception as e:
             session.rollback()
-            return "Error occured", 400
+            if helpers.is_debug_mode:
+                return str(e), 500
+            return helpers.nachoneko(), 500
         
 # Delete an album entry
 @album_bp.route("/<int:idAlbum>/delete", methods=["DELETE"])
@@ -67,7 +69,9 @@ def album_delete(idAlbum):
                 return "Album not found", 404
         except Exception as e:
             session.rollback()
-            return "Error occured", 400
+            if helpers.is_debug_mode:
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 # Retrieve all music based on Album ID
 @album_bp.route("/<int:idAlbum>/music", methods=["GET"])
@@ -88,7 +92,9 @@ def album_retrieve_all_music(idAlbum):
             else:
                 return 'No album with specified ID.', 404
         except Exception as e:
-            return 'Error occured', 400
+            if helpers.is_debug_mode:
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 # Retrieve all albums that belong to an artist
 @album_bp.route("/artist=<int:ownerId>", methods=["GET"])
@@ -109,7 +115,9 @@ def album_by_artist(ownerId):
             else:
                 return 'No such artist', 404
         except Exception as e:
-            return 'Error occured while retriving artist', 400
+            if helpers.is_debug_mode:
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 # Retrieve a specific album
 @album_bp.route("/<int:idAlbum>", methods=["GET"])
@@ -130,7 +138,9 @@ def album_retrieve(idAlbum):
             else:
                 return 'Album not found.', 404
         except Exception as e:
-            return 'Error occured when retrieving album.', 400
+            if helpers.is_debug_mode:
+                return str(e), 500
+            return helpers.nachoneko(), 500
         
 # Retrive top 3 albums based on number of music
 @album_bp.route("/top3", methods=["GET"])
@@ -147,8 +157,10 @@ def album_retrieve_top3():
                 "ownerName": ownerName,
                 "description": album.description
             } for album, ownerName in albums]), 200
-        except:
-            return 'Error occured when retrieving album.', 400
+        except Exception as e:
+            if helpers.is_debug_mode:
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 # Retrieve albums owned by caller
 @album_bp.route("/mine", methods=["GET"])
@@ -172,9 +184,11 @@ def album_retrieve_mine():
                     "description": album.description
                 } for album, ownerName in albums]), 200
             else:
-                return '', 404
-        except:
-            return '', 400
+                return 'Not found', 404
+        except Exception as e:
+            if helpers.is_debug_mode:
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 # Retrieve all albums
 @album_bp.route("/", methods=["GET"])
@@ -191,6 +205,8 @@ def album_retrieve_all():
                 "ownerName": ownerName,
                 "description": album.description
             } for album, ownerName in albums]), 200
-        except:
-            return 'Error occured when retrieving album.', 400
+        except Exception as e:
+            if helpers.is_debug_mode:
+                return str(e), 500
+            return helpers.nachoneko(), 500
     

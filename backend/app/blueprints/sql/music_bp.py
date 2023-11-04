@@ -65,8 +65,8 @@ def music_create():
         except Exception as e:
             session.rollback()
             if helpers.is_debug_mode:
-                return str(e), 400
-            return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
         
 # Delete music, and remove from all playlists and albums
 @music_bp.route("/delete/<int:id>", methods=["DELETE"])
@@ -87,8 +87,8 @@ def music_delete_id(id):
         except Exception as e:
             session.rollback()
             if helpers.is_debug_mode:
-                return str(e), 400
-            return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 # Retrieve all music that matches (substring of) search
 @music_bp.route("/search=<string:title>", methods=["GET"])
@@ -108,8 +108,8 @@ def music_search_string(title):
                 return 'Not found', 404
         except Exception as e:
             if helpers.is_debug_mode:
-                return str(e), 400
-            return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 # Retrieve music file based on ID
 @music_bp.route("/play/<int:id>", methods=["GET"])
@@ -123,8 +123,8 @@ def music_play_id(id):
                 return 'Not found', 404
         except Exception as e:
             if helpers.is_debug_mode:
-                return str(e), 400
-            return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
         
 # Retrieve top 10 music
 @music_bp.route("/trending", methods=["GET"])
@@ -145,8 +145,8 @@ def music_retrieve_trending():
                 return 'Not found', 404
         except Exception as e:
             if helpers.is_debug_mode:
-                return str(e), 400
-            return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
         
 # Retrieve music owned by caller
 @music_bp.route("/mine", methods=["GET"])
@@ -173,8 +173,8 @@ def music_retrieve_mine():
                 return 'Not found', 404
         except Exception as e:
             if helpers.is_debug_mode:
-                return str(e), 400
-            return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 # Retrieve all music
 @music_bp.route("/", methods=["GET"])
@@ -192,6 +192,6 @@ def music_retrieve_all():
             } for music, owner_name, album_name in musics]), 200
         except Exception as e:
             if helpers.is_debug_mode:
-                return str(e), 400
-            return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
     

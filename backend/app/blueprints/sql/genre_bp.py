@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify
 from ..__init__ import Session, Genre
+import helpers
 
 genre_bp = Blueprint("genre_bp", __name__)
 
@@ -13,6 +14,8 @@ def genre_retrieve_all():
                 "id": genre.id,
                 "name": genre.name
             } for genre in genres]), 200
-        except:
-            return '', 400
+        except Exception as e:
+            if helpers.is_debug_mode:
+                return str(e), 500
+            return helpers.nachoneko(), 500
     

@@ -8,7 +8,7 @@ import helpers
 user_bp = Blueprint("user_bp", __name__)
 
 
-# Retrieve all users (also artists)
+# Retrieve all users (every normal user is an artist)
 @user_bp.route("/", methods=["GET"])
 def user_retrieve_all():
     with Session() as session:
@@ -21,8 +21,10 @@ def user_retrieve_all():
                 "about": user.about,
             } for user in users]
             return jsonify(result), 200
-        except:
-            return "", 400
+        except Exception as e:
+            if helpers.is_debug_mode:
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 # Retrieve all users with email and account status (for admin)
 @user_bp.route("/full", methods=["GET"])
@@ -43,17 +45,20 @@ def user_retrieve_all_full():
                 "about": user.about,
                 "email": user.email,
                 "status": user.status,
+                "admin": True if user.roleId == 1 else False,
             } for user in users]
             return jsonify(result), 200
-        except:
-            return "", 400
+        except Exception as e:
+            if helpers.is_debug_mode:
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 # Retrieve user by id
 @user_bp.route("/<int:id>", methods=["GET"])
 def user_retrieve_by_id(id):
     with Session() as session:
         try:
-            user = session.query(User).filter(User.id == id).first()
+            user = session.query(User).get(id)
             if user is None:
                 return "", 404
             return (
@@ -66,8 +71,10 @@ def user_retrieve_by_id(id):
                 ),
                 200,
             )
-        except:
-            return "", 400
+        except Exception as e:
+            if helpers.is_debug_mode:
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 
 # Retrive top 3 users (artists)
@@ -75,7 +82,7 @@ def user_retrieve_by_id(id):
 def user_retrieve_top3():
     with Session() as session:
         try:
-            users = session.query(User).filter(User.roleId != 1).order_by(User.id.desc()).limit(3).all()
+            users = session.query(User).filter(User.roleId == 2).order_by(User.id.desc()).limit(3).all()
             return (
                 jsonify(
                     [
@@ -89,8 +96,10 @@ def user_retrieve_top3():
                 ),
                 200,
             )
-        except:
-            return "", 400
+        except Exception as e:
+            if helpers.is_debug_mode:
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 
 # Retrieve all users that matches (substring of) search by name
@@ -115,8 +124,8 @@ def user_search_by_name(name):
                 return 'Not found', 404
         except Exception as e:
             if helpers.is_debug_mode:
-                return str(e), 400
-            return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 
 # Update user profile
@@ -178,9 +187,8 @@ def update():
         except Exception as e:
             session.rollback()
             if helpers.is_debug_mode:
-                return str(e), 400
-            else:
-                return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 
 # Register a new user
@@ -214,13 +222,12 @@ def register():
             session.add(newUser)
             session.commit()
             helpers.send_onboarding_email(name, email)
-            return "ok!", 200
+            return "Created", 201
         except Exception as e:
             session.rollback()
             if helpers.is_debug_mode:
-                return str(e), 400
-            else:
-                return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 # Verify email and setup MFA
 @user_bp.route("/onboarding/<string:token>", methods=["GET"])
@@ -241,9 +248,8 @@ def onboarding(token):
         except Exception as e:
             session.rollback()
             if helpers.is_debug_mode:
-                return str(e), 400
-            else:
-                return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 
 # Login with email, password and OTP
@@ -306,9 +312,8 @@ def login():
         except Exception as e:
             session.rollback()
             if helpers.is_debug_mode:
-                return str(e), 400
-            else:
-                return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 
 # Check if user is authenticated
@@ -357,9 +362,8 @@ def request_reset_password():
             return "ok!", 200
         except Exception as e:
             if helpers.is_debug_mode:
-                return str(e), 400
-            else:
-                return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 
 # Reset password and MFA
@@ -392,9 +396,8 @@ def reset_password(token):
         except Exception as e:
             session.rollback()
             if helpers.is_debug_mode:
-                return str(e), 400
-            else:
-                return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 # Log out from application
 @user_bp.route("/logout", methods=["GET"])
@@ -416,9 +419,8 @@ def logout():
         except Exception as e:
             session.rollback()
             if helpers.is_debug_mode:
-                return str(e), 400
-            else:
-                return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 
 # Allow admin to ban an account
@@ -434,8 +436,8 @@ def user_ban_by_id(id):
             return "OK", 200
         except Exception as e:
             if helpers.is_debug_mode:
-                return str(e), 400
-            return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 # Allow admin to unban an account
 @user_bp.route("/<int:id>/unban", methods=["PUT"])
@@ -454,8 +456,8 @@ def user_unban_by_id(id):
             return "OK", 200
         except Exception as e:
             if helpers.is_debug_mode:
-                return str(e), 400
-            return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
 
 # Allow user to delete their own account
 @user_bp.route('/delete', methods=["DELETE"])
@@ -490,6 +492,6 @@ def user_delete():
                 return helpers.nachoneko(), 405
         except Exception as e:
             if helpers.is_debug_mode:
-                return str(e), 400
-            return helpers.nachoneko(), 400
+                return str(e), 500
+            return helpers.nachoneko(), 500
         
