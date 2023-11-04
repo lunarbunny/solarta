@@ -11,11 +11,11 @@ const ArtistDetailPage: NextPage = () => {
   const router = useRouter();
   const { data: artist } = useFetch<Artist>(
     `${API_URL}/user/${router.query.id}`,
-    { usesRouter: true }
+    { includeCred: true }
   );
   const { data: artistAlbums } = useFetch<Album[]>(
     `${API_URL}/album/artist=${router.query.id}`,
-    { usesRouter: true }
+    { includeCred: true }
   );
 
   if (!artist) {

@@ -46,12 +46,12 @@ const PlaylistPage: NextPage = () => {
   const { user, loading } = useAuth();
   const { data: playlist } = useFetch<Playlist>(
     `${API_URL}/playlist/${router.query.id}`,
-    { usesRouter: true }
+    { includeCred: true }
   );
 
   const { data: playlistMusic } = useFetch<Music[]>(
     `${API_URL}/playlist/${router.query.id}/music`,
-    { usesRouter: true }
+    { includeCred: true }
   );
 
   const [playlistName, setPlaylistName] = useState("");
@@ -72,7 +72,7 @@ const PlaylistPage: NextPage = () => {
   console.log(playlistSongs);
   const [addSongs, setAddSongs] = useState(false);
   const { data: notAddedMusic } = useFetch<Music[]>(`${API_URL}/playlist/${router.query.id}/music/notadded`, {
-    usesRouter: true,
+    includeCred: true,
   });
   const {
     isOpen: isEditOpen,
