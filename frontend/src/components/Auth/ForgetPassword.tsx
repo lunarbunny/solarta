@@ -40,6 +40,8 @@ const ForgetPassword: React.FC<Props> = ({ onLoginClick }) => {
 
     if (res.ok) {
       setError('An email with the password reset link has been sent.');
+    } else if (res.status == 418) {
+      setError('You have requested too many reset requests, please try again later.');
     }
   }
 

@@ -1,3 +1,4 @@
+import time
 from flask import Blueprint, jsonify, request, make_response
 from markupsafe import escape
 from validation import clean_text, validate_desc, validate_email, validate_mfa, validate_name, validate_password
@@ -215,13 +216,13 @@ def register():
 
     with Session() as session:
         try:
-            user = session.Query(User).filter(User.email == email).first()
+            user = session.query(User).filter(User.email == email).first()
             if user is not None:
                 return "Email is already taken.", 400
             
             # Fields are valid, proceed to generate user
             hashPwd = helpers.hash_password(password)
-            newUser = User(name, email, hashPwd, status=2, roleId=2, mfaSecret=None, sessionId=None, sessionExpiry=None, about=None)
+            newUser = User(name, email, hashPwd, status=2, roleId=2, mfaSecret=None, sessionId=None, sessionExpiry=None, about=None, lastLoginAttempt=None, loginAttempts=0)
 
             session.add(newUser)
             session.commit()
@@ -284,11 +285,21 @@ def login():
                 return helpers.nachoneko(), 401
             elif user.status == 1: # Banned
                 return helpers.nachoneko(), 403
+            elif user.loginAttempts >= 5 and helpers.is_timestamp_within(user.lastLoginAttempt, 15 * 60): # Too many login attempts
+                return helpers.nachoneko(), 418 # I'm a teapot (account locked for 15 minutes)
 
-            if not helpers.verify_otp(mfa, user.mfaSecret):
-                return helpers.nachoneko(), 401
-
-            if not helpers.verify_password_hash(user.hashPwd, password):
+            mfa_valid = helpers.verify_otp(mfa, user.mfaSecret)
+            pwd_valud = helpers.verify_password_hash(user.hashPwd, password)
+            if not mfa_valid or not pwd_valud:
+                # Update login attempts
+                if user.lastLoginAttempt is None or not helpers.is_timestamp_within(user.lastLoginAttempt, 15 * 60):
+                    # If never attempted login or last login attempt is more than 15 minutes ago, reset login attempts
+                    user.lastLoginAttempt = int(time.time())
+                    user.loginAttempts = 1
+                else:
+                    # If last login attempt is less than 15 minutes ago, increment login attempts
+                    user.loginAttempts += 1
+                session.commit()
                 return helpers.nachoneko(), 401
 
             # Generate session id and set cookie expiry
@@ -362,6 +373,19 @@ def request_reset_password():
             if user is None:
                 return "ok!", 200 # Don't tell user that email is not found
             
+            if user.resetAttempts >= 3 and helpers.is_timestamp_within(user.lastResetAttempt, 15 * 60): # Too many reset attempts
+                return helpers.nachoneko(), 418 # I'm a teapot (reset locked for 15 minutes)
+            
+            # Check if last reset attempt is within 15 minutes
+            if user.lastResetAttempt is None or not helpers.is_timestamp_within(user.lastResetAttempt, 15 * 60):
+                # If never attempted login or last login attempt is more than 15 minutes ago, reset login attempts
+                user.lastResetAttempt = int(time.time())
+                user.resetAttempts = 1
+            else:
+                # If last login attempt is less than 15 minutes ago, increment login attempts
+                user.resetAttempts += 1
+            session.commit()
+
             helpers.send_resetting_email(user.name, email)
             return "ok!", 200
         except Exception as e:

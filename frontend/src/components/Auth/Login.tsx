@@ -1,7 +1,8 @@
-import { Button, FormControl, FormLabel, Input, InputGroup, Text } from '@chakra-ui/react';
+import { Button, FormControl, Input, Text } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import useSignIn from '@/hooks/useSignIn';
 import { validateEmail, validateOTP, validatePwd } from '@/utils';
+import router from 'next/router';
 
 type LoginProps = {
   onRegisterClick: () => void;
@@ -55,7 +56,7 @@ const Login: React.FC<LoginProps> = ({ onRegisterClick, onForgetClick }) => {
 
   useEffect(() => {
     if (loggedIn) {
-      window.location.href = '/';
+      router.push('/');
     }
   }, [loggedIn]);
 
