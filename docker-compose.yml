@@ -44,7 +44,6 @@ services:
             - URL_SIGN_SECRET=${URL_SIGN_SECRET}
             - ONBOARDING_SALT=${ONBOARDING_SALT}
             - RESETTING_SALT=${RESETTING_SALT}
-            - WTF_CSRF_SECRET_KEY=${WTF_CSRF_SECRET_KEY}
         networks:
             - api-db
             - proxy-api

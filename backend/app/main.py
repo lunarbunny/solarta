@@ -8,7 +8,6 @@ import os
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = music_get_max_size()
-app.config['SECRET_KEY'] = os.getenv("WTF_CSRF_SECRET_KEY")
 
 CORS(app, supports_credentials=True) # Allow CORS for all endpoints
 
