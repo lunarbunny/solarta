@@ -64,33 +64,31 @@ async function getCsrfToken() {
   return data.token;
 }
 
-export async function postWithCsrfToken(endpoint: string, data: any): Promise<Response> {
+export async function postWithCsrfToken(endpoint: string, data: FormData): Promise<Response> {
   const csrfToken = await getCsrfToken();
   const headers = {
-    'X-CSRFToken': csrfToken,
-    'Content-Type': 'application/json'
+    'X-CSRFToken': csrfToken
   };
 
   const response = await fetch(endpoint, {
     method: 'POST',
     headers,
-    body: JSON.stringify(data)
+    body: data
   });
 
   return response;
 }
 
-export async function putWithCsrfToken(endpoint: string, data: any): Promise<Response> {
+export async function putWithCsrfToken(endpoint: string, data: FormData): Promise<Response> {
   const csrfToken = await getCsrfToken();
   const headers = {
-    'X-CSRFToken': csrfToken,
-    'Content-Type': 'application/json'
+    'X-CSRFToken': csrfToken
   };
 
   const response = await fetch(endpoint, {
     method: 'PUT',
     headers,
-    body: JSON.stringify(data)
+    body: data
   });
 
   return response;

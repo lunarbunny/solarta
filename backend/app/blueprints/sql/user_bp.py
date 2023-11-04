@@ -1,5 +1,6 @@
 import time
 from flask import Blueprint, jsonify, request, make_response
+from flask_wtf.csrf import validate_csrf
 from markupsafe import escape
 from validation import clean_text, validate_desc, validate_email, validate_mfa, validate_name, validate_password
 
@@ -213,6 +214,12 @@ def register():
     pwd_valid, pwd_error = validate_password(password)
     if not pwd_valid:
         return pwd_error, 400
+    
+    csrf_token = request.headers.get("X-CSRFToken")
+    if not csrf_token:
+        return helpers.nachoneko(), 400
+
+    # TODO: Validate CSRF session token
 
     with Session() as session:
         try:
