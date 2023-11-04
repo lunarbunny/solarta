@@ -43,7 +43,7 @@ def validate_mfa(mfa: str):
         return False, 'MFA is invalid.'
     return True, None
 
-def validate_about(input: str):
+def validate_desc(input: str):
     if input is None:
         return False, 'About is required.'
     if len(input) > 250:

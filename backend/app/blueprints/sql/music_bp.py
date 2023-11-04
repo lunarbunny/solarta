@@ -158,19 +158,16 @@ def music_retrieve_mine():
                 return helpers.nachoneko(), status
 
             ownerId = user.id
-
             musics = session.query(Music, User.name, Album.title).filter(Music.ownerId == ownerId).join(User, Music.ownerId == User.id).join(AlbumMusic, Music.id == AlbumMusic.idMusic).join(Album, AlbumMusic.idAlbum == Album.id).all()
-            if musics:
-                return jsonify([{
-                    "id": music.id,
-                    "title": music.title,
-                    "duration": music.duration,
-                    "genreId": music.genreId,
-                    "ownerName": owner_name,
-                    "albumName": album_name
-                } for music, owner_name, album_name in musics]), 200
-            else:
-                return 'Not found', 404
+            
+            return jsonify([{
+                "id": music.id,
+                "title": music.title,
+                "duration": music.duration,
+                "genreId": music.genreId,
+                "ownerName": owner_name,
+                "albumName": album_name
+            } for music, owner_name, album_name in musics]), 200
         except Exception as e:
             if helpers.is_debug_mode:
                 return str(e), 500

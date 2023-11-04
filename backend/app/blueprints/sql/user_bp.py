@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify, request, make_response
 from markupsafe import escape
-from validation import clean_text, validate_about, validate_email, validate_mfa, validate_name, validate_password
+from validation import clean_text, validate_desc, validate_email, validate_mfa, validate_name, validate_password
 
-from .. import Session, User, Role
+from .. import Session, User
 import helpers
 
 user_bp = Blueprint("user_bp", __name__)
@@ -60,7 +60,7 @@ def user_retrieve_by_id(id):
         try:
             user = session.query(User).get(id)
             if user is None:
-                return "", 404
+                return "Not found", 404
             return (
                 jsonify(
                     {
@@ -155,7 +155,7 @@ def update():
             # Change about
             if about is not None and about != "":
                 about = clean_text(about)
-                about_valid, about_error = validate_about(about)
+                about_valid, about_error = validate_desc(about)
                 if not about_valid:
                     return escape(about_error), 400
                 user.about = about

@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request
 
 from ..__init__ import Session, Album, AlbumMusic, Music, User
 import helpers
-from validation import clean_text, validate_name
+from validation import clean_text, validate_desc, validate_name
 
 album_bp = Blueprint("album_bp", __name__)
 
@@ -32,6 +32,9 @@ def album_create():
 
             if description is not None and description != '':
                 description = clean_text(description)
+                valid_desc, desc_error = validate_desc(description)
+                if not valid_desc:
+                    return desc_error, 400
 
             if releaseDateStr is None:
                 return "Release date is required", 400
@@ -58,15 +61,17 @@ def album_delete(idAlbum):
                 return helpers.nachoneko(), status
 
             album = session.get(Album, idAlbum)
-            if album:
-                if album.ownerId == user.id or user.roleId == 1:
-                    session.delete(album)
-                    session.commit()
-                    return "Deleted", 200
-                else:
-                    return "Unauthorized", 401
-            else:
-                return "Album not found", 404
+            
+            if album is None:
+                return "Not found", 404
+
+            # Only allow deletion if user is admin or owner of album
+            if not (album.ownerId == user.id or user.roleId == 1):
+                return "Unauthorized", 403
+
+            session.delete(album)
+            session.commit()
+            return "Deleted", 200
         except Exception as e:
             session.rollback()
             if helpers.is_debug_mode:
@@ -79,18 +84,20 @@ def album_retrieve_all_music(idAlbum):
     with Session() as session:
         try:
             album = session.get(Album, idAlbum)
-            if album:
-                album_music = session.query(Music, User.name, Album.title).select_from(Music).join(AlbumMusic).filter(AlbumMusic.idAlbum == idAlbum).join(User, User.id == Music.ownerId).join(Album, Album.id == AlbumMusic.idAlbum).all()
-                return jsonify([{
-                    "id": music.id,
-                    "title": music.title,
-                    "duration": music.duration,
-                    "genreId": music.genreId,
-                    "ownerName": owner_name,
-                    "albumName": album_name
-                } for music, owner_name, album_name in album_music]), 200
-            else:
-                return 'No album with specified ID.', 404
+
+            if album is None:
+                return "Not found", 404
+            
+            # Retrieve all music that belongs to this album
+            album_music = session.query(Music, User.name, Album.title).select_from(Music).join(AlbumMusic).filter(AlbumMusic.idAlbum == idAlbum).join(User, User.id == Music.ownerId).join(Album, Album.id == AlbumMusic.idAlbum).all()
+            return jsonify([{
+                "id": music.id,
+                "title": music.title,
+                "duration": music.duration,
+                "genreId": music.genreId,
+                "ownerName": owner_name,
+                "albumName": album_name
+            } for music, owner_name, album_name in album_music]), 200
         except Exception as e:
             if helpers.is_debug_mode:
                 return str(e), 500
@@ -102,18 +109,16 @@ def album_by_artist(ownerId):
     with Session() as session:
         try:
             albums = session.query(Album, User.name).join(User).filter(Album.ownerId == ownerId).all()
-            if albums:
-                return jsonify([{
-                    "id": album.id,
-                    "title": album.title,
-                    "imageUrl": album.imageUrl,
-                    "releaseDate": album.releaseDate,
-                    "ownerId": album.ownerId,
-                    "ownerName": ownerName,
-                    "description": album.description
-                } for album, ownerName in albums]), 200
-            else:
-                return 'No such artist', 404
+            
+            return jsonify([{
+                "id": album.id,
+                "title": album.title,
+                "imageUrl": album.imageUrl,
+                "releaseDate": album.releaseDate,
+                "ownerId": album.ownerId,
+                "ownerName": ownerName,
+                "description": album.description
+            } for album, ownerName in albums]), 200
         except Exception as e:
             if helpers.is_debug_mode:
                 return str(e), 500
@@ -124,19 +129,22 @@ def album_by_artist(ownerId):
 def album_retrieve(idAlbum):
     with Session() as session:
         try:
-            album, ownerName = session.query(Album, User.name).join(User).filter(Album.id == idAlbum).first()
-            if album:
-                return jsonify({
-                    "id": album.id,
-                    "title": album.title,
-                    "imageUrl": album.imageUrl,
-                    "releaseDate": album.releaseDate,
-                    "ownerId": album.ownerId,
-                    "ownerName": ownerName,
-                    "description": album.description
-                }), 200
-            else:
-                return 'Album not found.', 404
+            albumOwner = session.query(Album, User.name).join(User).filter(Album.id == idAlbum).first()
+            
+            if albumOwner is None:
+                return "Not found", 404
+            
+            album, ownerName = albumOwner
+            
+            return jsonify({
+                "id": album.id,
+                "title": album.title,
+                "imageUrl": album.imageUrl,
+                "releaseDate": album.releaseDate,
+                "ownerId": album.ownerId,
+                "ownerName": ownerName,
+                "description": album.description
+            }), 200
         except Exception as e:
             if helpers.is_debug_mode:
                 return str(e), 500
@@ -148,6 +156,7 @@ def album_retrieve_top3():
     with Session() as session:
         try:
             albums = session.query(Album, User.name).join(User).order_by(Album.id.desc()).limit(3).all()
+            
             return jsonify([{
                 "id": album.id,
                 "title": album.title,
@@ -173,18 +182,16 @@ def album_retrieve_mine():
 
             ownerId = user.id
             albums = session.query(Album, User.name).filter(Album.ownerId == ownerId).join(User).all()
-            if albums:
-                return jsonify([{
-                    "id": album.id,
-                    "title": album.title,
-                    "imageUrl": album.imageUrl,
-                    "releaseDate": album.releaseDate,
-                    "ownerId": album.ownerId,
-                    "ownerName": ownerName,
-                    "description": album.description
-                } for album, ownerName in albums]), 200
-            else:
-                return 'Not found', 404
+            
+            return jsonify([{
+                "id": album.id,
+                "title": album.title,
+                "imageUrl": album.imageUrl,
+                "releaseDate": album.releaseDate,
+                "ownerId": album.ownerId,
+                "ownerName": ownerName,
+                "description": album.description
+            } for album, ownerName in albums]), 200
         except Exception as e:
             if helpers.is_debug_mode:
                 return str(e), 500
@@ -196,6 +203,7 @@ def album_retrieve_all():
     with Session() as session:
         try:
             albums = session.query(Album, User.name).join(User).all()
+
             return jsonify([{
                 "id": album.id,
                 "title": album.title,
