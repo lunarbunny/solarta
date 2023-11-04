@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from ..__init__ import Session, Genre
 import helpers
 
@@ -9,6 +9,10 @@ genre_bp = Blueprint("genre_bp", __name__)
 def genre_retrieve_all():
     with Session() as session:
         try:
+            user, status = helpers.check_authenticated(session, request)
+            if user is None:
+                return helpers.nachoneko(), status
+
             genres = session.query(Genre).all()
             return jsonify([{
                 "id": genre.id,

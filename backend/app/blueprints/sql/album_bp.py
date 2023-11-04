@@ -16,6 +16,10 @@ def album_create():
             user, status = helpers.check_authenticated(session, request)
             if user is None:
                 return helpers.nachoneko(), status
+            
+            # Only user can create album
+            if user.roleId != 2:
+                return helpers.nachoneko(), 403
 
             ownerId = user.id
 
@@ -179,6 +183,10 @@ def album_retrieve_mine():
             user, status = helpers.check_authenticated(session, request)
             if user is None:
                 return helpers.nachoneko(), status
+
+            # Only user can retrieve their own albums
+            if user.roleId != 2:
+                return helpers.nachoneko(), 403
 
             ownerId = user.id
             albums = session.query(Album, User.name).filter(Album.ownerId == ownerId).join(User).all()

@@ -24,7 +24,7 @@ def playlist_delete(id):
 
             # Only allow update if user is owner of playlist or admin
             if playlist.ownerId != user.id and user.roleId != 1:
-                return "Unauthorized", 403
+                return helpers.nachoneko(), 403
 
             session.query(PlaylistMusic).filter(PlaylistMusic.idPlaylist == id).delete()
             session.delete(playlist)
@@ -45,6 +45,10 @@ def playlist_create():
             user, status = helpers.check_authenticated(session, request)
             if user is None:
                 return helpers.nachoneko(), status
+            
+            # Only allow users to create playlists
+            if user.roleId != 2:
+                return helpers.nachoneko(), 403
 
             data = request.form
             title = data.get("title", None)
@@ -90,7 +94,7 @@ def playlist_modify_song(idPlaylist, idMusic):
 
             # Only allow if user is admin or owner of playlist or admin
             if playlist.ownerId != user.id and user.roleId != 1:
-                return "Unauthorized", 403
+                return helpers.nachoneko(), 403
 
             if request.method == "POST":
                 music = session.get(Music, idMusic)
@@ -129,11 +133,11 @@ def playlist_update(id):
             playlist = session.get(Playlist, id)
 
             if playlist is None:
-                return "Playlist not found", 404
+                return helpers.nachoneko(), 404
             
             # Only allow if user is owner of playlist or admin
             if playlist.ownerId != user.id and user.roleId != 1:
-                return "Unauthorized", 403
+                return helpers.nachoneko(), 403
 
             data = request.form
             title = data.get("title", None)

@@ -160,6 +160,10 @@ def music_retrieve_mine():
             user, status = helpers.check_authenticated(session, request)
             if user is None:
                 return helpers.nachoneko(), status
+            
+            # Only user can retrieve their own music
+            if user.roleId != 2:
+                return helpers.nachoneko(), 403
 
             ownerId = user.id
             musics = session.query(Music, User.name, Album.title).filter(Music.ownerId == ownerId).join(User, Music.ownerId == User.id).join(AlbumMusic, Music.id == AlbumMusic.idMusic).join(Album, AlbumMusic.idAlbum == Album.id).all()
@@ -186,6 +190,7 @@ def music_retrieve_all():
             if user is None:
                 return helpers.nachoneko(), status
             
+            # Only admin can retrieve all music
             if user.roleId != 1:
                 return helpers.nachoneko(), 403
 
