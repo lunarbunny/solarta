@@ -144,6 +144,15 @@ def generate_otp_qr_string(
     )
 
 
+def verify_csrf(csrf_token):
+    from blueprints.csrf import CSRF
+    if csrf_token is None:
+        return nachoneko(), 400
+
+    if not CSRF().validate(csrf_token):
+        return "Skill issue", 403
+
+
 def verify_otp(token, secret) -> bool:
     return pyotp.totp.TOTP(secret).verify(token, valid_window=1)
 

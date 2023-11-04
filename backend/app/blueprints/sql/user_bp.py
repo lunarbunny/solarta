@@ -1,10 +1,10 @@
 import time
 from flask import Blueprint, jsonify, request, make_response
-from flask_wtf.csrf import validate_csrf
 from markupsafe import escape
 from validation import clean_text, validate_desc, validate_email, validate_mfa, validate_name, validate_password
 
 from .. import Session, User
+from ..csrf import CSRF
 import helpers
 
 user_bp = Blueprint("user_bp", __name__)
@@ -196,33 +196,28 @@ def update():
 # Register a new user
 @user_bp.route("/register", methods=["POST"])
 def register():
-    data = request.form
-    name = data.get("name", None)
-    email = data.get("email", None)
-    password = data.get("password", None)
-    
-    # Validation
-    name = clean_text(name)
-    name_valid, name_error = validate_name(name)
-    if not name_valid:
-        return name_error, 400
-    
-    email_valid, email_error = validate_email(email)
-    if not email_valid:
-        return email_error, 400
-    
-    pwd_valid, pwd_error = validate_password(password)
-    if not pwd_valid:
-        return pwd_error, 400
-    
-    csrf_token = request.headers.get("X-CSRFToken")
-    if not csrf_token:
-        return helpers.nachoneko(), 400
-
-    # TODO: Validate CSRF session token
-
+    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
     with Session() as session:
         try:
+            data = request.form
+            name = data.get("name", None)
+            email = data.get("email", None)
+            password = data.get("password", None)
+            
+            # Validation
+            name = clean_text(name)
+            name_valid, name_error = validate_name(name)
+            if not name_valid:
+                return name_error, 400
+            
+            email_valid, email_error = validate_email(email)
+            if not email_valid:
+                return email_error, 400
+            
+            pwd_valid, pwd_error = validate_password(password)
+            if not pwd_valid:
+                return pwd_error, 400
+    
             user = session.query(User).filter(User.email == email).first()
             if user is not None:
                 return "Email is already taken.", 400
@@ -267,6 +262,7 @@ def onboarding(token):
 # Login with email, password and OTP
 @user_bp.route("/login", methods=["POST"])
 def login():
+    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
     with Session() as session:
         try:
             data = request.form
@@ -311,6 +307,7 @@ def login():
 
             # Generate session id and set cookie expiry
             sessionId = helpers.generate_session()
+            print("SESSION IS BIG BIG " + sessionId)
             cookie_expiry = helpers.set_cookie_expiry()
 
             # Store hashed session id and expiry in database
