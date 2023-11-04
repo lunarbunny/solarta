@@ -51,6 +51,8 @@ services:
         volumes:
             - /var/lib/solarta/assets/music:/assets/music:rw
         read_only: true
+        tmpfs:
+            - /tmp
         cap_drop:
             - ALL
         security_opt:
