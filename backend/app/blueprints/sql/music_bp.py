@@ -177,11 +177,18 @@ def music_retrieve_mine():
                 return str(e), 500
             return helpers.nachoneko(), 500
 
-# Retrieve all music
+# Retrieve all music (for admin)
 @music_bp.route("/", methods=["GET"])
 def music_retrieve_all():
     with Session() as session:
         try:
+            user, status = helpers.check_authenticated(session, request)
+            if user is None:
+                return helpers.nachoneko(), status
+            
+            if user.roleId != 1:
+                return helpers.nachoneko(), 403
+
             musics = session.query(Music, User.name, Album.title).join(User, Music.ownerId == User.id).join(AlbumMusic, Music.id == AlbumMusic.idMusic).join(Album, AlbumMusic.idAlbum == Album.id).all()
             return jsonify([{
                 "id": music.id,
