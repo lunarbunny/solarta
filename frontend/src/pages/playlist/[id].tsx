@@ -39,6 +39,7 @@ import { useRouter } from "next/router";
 import useAuth from "@/hooks/useAuth";
 import AddMusicTable from "../../components/Media/AddMusicTable";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
+import { deleteWithCsrfToken, postWithCsrfToken, putWithCsrfToken } from "@/utils";
 
 const PlaylistPage: NextPage = () => {
   const router = useRouter();
@@ -120,13 +121,7 @@ const PlaylistPage: NextPage = () => {
     formData.append("title", playlistName);
     formData.append("description", playlistDesc);
 
-    const response = await fetch(
-      `${API_URL}/playlist/${router.query.id}/update`,
-      {
-        method: "PUT",
-        body: formData,
-      }
-    );
+    const response = await putWithCsrfToken(`${API_URL}/playlist/${router.query.id}/update`, null);
 
     if (response.ok) {
       location.reload();
@@ -137,13 +132,8 @@ const PlaylistPage: NextPage = () => {
 
   const handlePlaylistDelete = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const response = await fetch(
-      `${API_URL}/playlist/${router.query.id}/delete`,
-      {
-        method: "DELETE",
-        credentials: "include",
-      }
-    );
+    const response = await deleteWithCsrfToken(
+      `${API_URL}/playlist/${router.query.id}/delete`, null);
 
     if (response.ok) {
       location.replace("/");
@@ -160,13 +150,7 @@ const PlaylistPage: NextPage = () => {
     const playlistID: number = Number(router.query.id);
 
     for (let j = 0; j < playlistSongs.length; j++) {
-      const response = await fetch(
-        `${API_URL}/playlist/playlist=${playlistID}/music=${playlistSongs[j]}`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
+      const response = await postWithCsrfToken(`${API_URL}/playlist/playlist=${playlistID}/music=${playlistSongs[j]}`, null);
       if (response.ok) {
       } else {
         console.log(response);

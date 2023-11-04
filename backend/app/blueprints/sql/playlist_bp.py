@@ -41,6 +41,7 @@ def playlist_delete(id):
 # Create a playlist
 @playlist_bp.route("/create", methods=["POST"])
 def playlist_create():
+    print(request.headers.get("X-CSRFToken", None))
     helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
     with Session() as session:
         try:

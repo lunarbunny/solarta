@@ -2,7 +2,7 @@ import React from "react";
 import { useRouter } from "next/router";
 import { API_URL, Music } from "../../types";
 import { Button, Flex, Image, Td, Text } from "@chakra-ui/react";
-import { durationToTime } from "@/utils";
+import { deleteWithCsrfToken, durationToTime } from "@/utils";
 
 type Props = {
   data: Music;
@@ -15,13 +15,7 @@ const MusicTableRow: React.FC<Props> = ({ data, onClick, index }) => {
 
   const handleDeletePlaylistMusic = async () => {
     try {
-      const response = await fetch(
-        `${API_URL}/playlist/playlist=${router.query.id}/music=${data.id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
+      const response = await deleteWithCsrfToken(`${API_URL}/playlist/playlist=${router.query.id}/music=${data.id}`, null);
 
       if (response.ok) {
         location.reload();

@@ -32,7 +32,7 @@ import {
 } from "@chakra-ui/react";
 import { MdAlbum } from "react-icons/md";
 import UserStats from "../components/Admin/UserStats";
-import { durationToTime } from "@/utils";
+import { deleteWithCsrfToken, durationToTime, putWithCsrfToken } from "@/utils";
 import { AiOutlineUser } from "react-icons/ai";
 import { IoMdMusicalNote } from "react-icons/io";
 import { SearchIcon } from "@chakra-ui/icons";
@@ -138,10 +138,7 @@ const AdminPage: NextPage = () => {
   ) => {
     e.preventDefault();
 
-    const response = await fetch(`${API_URL}/music/delete/${selectedSong.id}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
+    const response = await deleteWithCsrfToken(`${API_URL}/music/delete/${selectedSong.id}`, null);
     if (response.ok) {
       location.reload();
     } else {
@@ -152,10 +149,7 @@ const AdminPage: NextPage = () => {
   const handleSubmitUserBan = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const response = await fetch(`${API_URL}/user/${selectedUser.id}/ban`, {
-      method: "PUT",
-      credentials: "include",
-    });
+    const response = await putWithCsrfToken(`${API_URL}/user/${selectedUser.id}/ban`, null);
     if (response.ok) {
       // console.log(response);
       location.reload();
@@ -167,10 +161,7 @@ const AdminPage: NextPage = () => {
   const handleSubmitUserUnban = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const response = await fetch(`${API_URL}/user/${selectedUser.id}/unban`, {
-      method: "PUT",
-      credentials: "include",
-    });
+    const response = await putWithCsrfToken(`${API_URL}/user/${selectedUser.id}/unban`, null);
     if (response.ok) {
       // console.log(response);
       location.reload();

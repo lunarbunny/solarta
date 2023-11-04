@@ -307,7 +307,6 @@ def login():
 
             # Generate session id and set cookie expiry
             sessionId = helpers.generate_session()
-            print("SESSION IS BIG BIG " + sessionId)
             cookie_expiry = helpers.set_cookie_expiry()
 
             # Store hashed session id and expiry in database

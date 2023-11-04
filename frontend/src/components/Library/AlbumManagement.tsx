@@ -3,7 +3,7 @@ import { useState } from "react";
 import { API_URL, Album } from "@/types";
 import AlbumWrap from "../Media/AlbumWrap";
 import { useRouter } from "next/router";
-import { validateDescription, validateName } from "@/utils";
+import { postWithCsrfToken, validateDescription, validateName } from "@/utils";
 
 type Props = {
   albums: Album[],
@@ -65,11 +65,7 @@ const AlbumManagement: React.FC<Props> = ({ albums }) => {
     formData.append('releaseDate', albumForm.releaseDate);
     formData.append('description', albumForm.description);
 
-    const res = await fetch(`${API_URL}/album/create`, {
-      method: 'POST',
-      body: formData,
-      credentials: 'include',
-    });
+    const res = await postWithCsrfToken(`${API_URL}/album/create`, formData);
 
     if (res.ok) {
       let data = await res.json();

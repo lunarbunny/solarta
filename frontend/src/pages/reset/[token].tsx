@@ -1,4 +1,5 @@
 import { API_URL } from "@/types";
+import { postWithCsrfToken } from "@/utils";
 import { Box, Button, Center, Container, Flex, FormControl, FormHelperText, Heading, Input, Text } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Link from "next/link";
@@ -25,10 +26,7 @@ const ResetPasswordPage: NextPage = () => {
     const formData = new FormData();
     formData.append('newPassword', password);
 
-    let res = await fetch(`${API_URL}/user/reset/${resetToken}`, {
-      method: "POST",
-      body: formData,
-    });
+    let res = await postWithCsrfToken(`${API_URL}/user/reset/${resetToken}`, formData);
 
     if (!res.ok) {
       setResetError("Reset password failed, please try requesting another reset email.");
