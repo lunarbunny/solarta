@@ -11,6 +11,7 @@ playlist_bp = Blueprint("playlist_bp", __name__)
 # Delete a playlist
 @playlist_bp.route("/<int:id>/delete", methods=["DELETE"])
 def playlist_delete(id):
+    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
@@ -40,6 +41,7 @@ def playlist_delete(id):
 # Create a playlist
 @playlist_bp.route("/create", methods=["POST"])
 def playlist_create():
+    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
@@ -80,6 +82,7 @@ def playlist_create():
 # Add/Delete songs in playlist
 @playlist_bp.route("/playlist=<int:idPlaylist>/music=<int:idMusic>", methods=["POST", "DELETE"])
 def playlist_modify_song(idPlaylist, idMusic):
+    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
@@ -120,6 +123,7 @@ def playlist_modify_song(idPlaylist, idMusic):
 # Update a playlist (title and/or description)
 @playlist_bp.route("/<int:id>/update", methods=["PUT"])
 def playlist_update(id):
+    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)

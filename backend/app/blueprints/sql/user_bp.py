@@ -133,6 +133,7 @@ def user_search_by_name(name):
 # Update user profile
 @user_bp.route("/update", methods=["POST"])
 def update():
+    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
@@ -363,6 +364,7 @@ def authenticated():
 # Request password reset email
 @user_bp.route("/reset", methods=["POST"])
 def request_reset_password():
+    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
     with Session() as session:
         try:
             data = request.form
@@ -401,6 +403,7 @@ def request_reset_password():
 # Reset password and MFA
 @user_bp.route("/reset/<string:token>", methods=["POST"])
 def reset_password(token):
+    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
     with Session() as session:
         try:
             verify_reset_email = helpers.verify_resetting_email(token)
@@ -458,6 +461,7 @@ def logout():
 # Allow admin to ban an account
 @user_bp.route("/<int:id>/ban", methods=["PUT"])
 def user_ban_by_id(id):
+    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
     with Session() as session:
         try:
             user = session.get(User, id)
@@ -474,6 +478,7 @@ def user_ban_by_id(id):
 # Allow admin to unban an account
 @user_bp.route("/<int:id>/unban", methods=["PUT"])
 def user_unban_by_id(id):
+    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
     with Session() as session:
         try:
             user = session.get(User, id)
@@ -494,6 +499,7 @@ def user_unban_by_id(id):
 # Allow user to delete their own account
 @user_bp.route('/delete', methods=["DELETE"])
 def user_delete():
+    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
