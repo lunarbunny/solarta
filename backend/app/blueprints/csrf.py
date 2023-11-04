@@ -12,9 +12,11 @@ class CSRF:
         return self.token
 
     def validate(self, request_token) -> bool:
-        print("SELF TOKEN IS " + self.token)
-        print("REQUEST TOKEN IS " + request_token)
-        print(self.token == request_token)
         if request_token is None:
             return False
         return self.token == request_token
+    
+    def regenerate_token(cls):
+        if cls._instance is not None:
+            cls._instance.token = token_urlsafe(32)
+        return cls._instance

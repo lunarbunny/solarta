@@ -1,6 +1,7 @@
 # Create Flask app
 from flask import Flask, jsonify
 from flask_cors import CORS
+from apscheduler.schedulers.background  import BackgroundScheduler
 from helpers import is_debug_mode, music_get_max_size
 from blueprints.csrf import CSRF
 import os
@@ -33,6 +34,15 @@ def get_csrf_token():
 @app.route("/")
 def default():
     return "Welcome to ICT3103 SSD"
+
+# Scheduler to regenerate CSRF tokens every 30s
+scheduler = BackgroundScheduler()
+scheduler.start()
+
+def regenerate_csrf_tokens():
+    CSRF().regenerate_token()
+
+scheduler.add_job(regenerate_csrf_tokens, 'interval', seconds=30)
 
 # Run Flask app
 if __name__ == "__main__":
