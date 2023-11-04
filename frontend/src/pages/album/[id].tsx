@@ -23,11 +23,11 @@ const AlbumDetailPage: NextPage = () => {
   const router = useRouter();
   const { data: album } = useFetch<Album>(
     `${API_URL}/album/${router.query.id}`,
-    { includeCred: true },
+    { usesRouter: true },
   );
   const { data: albumMusic } = useFetch<Music[]>(
     `${API_URL}/album/${router.query.id}/music`,
-    { includeCred: true },
+    { usesRouter: true },
   );
 
   const { user } = useAuth();

@@ -1,7 +1,7 @@
 import AlbumCard from "@/components/Media/AlbumCard";
 import useFetch from "@/hooks/useFetch";
 import { API_URL, Album, Artist } from "@/types";
-import { Box, CircularProgress, Divider, Heading, Image, Skeleton, Text, Wrap } from "@chakra-ui/react";
+import { Box, CircularProgress, Divider, Heading, Image, Text, Wrap } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -11,11 +11,11 @@ const ArtistDetailPage: NextPage = () => {
   const router = useRouter();
   const { data: artist } = useFetch<Artist>(
     `${API_URL}/user/${router.query.id}`,
-    { includeCred: true }
+    { usesRouter: true }
   );
   const { data: artistAlbums } = useFetch<Album[]>(
     `${API_URL}/album/artist=${router.query.id}`,
-    { includeCred: true }
+    { usesRouter: true }
   );
 
   if (!artist) {
@@ -45,7 +45,7 @@ const ArtistDetailPage: NextPage = () => {
             color='gray.400'
             fontWeight={300}
             fontSize={'2xl'}>
-            {artistAlbums ? `${artistAlbums.length} albums` : <Skeleton />}
+            {artistAlbums ? `${artistAlbums.length} albums` : '... albums'}
           </Text>
         </Box>
 
