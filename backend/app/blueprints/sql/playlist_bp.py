@@ -2,6 +2,7 @@ from datetime import datetime
 from flask import Blueprint, jsonify, request
 
 from ..__init__ import Session, Playlist, PlaylistMusic, Music, User
+from ..csrf import CSRF
 from validation import clean_text, validate_desc, validate_name
 import helpers
 
@@ -11,7 +12,9 @@ playlist_bp = Blueprint("playlist_bp", __name__)
 # Delete a playlist
 @playlist_bp.route("/<int:id>/delete", methods=["DELETE"])
 def playlist_delete(id):
-    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
+    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+        return "Skill issue", 403
+    
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
@@ -41,8 +44,9 @@ def playlist_delete(id):
 # Create a playlist
 @playlist_bp.route("/create", methods=["POST"])
 def playlist_create():
-    print(request.headers.get("X-CSRFToken", None))
-    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
+    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+        return "Skill issue", 403
+    
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
@@ -83,7 +87,9 @@ def playlist_create():
 # Add/Delete songs in playlist
 @playlist_bp.route("/playlist=<int:idPlaylist>/music=<int:idMusic>", methods=["POST", "DELETE"])
 def playlist_modify_song(idPlaylist, idMusic):
-    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
+    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+        return "Skill issue", 403
+    
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
@@ -124,7 +130,9 @@ def playlist_modify_song(idPlaylist, idMusic):
 # Update a playlist (title and/or description)
 @playlist_bp.route("/<int:id>/update", methods=["PUT"])
 def playlist_update(id):
-    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
+    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+        return "Skill issue", 403
+    
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)

@@ -1,8 +1,8 @@
 from datetime import datetime
-from email import utils
 from flask import Blueprint, jsonify, request
 
 from ..__init__ import Session, Album, AlbumMusic, Music, User
+from ..csrf import CSRF
 import helpers
 from validation import clean_text, validate_desc, validate_name
 
@@ -11,7 +11,9 @@ album_bp = Blueprint("album_bp", __name__)
 # Create a new album entry
 @album_bp.route("/create", methods=["POST"])
 def album_create():
-    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
+    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+        return "Skill issue", 403
+    
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
@@ -55,7 +57,9 @@ def album_create():
 # Delete an album entry
 @album_bp.route("/<int:idAlbum>/delete", methods=["DELETE"])
 def album_delete(idAlbum):
-    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
+    if not CSRF().validate(request.headers.get("X-CSRFToken", None)):
+        return "Skill issue", 403
+    
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
