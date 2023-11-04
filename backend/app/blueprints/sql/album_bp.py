@@ -11,6 +11,7 @@ album_bp = Blueprint("album_bp", __name__)
 # Create a new album entry
 @album_bp.route("/create", methods=["POST"])
 def album_create():
+    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
@@ -54,6 +55,7 @@ def album_create():
 # Delete an album entry
 @album_bp.route("/<int:idAlbum>/delete", methods=["DELETE"])
 def album_delete(idAlbum):
+    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)

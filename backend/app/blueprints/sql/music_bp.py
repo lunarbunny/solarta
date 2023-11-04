@@ -12,6 +12,7 @@ music_bp = Blueprint("music_bp", __name__)
 # Create a new music entry
 @music_bp.route("/create", methods=["POST"])
 def music_create():
+    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
@@ -75,6 +76,7 @@ def music_create():
 # Delete music, and remove from all playlists and albums
 @music_bp.route("/delete/<int:id>", methods=["DELETE"])
 def music_delete_id(id):
+    helpers.verify_csrf(request.headers.get("X-CSRFToken", None))
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
