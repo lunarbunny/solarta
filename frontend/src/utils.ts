@@ -1,3 +1,5 @@
+/* Date utils */
+
 export function dateToYear(date: string): string {
   // Sun, 01 Jan 2023 00:00:00 GMT
   return date.split(" ")[3];
@@ -24,6 +26,8 @@ export function formatDate(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+/* Validation utils */
+
 // For song names, album names
 export function validateName(text: string): boolean {
   return text.length >= 3 && text.length <= 64;
@@ -49,4 +53,61 @@ export function validatePwd(pwd: string, checkLength?: boolean): boolean {
 
 export function validateOTP(otp: string): boolean {
   return otp.length == 6 && !isNaN(Number(otp));
+}
+
+/* CSRF utils */
+import { API_URL } from "./types";
+
+async function getCsrfToken() {
+  const response = await fetch(`${API_URL}/csrf_token`);
+  const data = await response.json();
+  return data.token;
+}
+
+export async function postWithCsrfToken(endpoint: string, data: any): Promise<Response> {
+  const csrfToken = await getCsrfToken();
+  const headers = {
+    'X-Csrf-Token': csrfToken
+  };
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    credentials: "include",
+    headers,
+    body: data
+  });
+
+  return response;
+}
+
+export async function putWithCsrfToken(endpoint: string, data: any): Promise<Response> {
+  const csrfToken = await getCsrfToken();
+  const headers = {
+    'X-Csrf-Token': csrfToken
+  };
+
+  const response = await fetch(endpoint, {
+    method: 'PUT',
+    credentials: "include",
+    headers,
+    body: data
+  });
+
+  return response;
+}
+
+export async function deleteWithCsrfToken(endpoint: string, data: any): Promise<Response> {
+  const csrfToken = await getCsrfToken();
+  const headers = {
+    'X-Csrf-Token': csrfToken,
+  };
+
+  const response = await fetch(endpoint, {
+    method: 'DELETE',
+    credentials: "include",
+    headers,
+    body: data
+  });
+
+  return response;
 }

@@ -3,7 +3,8 @@ from flask import Blueprint, jsonify, request, make_response
 from markupsafe import escape
 from validation import clean_text, validate_desc, validate_email, validate_mfa, validate_name, validate_password
 
-from .. import Session, User
+from ..__init__ import Session, User
+from ..csrf import CSRF
 import helpers
 
 user_bp = Blueprint("user_bp", __name__)
@@ -132,6 +133,9 @@ def user_search_by_name(name):
 # Update user profile
 @user_bp.route("/update", methods=["POST"])
 def update():
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
+        return "Skill issue", 403
+    
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
@@ -195,27 +199,30 @@ def update():
 # Register a new user
 @user_bp.route("/register", methods=["POST"])
 def register():
-    data = request.form
-    name = data.get("name", None)
-    email = data.get("email", None)
-    password = data.get("password", None)
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
+        return "Skill issue", 403
     
-    # Validation
-    name = clean_text(name)
-    name_valid, name_error = validate_name(name)
-    if not name_valid:
-        return name_error, 400
-    
-    email_valid, email_error = validate_email(email)
-    if not email_valid:
-        return email_error, 400
-    
-    pwd_valid, pwd_error = validate_password(password)
-    if not pwd_valid:
-        return pwd_error, 400
-
     with Session() as session:
         try:
+            data = request.form
+            name = data.get("name", None)
+            email = data.get("email", None)
+            password = data.get("password", None)
+            
+            # Validation
+            name = clean_text(name)
+            name_valid, name_error = validate_name(name)
+            if not name_valid:
+                return name_error, 400
+            
+            email_valid, email_error = validate_email(email)
+            if not email_valid:
+                return email_error, 400
+            
+            pwd_valid, pwd_error = validate_password(password)
+            if not pwd_valid:
+                return pwd_error, 400
+    
             user = session.query(User).filter(User.email == email).first()
             if user is not None:
                 return "Email is already taken.", 400
@@ -260,6 +267,9 @@ def onboarding(token):
 # Login with email, password and OTP
 @user_bp.route("/login", methods=["POST"])
 def login():
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
+        return "Skill issue", 403
+    
     with Session() as session:
         try:
             data = request.form
@@ -320,7 +330,7 @@ def login():
                                 secure=True,
                                 httponly=True,
                                 samesite='strict',
-                                domain="nisokkususu.com")
+                                domain="solarta.nisokkususu.com")
 
             return response
 
@@ -359,6 +369,9 @@ def authenticated():
 # Request password reset email
 @user_bp.route("/reset", methods=["POST"])
 def request_reset_password():
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
+        return "Skill issue", 403
+    
     with Session() as session:
         try:
             data = request.form
@@ -397,6 +410,9 @@ def request_reset_password():
 # Reset password and MFA
 @user_bp.route("/reset/<string:token>", methods=["POST"])
 def reset_password(token):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
+        return "Skill issue", 403
+    
     with Session() as session:
         try:
             verify_reset_email = helpers.verify_resetting_email(token)
@@ -454,6 +470,9 @@ def logout():
 # Allow admin to ban an account
 @user_bp.route("/<int:id>/ban", methods=["PUT"])
 def user_ban_by_id(id):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
+        return "Skill issue", 403
+    
     with Session() as session:
         try:
             user = session.get(User, id)
@@ -470,6 +489,9 @@ def user_ban_by_id(id):
 # Allow admin to unban an account
 @user_bp.route("/<int:id>/unban", methods=["PUT"])
 def user_unban_by_id(id):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
+        return "Skill issue", 403
+    
     with Session() as session:
         try:
             user = session.get(User, id)
@@ -490,6 +512,9 @@ def user_unban_by_id(id):
 # Allow user to delete their own account
 @user_bp.route('/delete', methods=["DELETE"])
 def user_delete():
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
+        return "Skill issue", 403
+    
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)

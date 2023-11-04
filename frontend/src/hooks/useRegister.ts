@@ -1,4 +1,5 @@
 import { API_URL } from "@/types";
+import { postWithCsrfToken } from "@/utils";
 import { useState } from "react";
 
 interface RegisterState {
@@ -23,11 +24,7 @@ const useRegister = (): RegisterState => {
       formData.append('email', email);
       formData.append('password', password);
 
-      let res = await fetch(`${API_URL}/user/register`, {
-        method: 'POST',
-        body: formData,
-      });
-
+      let res = await postWithCsrfToken(`${API_URL}/user/register`, formData);
       let msg = await res.text();
 
       if (!res.ok) {

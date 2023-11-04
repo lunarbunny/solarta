@@ -1,5 +1,6 @@
 import { API_URL } from "@/types";
 import { useState } from "react";
+import { postWithCsrfToken } from "@/utils";
 
 interface SignInState {
   signIn: (email: string, password: string, otp: string) => Promise<void>;
@@ -23,10 +24,7 @@ const useSignIn = (): SignInState => {
       formData.append('password', password);
       formData.append('mfa', otp);
 
-      let res = await fetch(`${API_URL}/user/login`, {
-        method: 'POST',
-        body: formData,
-      });
+      const res = await postWithCsrfToken(`${API_URL}/user/login`, formData);
 
       if (!res.ok) {
         if (res.status == 418) {

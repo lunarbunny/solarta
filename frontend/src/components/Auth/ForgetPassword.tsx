@@ -2,7 +2,7 @@ import { Button, FormControl, FormLabel, Input, InputGroup, Text } from '@chakra
 import React, { useEffect, useState } from 'react';
 import useSignIn from '@/hooks/useSignIn';
 import { API_URL } from '@/types';
-import { validateEmail } from '@/utils';
+import { postWithCsrfToken, validateEmail } from '@/utils';
 
 type Props = {
   onLoginClick: () => void;
@@ -33,10 +33,7 @@ const ForgetPassword: React.FC<Props> = ({ onLoginClick }) => {
     const formData = new FormData();
     formData.append('email', email);
 
-    let res = await fetch(`${API_URL}/user/reset`, {
-      method: 'POST',
-      body: formData,
-    });
+    let res = await postWithCsrfToken(`${API_URL}/user/reset`, formData);
 
     if (res.ok) {
       setError('An email with the password reset link has been sent.');

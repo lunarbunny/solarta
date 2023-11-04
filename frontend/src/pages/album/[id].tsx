@@ -2,7 +2,7 @@ import MusicList from "@/components/Media/MusicList";
 import useAuth from "@/hooks/useAuth";
 import useFetch from "@/hooks/useFetch";
 import { Album, API_URL, Music } from "@/types";
-import { dateToPretty } from "@/utils";
+import { dateToPretty, deleteWithCsrfToken } from "@/utils";
 import { DeleteIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -41,10 +41,7 @@ const AlbumDetailPage: NextPage = () => {
 
   const handleDelete = async () => {
     if (confirm("Are you sure you want to delete this album?")) {
-      let res = await fetch(`${API_URL}/album/${album.id}/delete`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+      let res = await deleteWithCsrfToken(`${API_URL}/album/${album.id}/delete`, null);
 
       if (res.ok) {
         router.push("/library");

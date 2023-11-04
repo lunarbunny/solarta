@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, request, send_file
 from werkzeug.utils import secure_filename
 
 from ..__init__ import Session, Music, User, AlbumMusic, Album
+from ..csrf import CSRF
 from validation import clean_text, validate_name
 import helpers
 
@@ -12,6 +13,9 @@ music_bp = Blueprint("music_bp", __name__)
 # Create a new music entry
 @music_bp.route("/create", methods=["POST"])
 def music_create():
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
+        return "Skill issue", 403
+    
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
@@ -75,6 +79,9 @@ def music_create():
 # Delete music, and remove from all playlists and albums
 @music_bp.route("/delete/<int:id>", methods=["DELETE"])
 def music_delete_id(id):
+    if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
+        return "Skill issue", 403
+    
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
