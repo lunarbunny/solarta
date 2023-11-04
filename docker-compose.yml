@@ -102,7 +102,6 @@ services:
             - proxy-api
             - proxy-web
             - proxy-cicd
-            - external
         ports:
             - "80:80"
             - "443:443"
@@ -167,7 +166,4 @@ networks:
         internal: true
     proxy-cicd:
         name: solarta-proxy-cicd-local
-        internal: true
-    external:
-        name: solarta-external-local
         internal: false
