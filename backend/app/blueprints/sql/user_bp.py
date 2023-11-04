@@ -4,7 +4,6 @@ from markupsafe import escape
 from validation import clean_text, validate_desc, validate_email, validate_mfa, validate_name, validate_password
 
 from .. import Session, User
-from ..csrf import CSRF
 import helpers
 
 user_bp = Blueprint("user_bp", __name__)

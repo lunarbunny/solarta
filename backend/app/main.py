@@ -2,7 +2,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 from helpers import is_debug_mode, music_get_max_size
-from blueprints.csrf import CSRF
+from csrf import CSRF
 import os
 
 app = Flask(__name__)

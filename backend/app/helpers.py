@@ -145,7 +145,7 @@ def generate_otp_qr_string(
 
 
 def verify_csrf(csrf_token):
-    from blueprints.csrf import CSRF
+    from csrf import CSRF
     if csrf_token is None:
         return nachoneko(), 400
 
