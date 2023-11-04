@@ -212,17 +212,17 @@ def register():
     pwd_valid, pwd_error = validate_password(password)
     if not pwd_valid:
         return pwd_error, 400
-    
-    user = session.Query(User).filter(User.email == email).first()
-    if user is not None:
-        return "Email is already taken.", 400
-    
-    # Fields are valid, proceed to generate user
-    hashPwd = helpers.hash_password(password)
-    newUser = User(name, email, hashPwd, status=2, roleId=2, mfaSecret=None, sessionId=None, sessionExpiry=None, about=None)
 
     with Session() as session:
         try:
+            user = session.Query(User).filter(User.email == email).first()
+            if user is not None:
+                return "Email is already taken.", 400
+            
+            # Fields are valid, proceed to generate user
+            hashPwd = helpers.hash_password(password)
+            newUser = User(name, email, hashPwd, status=2, roleId=2, mfaSecret=None, sessionId=None, sessionExpiry=None, about=None)
+
             session.add(newUser)
             session.commit()
             helpers.send_onboarding_email(name, email)
