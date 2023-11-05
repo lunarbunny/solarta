@@ -1,7 +1,14 @@
 import time
 from flask import Blueprint, jsonify, request, make_response
 from markupsafe import escape
-from validation import clean_text, validate_desc, validate_email, validate_mfa, validate_name, validate_password
+from validation import (
+    clean_text,
+    validate_desc,
+    validate_email,
+    validate_mfa,
+    validate_name,
+    validate_password,
+)
 
 from ..__init__ import Session, User
 from ..csrf import CSRF
@@ -17,16 +24,20 @@ def user_retrieve_all():
         try:
             users = session.query(User).filter(User.roleId == 2).all()
             # Public user info
-            result = [{
-                "id": user.id,
-                "name": user.name,
-                "about": user.about,
-            } for user in users]
+            result = [
+                {
+                    "id": user.id,
+                    "name": user.name,
+                    "about": user.about,
+                }
+                for user in users
+            ]
             return jsonify(result), 200
         except Exception as e:
             if helpers.is_debug_mode:
                 return str(e), 500
             return helpers.nachoneko(), 500
+
 
 # Retrieve all users with email and account status (for admin)
 @user_bp.route("/full", methods=["GET"])
@@ -36,24 +47,28 @@ def user_retrieve_all_full():
             user, status = helpers.check_authenticated(session, request)
             if user is None:
                 return helpers.nachoneko(), status
-            if user.roleId != 1: # only admin can query
+            if user.roleId != 1:  # only admin can query
                 return helpers.nachoneko(), 403
 
             users = session.query(User).all()
             # Full user info
-            result = [{
-                "id": user.id,
-                "name": user.name,
-                "about": user.about,
-                "email": user.email,
-                "status": user.status,
-                "admin": True if user.roleId == 1 else False,
-            } for user in users]
+            result = [
+                {
+                    "id": user.id,
+                    "name": user.name,
+                    "about": user.about,
+                    "email": user.email,
+                    "status": user.status,
+                    "admin": True if user.roleId == 1 else False,
+                }
+                for user in users
+            ]
             return jsonify(result), 200
         except Exception as e:
             if helpers.is_debug_mode:
                 return str(e), 500
             return helpers.nachoneko(), 500
+
 
 # Retrieve user by id
 @user_bp.route("/<int:id>", methods=["GET"])
@@ -84,7 +99,13 @@ def user_retrieve_by_id(id):
 def user_retrieve_top3():
     with Session() as session:
         try:
-            users = session.query(User).filter(User.roleId == 2).order_by(User.id.desc()).limit(3).all()
+            users = (
+                session.query(User)
+                .filter(User.roleId == 2)
+                .order_by(User.id.desc())
+                .limit(3)
+                .all()
+            )
             return (
                 jsonify(
                     [
@@ -112,18 +133,28 @@ def user_search_by_name(name):
             user, status = helpers.check_authenticated(session, request)
             if user is None:
                 return helpers.nachoneko(), status
-            if user.roleId != 2: # only users can search
+            if user.roleId != 1:  # only admin can search
                 return helpers.nachoneko(), 403
             name = clean_text(name)
-            user_search_results = session.query(User).filter(User.name.ilike(f"{name}%"))
+            user_search_results = session.query(User).filter(
+                User.name.ilike(f"{name}%")
+            )
             if user_search_results:
-                return jsonify([{
-                    "id": user.id,
-                    "name": user.name,
-                    "about": user.about,
-                } for user in user_search_results]), 200
+                return (
+                    jsonify(
+                        [
+                            {
+                                "id": user.id,
+                                "name": user.name,
+                                "about": user.about,
+                            }
+                            for user in user_search_results
+                        ]
+                    ),
+                    200,
+                )
             else:
-                return 'Not found', 404
+                return "Not found", 404
         except Exception as e:
             if helpers.is_debug_mode:
                 return str(e), 500
@@ -135,7 +166,7 @@ def user_search_by_name(name):
 def update():
     if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
-    
+
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
@@ -148,7 +179,7 @@ def update():
             old_password = data.get("password", None)
             new_password = data.get("newPassword", None)
             mfa = data.get("mfa", None)
-            
+
             # Change name
             if name is not None and name != "":
                 name = clean_text(name)
@@ -156,7 +187,7 @@ def update():
                 if not name_valid:
                     return escape(name_error), 400
                 user.name = name
-            
+
             # Change about
             if about is not None and about != "":
                 about = clean_text(about)
@@ -164,7 +195,7 @@ def update():
                 if not about_valid:
                     return escape(about_error), 400
                 user.about = about
-            
+
             # Change password
             if new_password is not None and new_password != "":
                 if old_password is None or old_password == "":
@@ -177,16 +208,16 @@ def update():
                 mfa_valid, mfa_error = validate_mfa(mfa)
                 if not mfa_valid:
                     return escape(mfa_error), 400
-                
+
                 # Verify MFA and old password are correct
                 if not helpers.verify_otp(mfa, user.mfaSecret):
                     return helpers.nachoneko(), 401
                 if not helpers.verify_password_hash(user.hashPwd, old_password):
                     return helpers.nachoneko(), 401
-                
+
                 # Update password
                 user.hashPwd = helpers.hash_password(new_password)
-            
+
             session.commit()
             return "ok!", 200
         except Exception as e:
@@ -201,35 +232,47 @@ def update():
 def register():
     if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
-    
+
     with Session() as session:
         try:
             data = request.form
             name = data.get("name", None)
             email = data.get("email", None)
             password = data.get("password", None)
-            
+
             # Validation
             name = clean_text(name)
             name_valid, name_error = validate_name(name)
             if not name_valid:
                 return name_error, 400
-            
+
             email_valid, email_error = validate_email(email)
             if not email_valid:
                 return email_error, 400
-            
+
             pwd_valid, pwd_error = validate_password(password)
             if not pwd_valid:
                 return pwd_error, 400
-    
+
             user = session.query(User).filter(User.email == email).first()
             if user is not None:
                 return "Email is already taken.", 400
-            
+
             # Fields are valid, proceed to generate user
             hashPwd = helpers.hash_password(password)
-            newUser = User(name, email, hashPwd, status=2, roleId=2, mfaSecret=None, sessionId=None, sessionExpiry=None, about=None, lastLoginAttempt=None, loginAttempts=0)
+            newUser = User(
+                name,
+                email,
+                hashPwd,
+                status=2,
+                roleId=2,
+                mfaSecret=None,
+                sessionId=None,
+                sessionExpiry=None,
+                about=None,
+                lastLoginAttempt=None,
+                loginAttempts=0,
+            )
 
             session.add(newUser)
             session.commit()
@@ -240,6 +283,7 @@ def register():
             if helpers.is_debug_mode:
                 return str(e), 500
             return helpers.nachoneko(), 500
+
 
 # Verify email and setup MFA
 @user_bp.route("/onboarding/<string:token>", methods=["GET"])
@@ -269,14 +313,14 @@ def onboarding(token):
 def login():
     if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
-    
+
     with Session() as session:
         try:
             data = request.form
             email = data.get("email", None)
             password = data.get("password", None)
             mfa = data.get("mfa", None)
-            
+
             email_valid, email_error = validate_email(email)
             if not email_valid:
                 return email_error, 400
@@ -284,25 +328,32 @@ def login():
             pwd_valid, pwd_error = validate_password(password, check_complexity=False)
             if not pwd_valid:
                 return pwd_error, 400
-            
+
             mfa_valid, mfa_error = validate_mfa(mfa)
             if not mfa_valid:
                 return mfa_error, 400
-        
-            user = session.query(User).filter(User.email==email).first()
 
-            if user is None: # User does not exist
+            user = session.query(User).filter(User.email == email).first()
+
+            if user is None:  # User does not exist
                 return helpers.nachoneko(), 401
-            elif user.status == 1: # Banned
+            elif user.status == 1:  # Banned
                 return helpers.nachoneko(), 403
-            elif user.loginAttempts >= 5 and helpers.is_timestamp_within(user.lastLoginAttempt, 15 * 60): # Too many login attempts
-                return helpers.nachoneko(), 418 # I'm a teapot (account locked for 15 minutes)
+            elif user.loginAttempts >= 5 and helpers.is_timestamp_within(
+                user.lastLoginAttempt, 15 * 60
+            ):  # Too many login attempts
+                return (
+                    helpers.nachoneko(),
+                    418,
+                )  # I'm a teapot (account locked for 15 minutes)
 
             mfa_valid = helpers.verify_otp(mfa, user.mfaSecret)
             pwd_valud = helpers.verify_password_hash(user.hashPwd, password)
             if not mfa_valid or not pwd_valud:
                 # Update login attempts
-                if user.lastLoginAttempt is None or not helpers.is_timestamp_within(user.lastLoginAttempt, 15 * 60):
+                if user.lastLoginAttempt is None or not helpers.is_timestamp_within(
+                    user.lastLoginAttempt, 15 * 60
+                ):
                     # If never attempted login or last login attempt is more than 15 minutes ago, reset login attempts
                     user.lastLoginAttempt = int(time.time())
                     user.loginAttempts = 1
@@ -323,14 +374,16 @@ def login():
 
             response = make_response("ok!")
             response.status = 200
-            response.set_cookie("SESSIONID",
-                                value=sessionId,
-                                max_age=None,
-                                expires=cookie_expiry,
-                                secure=True,
-                                httponly=True,
-                                samesite='strict',
-                                domain="solarta.nisokkususu.com")
+            response.set_cookie(
+                "SESSIONID",
+                value=sessionId,
+                max_age=None,
+                expires=cookie_expiry,
+                secure=True,
+                httponly=True,
+                samesite="strict",
+                domain="solarta.nisokkususu.com",
+            )
 
             return response
 
@@ -352,7 +405,7 @@ def authenticated():
                 return "Invalid session cookie.", status
             else:
                 return helpers.nachoneko(), status
-            
+
         data = {
             "id": user.id,
             "name": user.name,
@@ -371,7 +424,7 @@ def authenticated():
 def request_reset_password():
     if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
-    
+
     with Session() as session:
         try:
             data = request.form
@@ -384,13 +437,20 @@ def request_reset_password():
             user = session.query(User).filter(User.email == email).first()
 
             if user is None:
-                return "ok!", 200 # Don't tell user that email is not found
-            
-            if user.resetAttempts >= 3 and helpers.is_timestamp_within(user.lastResetAttempt, 15 * 60): # Too many reset attempts
-                return helpers.nachoneko(), 418 # I'm a teapot (reset locked for 15 minutes)
-            
+                return "ok!", 200  # Don't tell user that email is not found
+
+            if user.resetAttempts >= 3 and helpers.is_timestamp_within(
+                user.lastResetAttempt, 15 * 60
+            ):  # Too many reset attempts
+                return (
+                    helpers.nachoneko(),
+                    418,
+                )  # I'm a teapot (reset locked for 15 minutes)
+
             # Check if last reset attempt is within 15 minutes
-            if user.lastResetAttempt is None or not helpers.is_timestamp_within(user.lastResetAttempt, 15 * 60):
+            if user.lastResetAttempt is None or not helpers.is_timestamp_within(
+                user.lastResetAttempt, 15 * 60
+            ):
                 # If never attempted login or last login attempt is more than 15 minutes ago, reset login attempts
                 user.lastResetAttempt = int(time.time())
                 user.resetAttempts = 1
@@ -412,13 +472,13 @@ def request_reset_password():
 def reset_password(token):
     if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
-    
+
     with Session() as session:
         try:
             verify_reset_email = helpers.verify_resetting_email(token)
             if verify_reset_email is None:
                 return helpers.nachoneko(), 400
-            
+
             # Check if user exists and is active (status == 0)
             user = session.query(User).filter(User.email == verify_reset_email).first()
             if user is None or user.status != 0:
@@ -431,7 +491,7 @@ def reset_password(token):
                 return "Password is required.", 400
 
             user.hashPwd = helpers.hash_password(password)
-            
+
             # Reset MFA
             user.mfaSecret = helpers.generate_otp_secret()
 
@@ -442,6 +502,7 @@ def reset_password(token):
             if helpers.is_debug_mode:
                 return str(e), 500
             return helpers.nachoneko(), 500
+
 
 # Log out from application
 @user_bp.route("/logout", methods=["GET"])
@@ -457,7 +518,9 @@ def logout():
             session.commit()
 
             response = make_response("ok")
-            response.set_cookie("SESSIONID", value="", expires=0, httponly=True, secure=True)
+            response.set_cookie(
+                "SESSIONID", value="", expires=0, httponly=True, secure=True
+            )
 
             return response
         except Exception as e:
@@ -472,7 +535,7 @@ def logout():
 def user_ban_by_id(id):
     if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
-    
+
     with Session() as session:
         try:
             user = session.get(User, id)
@@ -486,12 +549,13 @@ def user_ban_by_id(id):
                 return str(e), 500
             return helpers.nachoneko(), 500
 
+
 # Allow admin to unban an account
 @user_bp.route("/<int:id>/unban", methods=["PUT"])
 def user_unban_by_id(id):
     if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
-    
+
     with Session() as session:
         try:
             user = session.get(User, id)
@@ -499,9 +563,9 @@ def user_unban_by_id(id):
                 return helpers.nachoneko(), 400
             # If a user do not have mfa secret, they are not verified yet
             if user.mfaSecret is None:
-                user.status = 2 # Unverified
+                user.status = 2  # Unverified
             else:
-                user.status = 0 # Active
+                user.status = 0  # Active
             session.commit()
             return "OK", 200
         except Exception as e:
@@ -509,20 +573,21 @@ def user_unban_by_id(id):
                 return str(e), 500
             return helpers.nachoneko(), 500
 
+
 # Allow user to delete their own account
-@user_bp.route('/delete', methods=["DELETE"])
+@user_bp.route("/delete", methods=["DELETE"])
 def user_delete():
     if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
-    
+
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
             if user is None:
                 if helpers.is_debug_mode:
-                    return 'Invalid session cookie.', status
+                    return "Invalid session cookie.", status
                 return helpers.nachoneko(), 400
-            
+
             data = request.form
             password = data.get("password", None)
             confirmPwd = data.get("cfmPassword", None)
@@ -530,21 +595,22 @@ def user_delete():
 
             if password is None or confirmPwd is None or mfa is None:
                 return "Require all details.", 400
-            
+
             if password != confirmPwd:
                 return "Password don't match.", 400
-            
+
             if not helpers.verify_otp(mfa, user.mfaSecret):
                 return helpers.nachoneko(), 400
-            
-            if user.status != 1 and helpers.verify_password_hash(user.hashPwd, password):
+
+            if user.status != 1 and helpers.verify_password_hash(
+                user.hashPwd, password
+            ):
                 session.delete(user)
                 session.commit()
                 return "OK", 200
-            else: # avoid deleting banned users, etc.
+            else:  # avoid deleting banned users, etc.
                 return helpers.nachoneko(), 405
         except Exception as e:
             if helpers.is_debug_mode:
                 return str(e), 500
             return helpers.nachoneko(), 500
-        
