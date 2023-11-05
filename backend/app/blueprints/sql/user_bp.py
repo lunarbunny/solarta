@@ -477,12 +477,12 @@ def reset_password(token):
         try:
             verify_reset_email = helpers.verify_resetting_email(token)
             if verify_reset_email is None:
-                return helpers.nachoneko(), 400
+                return "Your reset token is invalid or has expired. Please request another reset email.", 400
 
             # Check if user exists and is active (status == 0)
             user = session.query(User).filter(User.email == verify_reset_email).first()
             if user is None or user.status != 0:
-                return helpers.nachoneko(), 400
+                return helpers.nachoneko(), 404
 
             data = request.form
             password = data.get("newPassword", None)

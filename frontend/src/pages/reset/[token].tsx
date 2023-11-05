@@ -29,7 +29,12 @@ const ResetPasswordPage: NextPage = () => {
     let res = await postWithCsrfToken(`${API_URL}/user/reset/${resetToken}`, formData);
 
     if (!res.ok) {
-      setResetError("Reset password failed, please try requesting another reset email.");
+      if (res.status == 400) {
+        let resText = await res.text();
+        setResetError(resText);
+      } else {
+        setResetError("Error occured, please try requesting another reset email.");
+      }
       return;
     } else {
       let otpToken = await res.text();
