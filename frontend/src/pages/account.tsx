@@ -43,9 +43,6 @@ const AccountPage: NextPage = () => {
   });
 
   const [error, setError] = useState<string>("");
-  const [nameHasError, setNameHasError] = useState<boolean>(false);
-  const [aboutHasError, setAboutHasError] = useState<boolean>(false);
-  const [pwdHasError, setPwdHasError] = useState<boolean>(false);
 
   useEffect(() => {
     if (userLoading) return;
@@ -78,7 +75,6 @@ const AccountPage: NextPage = () => {
     if (form.name != user.name) {
       if (!validateName(form.name)) {
         setError("Please enter a name that is 3-64 chars long.");
-        setNameHasError(true);
         return;
       }
       formData.append("name", form.name);
@@ -86,7 +82,6 @@ const AccountPage: NextPage = () => {
     if (form.about != user.about) {
       if (!validateDescription(form.about)) {
         setError("Please enter an about that is 3-250 chars long.");
-        setAboutHasError(true);
         return;
       }
       formData.append("about", form.about);
@@ -94,12 +89,10 @@ const AccountPage: NextPage = () => {
     if (form.password != "" && form.newPassword != "" && form.otp != "") {
       if (!validatePwd(form.password)) {
         setError("Your current password is empty.");
-        setPwdHasError(true);
         return;
       }
       if (!validatePwd(form.newPassword, true)) {
         setError("Please enter a password that is >= 12 chars long.");
-        setPwdHasError(true);
         return;
       }
       formData.append("password", form.password);
@@ -107,7 +100,7 @@ const AccountPage: NextPage = () => {
       formData.append("mfa", form.otp);
     }
 
-    if (formData.keys.length == 0) return; // no changes
+    if (formData.entries().next().done) return;
 
     if (!confirm("Are you sure you want to update your profile?")) return;
 
