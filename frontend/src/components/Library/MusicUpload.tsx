@@ -40,9 +40,10 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
   });
 
   // Fetch albums and genres to populate the dropdowns
-  const { data: genres } = useFetch<Genre[]>(`${API_URL}/genre`);
-
-  const [error, setError] = useState('');
+  const { data: genres } = useFetch<Genre[]>(`${API_URL}/genre`, {
+    includeCred: true,
+  });
+  const [error, setError] = useState("");
   const [songnameHasError, setSongnameHasError] = useState(false);
   const [albumIdHasError, setAlbumIdHasError] = useState(false);
   const [genreIdHasError, setGenreIdHasError] = useState(false);
@@ -73,7 +74,7 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
     const sizeLimit = 10 * 1024 * 1024;
     if (uploadForm.music_file && uploadForm.music_file.size > sizeLimit) {
       alert("Error: Music file size must be less than 10MB.");
-      setUploadForm(old => ({ ...old, music_file: null }));
+      setUploadForm((old) => ({ ...old, music_file: null }));
     }
   }, [uploadForm.music_file]);
 
@@ -81,7 +82,7 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
     e.preventDefault();
 
     // Reset errors
-    if (error) setError('');
+    if (error) setError("");
     if (songnameHasError) setSongnameHasError(false);
     if (albumIdHasError) setAlbumIdHasError(false);
     if (genreIdHasError) setGenreIdHasError(false);
@@ -89,25 +90,25 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
 
     // Validations
     if (!validateName(uploadForm.title)) {
-      setError('Please enter a song name that is 3-64 chars long.');
+      setError("Please enter a song name that is 3-64 chars long.");
       setSongnameHasError(true);
       return;
     }
 
     if (uploadForm.albumId == "none") {
-      setError('Please select an album.');
+      setError("Please select an album.");
       setAlbumIdHasError(true);
       return;
     }
 
     if (uploadForm.genreId == "none") {
-      setError('Please select a genre.');
+      setError("Please select a genre.");
       setGenreIdHasError(true);
       return;
     }
 
     if (!uploadForm.music_file) {
-      setError('Please choose a music file to upload.');
+      setError("Please choose a music file to upload.");
       setMusicFileHasError(true);
       return;
     }
@@ -205,7 +206,7 @@ const MusicUpload: React.FC<Props> = ({ albums }) => {
             </FormControl>
           </InputGroup>
 
-          <Flex direction="row" align="center" mt={4} w="100%" >
+          <Flex direction="row" align="center" mt={4} w="100%">
             <Text fontSize="12pt" color="red.300" flexGrow={1}>
               {error}
             </Text>

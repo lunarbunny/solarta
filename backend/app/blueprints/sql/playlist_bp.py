@@ -14,13 +14,13 @@ playlist_bp = Blueprint("playlist_bp", __name__)
 def playlist_delete(id):
     if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
-    
+
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
             if user is None:
                 return helpers.nachoneko(), status
-            
+
             playlist = session.get(Playlist, id)
 
             if playlist is None:
@@ -46,13 +46,13 @@ def playlist_delete(id):
 def playlist_create():
     if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
-    
+
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
             if user is None:
                 return helpers.nachoneko(), status
-            
+
             # Only allow users to create playlists
             if user.roleId != 2:
                 return helpers.nachoneko(), 403
@@ -66,13 +66,13 @@ def playlist_create():
             title_valid, title_error = validate_name(title)
             if not title_valid:
                 return title_error, 400
-            
-            if description is not None and description != '':
+
+            if description is not None and description != "":
                 description = clean_text(description)
                 valid_desc, desc_error = validate_desc(description)
                 if not valid_desc:
                     return desc_error, 400
-                
+
             if creation_date_str is None or creation_date_str == "":
                 return "Creation date is required", 400
 
@@ -89,17 +89,19 @@ def playlist_create():
 
 
 # Add/Delete songs in playlist
-@playlist_bp.route("/playlist=<int:idPlaylist>/music=<int:idMusic>", methods=["POST", "DELETE"])
+@playlist_bp.route(
+    "/playlist=<int:idPlaylist>/music=<int:idMusic>", methods=["POST", "DELETE"]
+)
 def playlist_modify_song(idPlaylist, idMusic):
     if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
-    
+
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
             if user is None:
                 return helpers.nachoneko(), status
-            
+
             playlist = session.get(Playlist, idPlaylist)
 
             # Only allow if user is admin or owner of playlist or admin
@@ -115,10 +117,17 @@ def playlist_modify_song(idPlaylist, idMusic):
                     return "Created", 201
                 else:
                     return "Not found", 404
-                
+
             elif request.method == "DELETE":
                 if playlist:
-                    playlistMusic = session.query(PlaylistMusic).filter(PlaylistMusic.idPlaylist == playlist.id, PlaylistMusic.idMusic == idMusic).one_or_none()
+                    playlistMusic = (
+                        session.query(PlaylistMusic)
+                        .filter(
+                            PlaylistMusic.idPlaylist == playlist.id,
+                            PlaylistMusic.idMusic == idMusic,
+                        )
+                        .one_or_none()
+                    )
                     if playlistMusic:
                         session.delete(playlistMusic)
                         session.commit()
@@ -136,7 +145,7 @@ def playlist_modify_song(idPlaylist, idMusic):
 def playlist_update(id):
     if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
-    
+
     with Session() as session:
         try:
             user, status = helpers.check_authenticated(session, request)
@@ -147,20 +156,23 @@ def playlist_update(id):
 
             if playlist is None:
                 return helpers.nachoneko(), 404
-            
+
             # Only allow if user is owner of playlist or admin
             if playlist.ownerId != user.id and user.roleId != 1:
                 return helpers.nachoneko(), 403
 
             data = request.form
             title = data.get("title", None)
+
             description = data.get("description", None)
 
             title = clean_text(title)
+
             title_valid, title_error = validate_name(title)
+
             if not title_valid:
                 return title_error, 400
-            
+
             description = clean_text(description)
             desc_valid, desc_error = validate_desc(description)
             if not desc_valid:
@@ -169,6 +181,8 @@ def playlist_update(id):
             playlist.title = title
             playlist.description = description
             session.commit()
+
+            return "Updated successful", 200
         except Exception as e:
             session.rollback()
             if helpers.is_debug_mode:
@@ -189,12 +203,14 @@ def playlist_retrieve_notadded_music(idPlaylist):
 
             if playlist is None:
                 return "Playlist not found", 404
-            
+
             # Only allow if user is owner of playlist or admin
             if playlist.ownerId != user.id and user.roleId != 1:
                 return "Unauthorized", 403
 
-            to_exclude = session.query(PlaylistMusic.idMusic).filter(PlaylistMusic.idPlaylist == playlist.id)
+            to_exclude = session.query(PlaylistMusic.idMusic).filter(
+                PlaylistMusic.idPlaylist == playlist.id
+            )
             excluded_playlist = (
                 session.query(Music, User.name)
                 .join(User, User.id == Music.ownerId)
@@ -202,13 +218,19 @@ def playlist_retrieve_notadded_music(idPlaylist):
                 .all()
             )
             return (
-                jsonify([{
-                    "id": music.id,
-                    "title": music.title,
-                    "duration": music.duration,
-                    "genreId": music.genreId,
-                    "ownerName": owner_name
-                } for music, owner_name in excluded_playlist]), 200
+                jsonify(
+                    [
+                        {
+                            "id": music.id,
+                            "title": music.title,
+                            "duration": music.duration,
+                            "genreId": music.genreId,
+                            "ownerName": owner_name,
+                        }
+                        for music, owner_name in excluded_playlist
+                    ]
+                ),
+                200,
             )
         except Exception as e:
             if helpers.is_debug_mode:
@@ -229,7 +251,7 @@ def playlist_retrieve_all_music(idPlaylist):
 
             if playlist is None:
                 return "Playlist not found", 404
-            
+
             # Only allow if user is owner of playlist or admin
             if playlist.ownerId != user.id and user.roleId != 1:
                 return "Unauthorized", 403
@@ -242,13 +264,19 @@ def playlist_retrieve_all_music(idPlaylist):
                 .all()
             )
             return (
-                jsonify([{
-                    "id": music.id,
-                    "title": music.title,
-                    "duration": music.duration,
-                    "genreId": music.genreId,
-                    "ownerName": owner_name
-                } for music, owner_name in playlist_music]), 200
+                jsonify(
+                    [
+                        {
+                            "id": music.id,
+                            "title": music.title,
+                            "duration": music.duration,
+                            "genreId": music.genreId,
+                            "ownerName": owner_name,
+                        }
+                        for music, owner_name in playlist_music
+                    ]
+                ),
+                200,
             )
         except Exception as e:
             if helpers.is_debug_mode:
@@ -266,7 +294,9 @@ def playlist_retrieve_user():
                 return helpers.nachoneko(), status
 
             ownerId = user.id
-            playlists = session.query(Playlist).filter(Playlist.ownerId == ownerId).all()
+            playlists = (
+                session.query(Playlist).filter(Playlist.ownerId == ownerId).all()
+            )
 
             return (
                 jsonify(
@@ -293,7 +323,6 @@ def playlist_retrieve_user():
 def playlist_retrieve_details(idPlaylist):
     with Session() as session:
         try:
-
             user, status = helpers.check_authenticated(session, request)
             if user is None:
                 return helpers.nachoneko(), status
@@ -302,7 +331,7 @@ def playlist_retrieve_details(idPlaylist):
 
             if playlist is None:
                 return "Playlist not found.", 404
-            
+
             # Only allow if user is owner of playlist or admin
             if playlist.ownerId != user.id and user.roleId != 1:
                 return "Unauthorized", 403
