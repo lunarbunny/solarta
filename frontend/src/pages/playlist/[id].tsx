@@ -58,7 +58,6 @@ const PlaylistPage: NextPage = () => {
     `${API_URL}/playlist/${router.query.id}/music`,
     { usesRouter: true, includeCred: true }
   );
-  console.log(playlistMusic);
 
   const [playlistName, setPlaylistName] = useState("");
   const [playlistDesc, setPlaylistDesc] = useState("");
@@ -195,7 +194,7 @@ const PlaylistPage: NextPage = () => {
   }, [playlist]);
 
   return (
-    <Box color="whiteAlpha.800" bg="blackAlpha.700" w="100%" h="100%">
+    <Box color="whiteAlpha.800" bg="blackAlpha.700" w="100%" h="100vh">
       {addSongs == false ? (
         <>
           <Box

@@ -23,11 +23,11 @@ const AlbumDetailPage: NextPage = () => {
   const router = useRouter();
   const { data: album } = useFetch<Album>(
     `${API_URL}/album/${router.query.id}`,
-    { usesRouter: true },
+    { usesRouter: true }
   );
   const { data: albumMusic } = useFetch<Music[]>(
     `${API_URL}/album/${router.query.id}/music`,
-    { usesRouter: true },
+    { usesRouter: true }
   );
 
   const { user } = useAuth();
@@ -41,7 +41,10 @@ const AlbumDetailPage: NextPage = () => {
 
   const handleDelete = async () => {
     if (confirm("Are you sure you want to delete this album?")) {
-      let res = await deleteWithCsrfToken(`${API_URL}/album/${album.id}/delete`, null);
+      let res = await deleteWithCsrfToken(
+        `${API_URL}/album/${album.id}/delete`,
+        null
+      );
 
       if (res.ok) {
         router.push("/library");
@@ -49,10 +52,10 @@ const AlbumDetailPage: NextPage = () => {
         alert("Error: Could not delete album.");
       }
     }
-  }
+  };
 
   return (
-    <Box w="100%" maxW={"7xl"}>
+    <Box w="100%" maxW={"7xl"} h="100vh" overflowY="auto">
       <Image
         alt={"album cover"}
         src={`https://picsum.photos/720?random=${router.query.id}`}
@@ -74,26 +77,36 @@ const AlbumDetailPage: NextPage = () => {
           </Heading>
           <Text color="gray.400" fontWeight={300} fontSize={"xl"}>
             By{" "}
-            <u><Link href={`/artist/${album.ownerId}`}>{album.ownerName}</Link></u>{isOwner && " (You)"}
+            <u>
+              <Link href={`/artist/${album.ownerId}`}>{album.ownerName}</Link>
+            </u>
+            {isOwner && " (You)"}
           </Text>
         </Box>
 
-        <Text mt={4} color="gray.400">Released on <strong>{dateToPretty(album.releaseDate)}</strong>. {album.description}</Text>
+        <Text mt={4} color="gray.400">
+          Released on <strong>{dateToPretty(album.releaseDate)}</strong>.{" "}
+          {album.description}
+        </Text>
 
         {(isOwner || isAdmin) && (
           <>
             <Divider my={4} />
             {isOwner && (
               <Link href={`/library?uploadToAlbum=${album.id}`}>
-                <Button colorScheme="blue" size="sm"
-                  leftIcon={<BiUpload />}>
+                <Button colorScheme="blue" size="sm" leftIcon={<BiUpload />}>
                   Upload Music
                 </Button>
               </Link>
             )}
-            <Button colorScheme="red" size="sm" variant="outline" ml={4}
+            <Button
+              colorScheme="red"
+              size="sm"
+              variant="outline"
+              ml={4}
               leftIcon={<DeleteIcon />}
-              onClick={handleDelete} >
+              onClick={handleDelete}
+            >
               Delete Album
             </Button>
           </>

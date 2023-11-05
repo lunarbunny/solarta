@@ -18,7 +18,7 @@ const HomePage: NextPage = () => {
     `${API_URL}/album/top3`
   );
   return (
-    <Box w="100%" p={8}>
+    <Box w="100%" p={8} h="100vh">
       <Grid
         columnGap={16}
         templateAreas={`

@@ -52,7 +52,8 @@ const MusicPlayer = () => {
     setState({
       ...state,
       playlist: state.playlist.filter((item) => item.title !== title),
-      currentTrack: state.currentTrack < state.playlist.length - 1 ? state.currentTrack : 0,
+      currentTrack:
+        state.currentTrack < state.playlist.length - 1 ? state.currentTrack : 0,
     });
   };
 
@@ -64,7 +65,9 @@ const MusicPlayer = () => {
       showJumpControls={false}
       onClickPrevious={() => handleClickNextPrev(false)}
       onClickNext={() => handleClickNextPrev(true)}
-      src={state.playlist.length > 0 ? state.playlist[state.currentTrack].src : ""}
+      src={
+        state.playlist.length > 0 ? state.playlist[state.currentTrack].src : ""
+      }
       onError={handleError}
       onPlayError={handleError}
       onEnded={handleEnd}
@@ -104,7 +107,7 @@ const MusicPlayer = () => {
         </Flex>,
       ]}
       customVolumeControls={[
-        <Popover key={3}>
+        <Popover strategy="fixed" key={3}>
           <PopoverTrigger>
             <span>
               <Icon mx="10px" as={PiPlaylist} boxSize="30px" color="#72c2e7" />
@@ -118,9 +121,22 @@ const MusicPlayer = () => {
             </PopoverHeader>
             <PopoverBody>
               {state.playlist.map((song, idx) => (
-                <Box key={idx} my="5px" px="5px" borderRadius="5px" bg={state.currentTrack == idx ? "blue.500" : "blue.700"}>
+                <Box
+                  key={idx}
+                  my="5px"
+                  px="5px"
+                  borderRadius="5px"
+                  bg={state.currentTrack == idx ? "blue.500" : "blue.700"}
+                >
                   <Flex direction="row" align="center">
-                    <Flex flexGrow={1} py={2} direction="column" color={state.currentTrack == idx ? "white" : "whiteAlpha.800"}>
+                    <Flex
+                      flexGrow={1}
+                      py={2}
+                      direction="column"
+                      color={
+                        state.currentTrack == idx ? "white" : "whiteAlpha.800"
+                      }
+                    >
                       <Text fontWeight="bold">{song.title}</Text>
                       <Text>{song.artist}</Text>
                     </Flex>

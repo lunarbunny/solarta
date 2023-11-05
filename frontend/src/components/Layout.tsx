@@ -9,14 +9,21 @@ interface Props {
 
 const Layout: React.FC<Props> = ({ children }) => {
   return (
-    <Flex as="main" direction="column" bg="blackAlpha.500" h="100vh">
+    <Flex
+      as="main"
+      direction="column"
+      bg="blackAlpha.500"
+      h="100vh"
+      position="relative"
+      zIndex={0}
+    >
       <Flex flexGrow={4} direction="row">
         <Sidebar />
-        <Box w="100%" maxH="100vh" overflowY="scroll">
+        <Box w="100%" maxH="100%">
           {children}
         </Box>
       </Flex>
-      <Box boxShadow="0px 0px 5px 0px rgba(0,0,0,0.75)">
+      <Box zIndex={1} position="absolute" left="0" right="0" bottom="0">
         <MusicPlayer />
       </Box>
     </Flex>

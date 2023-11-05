@@ -1,7 +1,15 @@
 import AlbumCard from "@/components/Media/AlbumCard";
 import useFetch from "@/hooks/useFetch";
 import { API_URL, Album, Artist } from "@/types";
-import { Box, CircularProgress, Divider, Heading, Image, Text, Wrap } from "@chakra-ui/react";
+import {
+  Box,
+  CircularProgress,
+  Divider,
+  Heading,
+  Image,
+  Text,
+  Wrap,
+} from "@chakra-ui/react";
 import { NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -19,33 +27,31 @@ const ArtistDetailPage: NextPage = () => {
   );
 
   if (!artist) {
-    return <CircularProgress isIndeterminate color='white.500' />;
+    return <CircularProgress isIndeterminate color="white.500" />;
   }
 
   return (
-    <Box w='100%' maxW={'7xl'}>
+    <Box w="100%" maxW={"7xl"} h="100vh" overflowY="auto">
       <Image
-        alt={'artist cover'}
+        alt={"artist cover"}
         src={`https://picsum.photos/720?random=${router.query.id}`}
-        fit={'cover'}
-        align={'center'}
-        w={'100%'}
-        h={{ base: '100%', sm: '400px' }}
+        fit={"cover"}
+        align={"center"}
+        w={"100%"}
+        h={{ base: "100%", sm: "400px" }}
       />
 
       <Box p={8}>
-        <Box as={'header'}>
+        <Box as={"header"}>
           <Heading
             lineHeight={1.1}
             fontWeight="semibold"
-            fontSize={{ base: '4xl', lg: '5xl' }}>
+            fontSize={{ base: "4xl", lg: "5xl" }}
+          >
             {artist.name}
           </Heading>
-          <Text
-            color='gray.400'
-            fontWeight={300}
-            fontSize={'2xl'}>
-            {artistAlbums ? `${artistAlbums.length} albums` : '... albums'}
+          <Text color="gray.400" fontWeight={300} fontSize={"2xl"}>
+            {artistAlbums ? `${artistAlbums.length} albums` : "... albums"}
           </Text>
         </Box>
 
@@ -54,11 +60,12 @@ const ArtistDetailPage: NextPage = () => {
         <Divider my={4} />
 
         <Wrap>
-          {artistAlbums && artistAlbums.map((album, i) => (
-            <Link href={`/album/${album.id}`} key={i}>
-              <AlbumCard data={album} />
-            </Link>
-          ))}
+          {artistAlbums &&
+            artistAlbums.map((album, i) => (
+              <Link href={`/album/${album.id}`} key={i}>
+                <AlbumCard data={album} />
+              </Link>
+            ))}
         </Wrap>
       </Box>
     </Box>
