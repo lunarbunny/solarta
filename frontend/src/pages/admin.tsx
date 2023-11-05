@@ -88,7 +88,11 @@ const AdminPage: NextPage = () => {
   });
 
   if (userLoading) {
-    return <Center><CircularProgress isIndeterminate color="blue.300" /></Center>;
+    return (
+      <Center>
+        <CircularProgress isIndeterminate color="blue.300" />
+      </Center>
+    );
   } else if (!user || !user.admin) {
     router.push("/"); // redirect to home page if not authorized
     return <>Redirecting to home page...</>;
@@ -138,7 +142,10 @@ const AdminPage: NextPage = () => {
   ) => {
     e.preventDefault();
 
-    const response = await deleteWithCsrfToken(`${API_URL}/music/delete/${selectedSong.id}`, null);
+    const response = await deleteWithCsrfToken(
+      `${API_URL}/music/delete/${selectedSong.id}`,
+      null
+    );
     if (response.ok) {
       location.reload();
     } else {
@@ -149,7 +156,10 @@ const AdminPage: NextPage = () => {
   const handleSubmitUserBan = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const response = await putWithCsrfToken(`${API_URL}/user/${selectedUser.id}/ban`, null);
+    const response = await putWithCsrfToken(
+      `${API_URL}/user/${selectedUser.id}/ban`,
+      null
+    );
     if (response.ok) {
       // console.log(response);
       location.reload();
@@ -161,7 +171,10 @@ const AdminPage: NextPage = () => {
   const handleSubmitUserUnban = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const response = await putWithCsrfToken(`${API_URL}/user/${selectedUser.id}/unban`, null);
+    const response = await putWithCsrfToken(
+      `${API_URL}/user/${selectedUser.id}/unban`,
+      null
+    );
     if (response.ok) {
       // console.log(response);
       location.reload();
@@ -178,20 +191,24 @@ const AdminPage: NextPage = () => {
         <Td>{data.about}</Td>
         <Td>{returnStatus(data.status as number)}</Td>
         <Td isNumeric>
-          <Button
-            _hover={{ bg: data.status === 0 ? "red.600" : "green.600" }}
-            bg="blue.700"
-            color="whiteAlpha.900"
-            onClick={data.status === 0 ? onUserBanOpen : onUserUnbanOpen}
-            onMouseOver={(e) =>
-              setSelectedUser({
-                id: data.id,
-                ownerName: data.name,
-              })
-            }
-          >
-            {data.status === 0 ? "BAN" : "UNBAN"}
-          </Button>
+          {data.status === 2 ? (
+            ""
+          ) : (
+            <Button
+              _hover={{ bg: data.status === 0 ? "red.600" : "green.600" }}
+              bg="blue.700"
+              color="whiteAlpha.900"
+              onClick={data.status === 0 ? onUserBanOpen : onUserUnbanOpen}
+              onMouseOver={(e) =>
+                setSelectedUser({
+                  id: data.id,
+                  ownerName: data.name,
+                })
+              }
+            >
+              {data.status === 0 ? "BAN" : "UNBAN"}
+            </Button>
+          )}
         </Td>
       </Tr>
     );
