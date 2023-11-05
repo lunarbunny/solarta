@@ -92,7 +92,7 @@ const AccountPage: NextPage = () => {
         return;
       }
       if (!validatePwd(form.newPassword, true)) {
-        setError("Please enter a password that is >= 12 chars long.");
+        setError("Please enter a password that is at least 12 characters long.");
         return;
       }
       formData.append("password", form.password);

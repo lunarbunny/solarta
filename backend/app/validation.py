@@ -40,7 +40,7 @@ def validate_password(pwd: str, check_complexity: bool = True):
         return True, None
 
     if len(pwd) < 12:
-        return False, 'Password needs to be more than 12 characters.'
+        return False, 'Password must be at least 12 characters long.'
 
     strength = PasswordStrength(pwd).strength()
     if strength < REQUIRED_PASSWORD_STRENGTH:
