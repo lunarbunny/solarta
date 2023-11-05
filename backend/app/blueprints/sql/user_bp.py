@@ -486,9 +486,10 @@ def reset_password(token):
 
             data = request.form
             password = data.get("newPassword", None)
-
-            if password is None:
-                return "Password is required.", 400
+            
+            pwd_valid, pwd_error = validate_password(password)
+            if not pwd_valid:
+                return pwd_error, 400
 
             user.hashPwd = helpers.hash_password(password)
 
