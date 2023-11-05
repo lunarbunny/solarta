@@ -12,7 +12,7 @@ def clean_text(input: str):
 
 # User display name
 def validate_name(input: str):
-    if input is None or input == '':
+    if input is None or input == '' or input.isspace():
         return False, 'Name is required.'
     if len(input) > 64:
         return False, 'Name is too long, must be maximum of 64 characters.'

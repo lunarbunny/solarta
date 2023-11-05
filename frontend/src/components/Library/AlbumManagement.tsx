@@ -43,7 +43,7 @@ const AlbumManagement: React.FC<Props> = ({ albums }) => {
 
     // Validatation
     if (!validateName(albumForm.title)) {
-      setError('Please enter a title that is 3-64 chars long.');
+      setError('Please enter a title that is 3-64 chars long. (Letters, numbers, and space only)');
       setTitleHasError(true);
       return;
     }
