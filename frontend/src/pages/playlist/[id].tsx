@@ -58,6 +58,7 @@ const PlaylistPage: NextPage = () => {
     `${API_URL}/playlist/${router.query.id}/music`,
     { usesRouter: true, includeCred: true }
   );
+  console.log(playlistMusic);
 
   const [playlistName, setPlaylistName] = useState("");
   const [playlistDesc, setPlaylistDesc] = useState("");
@@ -334,7 +335,7 @@ const PlaylistPage: NextPage = () => {
           >
             <Icon boxSize={10} as={FiInfo} mr={2} />
             <Text fontSize="2xl">
-              Choose songs below to add to your new playlist
+              Choose songs below to add to your playlist
             </Text>
           </Flex>
 

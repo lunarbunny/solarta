@@ -61,13 +61,10 @@ const MusicTable: React.FC<Props> = ({ items }) => {
           <Tr>
             <Th>#</Th>
             <Th>Title</Th>
-            <Th>Album</Th>
             <Th>
               <Icon boxSize="20px" as={BiTime} />
             </Th>
-            <Th>
-              <Icon boxSize="20px" as={BiTrash} />
-            </Th>
+            <Th></Th>
           </Tr>
         </Thead>
         <Tbody>

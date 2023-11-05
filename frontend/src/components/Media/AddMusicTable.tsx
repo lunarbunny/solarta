@@ -60,7 +60,6 @@ const AddMusicTable: React.FC<Props> = ({
         <Tr>
           <Th>#</Th>
           <Th>Title</Th>
-          <Th>Album</Th>
           <Th>
             <Icon boxSize="20px" as={BiTime} />
           </Th>
@@ -86,7 +85,6 @@ const AddMusicTable: React.FC<Props> = ({
                   </Flex>
                 </Flex>
               </Td>
-              <Td>{info ? info.albumName : ""}</Td>
               <Td>{durationToTime(info ? info.duration : 0)}</Td>
               <Td isNumeric>
                 <Button

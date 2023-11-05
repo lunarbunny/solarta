@@ -15,7 +15,10 @@ const MusicTableRow: React.FC<Props> = ({ data, onClick, index }) => {
 
   const handleDeletePlaylistMusic = async () => {
     try {
-      const response = await deleteWithCsrfToken(`${API_URL}/playlist/playlist=${router.query.id}/music=${data.id}`, null);
+      const response = await deleteWithCsrfToken(
+        `${API_URL}/playlist/playlist=${router.query.id}/music=${data.id}`,
+        null
+      );
 
       if (response.ok) {
         location.reload();
@@ -46,9 +49,8 @@ const MusicTableRow: React.FC<Props> = ({ data, onClick, index }) => {
           </Flex>
         </Flex>
       </Td>
-      <Td>{data.albumName}</Td>
       <Td>{durationToTime(data.duration)}</Td>
-      <Td>
+      <Td isNumeric>
         <Button
           bg="red.500"
           _hover={{ bg: "red.600" }}
