@@ -27,11 +27,16 @@ const useSignIn = (): SignInState => {
       const res = await postWithCsrfToken(`${API_URL}/user/login`, formData);
 
       if (!res.ok) {
-        if (res.status == 418) {
-          setError('Account is locked, please try again later.');
-        } else {
-          setError('Sign-in failed, please try again.');
-        }
+        if (res.status == 400) {
+          // Only show validation errors, otherwise the response is just nachoneko
+          let msg = await res.text();
+          setError(msg);
+        } else
+          if (res.status == 418) {
+            setError('Account is locked, please try again later.');
+          } else {
+            setError('Sign-in failed, please try again.');
+          }
         return;
       }
 

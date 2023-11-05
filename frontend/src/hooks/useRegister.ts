@@ -25,10 +25,15 @@ const useRegister = (): RegisterState => {
       formData.append('password', password);
 
       let res = await postWithCsrfToken(`${API_URL}/user/register`, formData);
-      let msg = await res.text();
 
       if (!res.ok) {
-        setError(msg);
+        if (res.status == 400) {
+          // Only show validation errors, otherwise the response is just nachoneko
+          let msg = await res.text();
+          setError(msg);
+        } else {
+          setError('Registration failed, please try again.');
+        }
         return;
       }
 
