@@ -86,19 +86,18 @@ services:
                 delay: 1s
 
     proxy:
-        build: ./nginx
+        build:
+            context: ./nginx
+            args:
+                LOGGER_PASSWORD: ${LOGGER_PASSWORD}
         image: solarta-proxy
         container_name: solarta-proxy
-        depends_on:
-            - api
-            - web
-            - cicd
-            - sast
         networks:
             - proxy-api
             - proxy-web
             - proxy-cicd
             - proxy-sast
+            - proxy-logger
         ports:
             - "80:80"
             - "443:443"
@@ -124,18 +123,18 @@ services:
                 delay: 5s
 
     logger:
-        image: gvalkov/tailon
+        image: ghcr.io/niniyas/tailon:beta
         container_name: solarta-logger
         networks:
-            - logger
+            - proxy-logger
         user: "1000:1000"
         command:
+            - "-r"
+            - "/tailon"
             - "/var/log/nginx/api/*.log"
             - "/var/log/nginx/web/*.log"
             - "/var/log/nginx/jenkins/*.log"
             - "/var/log/nginx/sonarqube/*.log"
-        ports:
-            - "127.0.0.1:8080:8080"
         volumes:
             - /var/log/nginx/api:/var/log/nginx/api:rw
             - /var/log/nginx/web:/var/log/nginx/web:rw
@@ -218,6 +217,6 @@ networks:
     proxy-sast:
         name: solarta-proxy-sast-local
         internal: false
-    logger:
-        name: solarta-logger-local
+    proxy-logger:
+        name: solarta-proxy-logger-local
         internal: false
