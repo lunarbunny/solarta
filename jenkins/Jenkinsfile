@@ -51,23 +51,30 @@ pipeline {
             }
         }
 
-        stage('OWASP Dependency-Check Vulnerabilities') {
+        stage('OWASP Dependency Check') {
             steps {
+                // Run OWASP Dependency-Check
+                // https://jeremylong.github.io/DependencyCheck/dependency-check-cli/arguments.html
+                dependencyCheck additionalArguments: ''' 
+                            --enableExperimental
+                            -o './dependency-check-report-api.xml'
+                            -s './backend/app'
+                            -f 'XML' 
+                            ''', odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
+
                 // Install deps first
                 nodejs(nodeJSInstallationName: 'NodeJS 20') {
                     sh 'npm install --prefix ./frontend'
                 }
 
-                // Run OWASP Dependency-Check
-                // https://jeremylong.github.io/DependencyCheck/dependency-check-cli/arguments.html
                 dependencyCheck additionalArguments: ''' 
-                            -o './'
+                            -o './dependency-check-report-web.xml'
                             -s './frontend'
-                            -f 'HTML' 
+                            -f 'XML' 
                             ''', odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
 
                 // Write report to specified file
-                dependencyCheckPublisher pattern: 'dependency-check-report.html'
+                dependencyCheckPublisher pattern: 'dependency-check-report-*.xml'
             }
         }
     }
