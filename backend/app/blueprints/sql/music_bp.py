@@ -22,20 +22,20 @@ def music_create():
             if user is None:
                 return helpers.nachoneko(), status
 
-            ownerId = user.id
+            owner_id = user.id
             data = request.form
             title = data.get("title", "")
-            genreId = data.get("genreId", "")
-            albumId = data.get("albumId", "")
+            genre_id = data.get("genreId", "")
+            album_id = data.get("albumId", "")
 
             title_valid, title_error = validate_name(title)
             if not title_valid:
                 return title_error, 400
             
-            if not genreId.isdigit():
+            if not genre_id.isdigit():
                 return 'Invalid genre ID', 400
             
-            if not albumId.isdigit():
+            if not album_id.isdigit():
                 return 'Invalid album ID', 400
             
             if request.files is None or "music_file" not in request.files:
@@ -49,7 +49,7 @@ def music_create():
             # Clean filename
             # Limit title to 28 characters, leave 6 characters for owner ID prefix, and 4 characters for extension
             # XXXXXX-<title>.mp3 (Typically 6 + 28 + 4 = 38 characters, max db support is 45 characters)
-            filename = f"{ownerId:06}-{secure_filename(filename)[:28]}{ext}"
+            filename = f"{owner_id:06}-{secure_filename(filename)[:28]}{ext}"
             save_dir = helpers.music_get_save_dir()
             save_path = os.path.join(save_dir, filename)
 
@@ -61,13 +61,13 @@ def music_create():
             if meta is None:
                 return 'Music file is invalid.', 400
             # Size constrained with Max-Content-Length header, no need to check here
-            duration, size = meta
+            duration, _ = meta
             duration = math.ceil(duration)
             
-            new_music = Music(title, filename, duration, genreId, ownerId)
+            new_music = Music(title, filename, duration, genre_id, owner_id)
             session.add(new_music)
             session.flush()
-            session.add(AlbumMusic(albumId, new_music.id))
+            session.add(AlbumMusic(album_id, new_music.id))
             session.commit()
             return 'Created', 201
         except Exception as e:
@@ -172,8 +172,8 @@ def music_retrieve_mine():
             if user.roleId != 2:
                 return helpers.nachoneko(), 403
 
-            ownerId = user.id
-            musics = session.query(Music, User.name, Album.title).filter(Music.ownerId == ownerId).join(User, Music.ownerId == User.id).join(AlbumMusic, Music.id == AlbumMusic.idMusic).join(Album, AlbumMusic.idAlbum == Album.id).all()
+            owner_id = user.id
+            musics = session.query(Music, User.name, Album.title).filter(Music.ownerId == owner_id).join(User, Music.ownerId == User.id).join(AlbumMusic, Music.id == AlbumMusic.idMusic).join(Album, AlbumMusic.idAlbum == Album.id).all()
             
             return jsonify([{
                 "id": music.id,

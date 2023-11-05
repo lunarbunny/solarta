@@ -21,8 +21,8 @@ def validate_name(input: str):
     return True, None
 
 # Emails can only contain alphanumeric, @/+/-, and dot.
-email_format_regex = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
-email_illegal_regex = re.compile(r"[^a-zA-Z0-9_.+-@]")
+email_format_regex = re.compile(r"(^[a-zA-Z0-9_.+\-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
+email_illegal_regex = re.compile(r"[^a-zA-Z0-9_.+\-@]")
 def validate_email(email: str):
     if email is None or email == '':
         return False, 'Email is required.'

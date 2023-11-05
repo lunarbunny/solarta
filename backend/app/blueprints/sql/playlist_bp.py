@@ -60,7 +60,7 @@ def playlist_create():
             data = request.form
             title = data.get("title", None)
             description = data.get("description", None)  # Optional
-            creationDateStr = data.get("creationDate", None)  # Format: YYYY-MM-DD
+            creation_date_str = data.get("creationDate", None)  # Format: YYYY-MM-DD
 
             title = clean_text(title)
             title_valid, title_error = validate_name(title)
@@ -73,11 +73,11 @@ def playlist_create():
                 if not valid_desc:
                     return desc_error, 400
                 
-            if creationDateStr is None or creationDateStr == "":
+            if creation_date_str is None or creation_date_str == "":
                 return "Creation date is required", 400
 
-            creationDate = datetime.strptime(creationDateStr, "%Y-%m-%d").date()
-            new_playlist = Playlist(user.id, creationDate, title, description)
+            creation_date = datetime.strptime(creation_date_str, "%Y-%m-%d").date()
+            new_playlist = Playlist(user.id, creation_date, title, description)
             session.add(new_playlist)
             session.commit()
             return "Created", 201

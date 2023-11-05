@@ -2,11 +2,11 @@ from secrets import token_urlsafe
 
 class CSRF:
     _instance = None
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(CSRF, cls).__new__(cls)
-            cls._instance.token = token_urlsafe(32)
-        return cls._instance
+    def __new__(self):
+        if self._instance is None:
+            self._instance = super(CSRF, self).__new__(self)
+            self._instance.token = token_urlsafe(32)
+        return self._instance
 
     def get_token(self) -> str:
         return self.token
@@ -16,7 +16,7 @@ class CSRF:
             return False
         return self.token == request_token
     
-    def regenerate_token(cls):
-        if cls._instance is not None:
-            cls._instance.token = token_urlsafe(32)
-        return cls._instance
+    def regenerate_token(self):
+        if self._instance is not None:
+            self._instance.token = token_urlsafe(32)
+        return self._instance

@@ -24,13 +24,10 @@ def album_create():
             if user.roleId != 2:
                 return helpers.nachoneko(), 403
 
-            ownerId = user.id
-
             data = request.form
             title = data.get("title", None)
-            releaseDateStr = data.get("releaseDate", None) # Format: YYYY-MM-DD
+            rel_date_str = data.get("releaseDate", None) # Format: YYYY-MM-DD
             description = data.get("description", None) # Optional
-            # imageUrl = data.get("imageUrl", None) # Optional
 
             title = clean_text(title)
             title_valid, title_error = validate_name(title)
@@ -43,11 +40,11 @@ def album_create():
                 if not valid_desc:
                     return desc_error, 400
 
-            if releaseDateStr is None:
+            if rel_date_str is None:
                 return "Release date is required", 400
-            releaseDate = datetime.strptime(releaseDateStr, "%Y-%m-%d")
+            release_date = datetime.strptime(rel_date_str, "%Y-%m-%d")
 
-            new_album = Album(title, releaseDate, ownerId, None, description)
+            new_album = Album(title, release_date, user.id, None, description)
 
             session.add(new_album)
             session.commit()
@@ -59,8 +56,8 @@ def album_create():
             return helpers.nachoneko(), 500
         
 # Delete an album entry
-@album_bp.route("/<int:idAlbum>/delete", methods=["DELETE"])
-def album_delete(idAlbum):
+@album_bp.route("/<int:album_id>/delete", methods=["DELETE"])
+def album_delete(album_id):
     if not CSRF().validate(request.headers.get("X-Csrf-Token", None)):
         return "Skill issue", 403
     
@@ -70,7 +67,7 @@ def album_delete(idAlbum):
             if user is None:
                 return helpers.nachoneko(), status
 
-            album = session.get(Album, idAlbum)
+            album = session.get(Album, album_id)
             
             if album is None:
                 return "Not found", 404
@@ -89,17 +86,17 @@ def album_delete(idAlbum):
             return helpers.nachoneko(), 500
 
 # Retrieve all music based on Album ID
-@album_bp.route("/<int:idAlbum>/music", methods=["GET"])
-def album_retrieve_all_music(idAlbum):
+@album_bp.route("/<int:album_id>/music", methods=["GET"])
+def album_retrieve_all_music(album_id):
     with Session() as session:
         try:
-            album = session.get(Album, idAlbum)
+            album = session.get(Album, album_id)
 
             if album is None:
                 return "Not found", 404
             
             # Retrieve all music that belongs to this album
-            album_music = session.query(Music, User.name, Album.title).select_from(Music).join(AlbumMusic).filter(AlbumMusic.idAlbum == idAlbum).join(User, User.id == Music.ownerId).join(Album, Album.id == AlbumMusic.idAlbum).all()
+            album_music = session.query(Music, User.name, Album.title).select_from(Music).join(AlbumMusic).filter(AlbumMusic.idAlbum == album_id).join(User, User.id == Music.ownerId).join(Album, Album.id == AlbumMusic.idAlbum).all()
             return jsonify([{
                 "id": music.id,
                 "title": music.title,
@@ -114,11 +111,11 @@ def album_retrieve_all_music(idAlbum):
             return helpers.nachoneko(), 500
 
 # Retrieve all albums that belong to an artist
-@album_bp.route("/artist=<int:ownerId>", methods=["GET"])
-def album_by_artist(ownerId):
+@album_bp.route("/artist=<int:owner_id>", methods=["GET"])
+def album_by_artist(owner_id):
     with Session() as session:
         try:
-            albums = session.query(Album, User.name).join(User).filter(Album.ownerId == ownerId).all()
+            albums = session.query(Album, User.name).join(User).filter(Album.ownerId == owner_id).all()
             
             return jsonify([{
                 "id": album.id,
@@ -135,11 +132,11 @@ def album_by_artist(ownerId):
             return helpers.nachoneko(), 500
 
 # Retrieve a specific album
-@album_bp.route("/<int:idAlbum>", methods=["GET"])
-def album_retrieve(idAlbum):
+@album_bp.route("/<int:album_id>", methods=["GET"])
+def album_retrieve(album_id):
     with Session() as session:
         try:
-            albumOwner = session.query(Album, User.name).join(User).filter(Album.id == idAlbum).first()
+            albumOwner = session.query(Album, User.name).join(User).filter(Album.id == album_id).first()
             
             if albumOwner is None:
                 return "Not found", 404
