@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y lsb-release && \
         $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list && \
     apt-get update && apt-get install -y docker-ce-cli
 
-RUN groupadd --gid 998 docker && \
+RUN groupadd --gid 999 docker && \
     usermod -aG docker jenkins
 
 USER jenkins
