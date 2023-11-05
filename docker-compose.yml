@@ -123,6 +123,34 @@ services:
                 condition: always
                 delay: 5s
 
+    logger:
+        image: gvalkov/tailon
+        container_name: solarta-logger
+        networks:
+            - logger
+        user: "1000:1000"
+        command:
+            - "/var/log/nginx/api/*.log"
+            - "/var/log/nginx/web/*.log"
+            - "/var/log/nginx/jenkins/*.log"
+            - "/var/log/nginx/sonarqube/*.log"
+        ports:
+            - "127.0.0.1:8080:8080"
+        volumes:
+            - /var/log/nginx/api:/var/log/nginx/api:rw
+            - /var/log/nginx/web:/var/log/nginx/web:rw
+            - /var/log/nginx/jenkins:/var/log/nginx/jenkins:rw
+            - /var/log/nginx/sonarqube:/var/log/nginx/sonarqube:rw
+        deploy:
+            resources:
+                limits:
+                    cpus: "1"
+                    memory: 256M
+                    pids: 1000
+            restart_policy:
+                condition: always
+                delay: 1s
+
     cicd:
         build: ./jenkins
         image: solarta-cicd
@@ -189,4 +217,7 @@ networks:
         internal: false
     proxy-sast:
         name: solarta-proxy-sast-local
+        internal: false
+    logger:
+        name: solarta-logger-local
         internal: false
