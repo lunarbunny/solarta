@@ -107,7 +107,9 @@ services:
             - "80:80"
             - "443:443"
         volumes:
-            - /var/log/nginx:/var/log/nginx:rw
+            - /var/log/nginx/api:/var/log/nginx/api:rw
+            - /var/log/nginx/web:/var/log/nginx/web:rw
+            - /var/log/nginx/jenkins:/var/log/nginx/jenkins:rw
             - /etc/letsencrypt/live/solarta.nisokkususu.com/fullchain.pem:/etc/nginx/ssl/fullchain.pem:ro
             - /etc/letsencrypt/live/solarta.nisokkususu.com/privkey.pem:/etc/nginx/ssl/privkey.pem:ro
         cap_drop:
