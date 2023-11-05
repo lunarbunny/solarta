@@ -155,6 +155,8 @@ services:
     sast:
         image: sonarqube
         container_name: solarta-sast
+        environment:
+            - SONAR_WEB_CONTEXT=/sonarqube
         networks:
             - proxy-sast
         volumes:
@@ -163,7 +165,7 @@ services:
             resources:
                 limits:
                     cpus: "2"
-                    memory: 2G
+                    memory: 3G
                     pids: 1000
             restart_policy:
                 condition: always
