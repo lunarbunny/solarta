@@ -2,7 +2,7 @@ import AccountManagement from "@/components/Auth/AccountManagement";
 import LibrarySection from "@/components/Library/LibrarySection";
 import useAuth from "@/hooks/useAuth";
 import { API_URL } from "@/types";
-import { postWithCsrfToken, validateDescription, validateName, validatePwd } from "@/utils";
+import { postWithCsrfToken, validateDescription, validateName, validateOTP, validatePwd } from "@/utils";
 import {
   Box,
   Button,
@@ -69,8 +69,6 @@ const AccountPage: NextPage = () => {
   const handleProfileSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!user) return;
-
     const formData = new FormData();
     if (form.name != user.name) {
       if (!validateName(form.name)) {
@@ -86,13 +84,17 @@ const AccountPage: NextPage = () => {
       }
       formData.append("about", form.about);
     }
-    if (form.password != "" && form.newPassword != "" && form.otp != "") {
+    if (form.password != "" || form.newPassword != "" || form.otp != "") {
       if (!validatePwd(form.password)) {
         setError("Your current password is empty.");
         return;
       }
       if (!validatePwd(form.newPassword, true)) {
-        setError("Please enter a password that is at least 12 characters long.");
+        setError("Please enter a new password that is at least 12 characters long.");
+        return;
+      }
+      if (!validateOTP(form.otp)) {
+        setError("Please enter a valid 6 digit OTP.");
         return;
       }
       formData.append("password", form.password);
@@ -100,7 +102,10 @@ const AccountPage: NextPage = () => {
       formData.append("mfa", form.otp);
     }
 
-    if (formData.entries().next().done) return;
+    if (formData.entries().next().done) {
+      setError("No changes detected.");
+      return;
+    }
 
     if (!confirm("Are you sure you want to update your profile?")) return;
 
@@ -196,6 +201,9 @@ const AccountPage: NextPage = () => {
               value={form.otp}
               onChange={(e) => setForm({ ...form, otp: e.target.value })}
             />
+            <FormHelperText>
+              Passwords must be at least 12 characters long.
+            </FormHelperText>
           </FormControl>
 
           <Flex align="center" mt={4}>
