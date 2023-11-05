@@ -99,10 +99,12 @@ services:
             - api
             - web
             - cicd
+            - sast
         networks:
             - proxy-api
             - proxy-web
             - proxy-cicd
+            - proxy-sast
         ports:
             - "80:80"
             - "443:443"
@@ -110,6 +112,7 @@ services:
             - /var/log/nginx/api:/var/log/nginx/api:rw
             - /var/log/nginx/web:/var/log/nginx/web:rw
             - /var/log/nginx/jenkins:/var/log/nginx/jenkins:rw
+            - /var/log/nginx/sonarqube:/var/log/nginx/sonarqube:rw
             - /etc/letsencrypt/live/solarta.nisokkususu.com/fullchain.pem:/etc/nginx/ssl/fullchain.pem:ro
             - /etc/letsencrypt/live/solarta.nisokkususu.com/privkey.pem:/etc/nginx/ssl/privkey.pem:ro
         cap_drop:
@@ -149,12 +152,34 @@ services:
                 condition: always
                 delay: 1s
 
+    sast:
+        image: sonarqube
+        container_name: solarta-sast
+        environment:
+            - SONAR_WEB_CONTEXT=/sonarqube
+        networks:
+            - proxy-sast
+        volumes:
+            - sast:/opt/sonarqube:rw
+        deploy:
+            resources:
+                limits:
+                    cpus: "2"
+                    memory: 3G
+                    pids: 1000
+            restart_policy:
+                condition: always
+                delay: 1s
+
 volumes:
     db:
         name: solarta-db-volume
         external: false
     cicd:
         name: solarta-cicd-volume
+        external: false
+    sast:
+        name: solarta-sast-volume
         external: false
 
 networks:
@@ -169,4 +194,7 @@ networks:
         internal: true
     proxy-cicd:
         name: solarta-proxy-cicd-local
+        internal: false
+    proxy-sast:
+        name: solarta-proxy-sast-local
         internal: false

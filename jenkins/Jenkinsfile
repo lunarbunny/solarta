@@ -8,6 +8,7 @@ pipeline {
         MARIADB_PASSWORD = credentials('c0e67a34-0eb6-4ad2-85f3-d28c38ab4ed1')
         MARIADB_ROOT_PASSWORD = credentials('8373d9b7-35d9-44c3-9f33-a102153516bb')
         RESETTING_SALT = credentials('961a213b-8863-479d-b760-9cfb3fadbc80')
+        SCANNER_HOME = tool 'SonarQube'
     }
 
     stages {
@@ -75,6 +76,14 @@ pipeline {
 
                 // Write report to specified file
                 dependencyCheckPublisher pattern: 'dependency-check-report-*.xml'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=Solarta -Dsonar.sources=."
+                }
             }
         }
     }
