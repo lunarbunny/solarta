@@ -4,7 +4,7 @@ import sendgrid
 import pyotp
 import time
 from models.User import User
-from sendgrid.helpers.mail import *
+from sendgrid.helpers.mail import Mail
 from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
 import eyed3
@@ -18,15 +18,15 @@ sg = sendgrid.SendGridAPIClient(api_key=os.getenv("SENDGRID_API_KEY"))
 serializer = URLSafeTimedSerializer(secret_key=os.getenv("URL_SIGN_SECRET"))
 
 def music_get_save_dir():
-    dir = os.environ.get("MUSIC_ASSET_DIR")
-    if dir is None:
+    music_dir = os.environ.get("MUSIC_ASSET_DIR")
+    if music_dir is None:
         print("MUSIC_ASSET_DIR not set", file=sys.stderr)
         sys.exit(1)
-    elif not os.path.isdir(dir):
-        os.makedirs(dir, exist_ok=True)
-        print(f"{dir} is not a directory", file=sys.stderr)
+    elif not os.path.isdir(music_dir):
+        os.makedirs(music_dir, exist_ok=True)
+        print(f"{music_dir} is not a directory", file=sys.stderr)
         sys.exit(1)
-    return dir
+    return music_dir
 
 def music_strip_tags_and_get_metadata(path):
     file = eyed3.load(path)
@@ -53,7 +53,7 @@ def check_needs_rehash(hash):
 def verify_password_hash(hash, password):
     try:
         return argon_hasher.verify(hash, password)
-    except:
+    except Exception:
         return False
 
 def is_timestamp_within(timestamp, seconds):
@@ -173,8 +173,8 @@ def check_authenticated(db, request) -> tuple[User | None, int]:
     if user is None:
         return None, 401
 
-    # Check if user is banned or unverified
-    if user.status != 0: # 0 = active, 1 = banned, 2 = unverified
+    # Check user status: 0 = active, 1 = banned, 2 = unverified
+    if user.status != 0:
         return None, 403
 
     # If session expired, clear session

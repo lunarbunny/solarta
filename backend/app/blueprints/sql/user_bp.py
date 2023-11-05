@@ -259,13 +259,13 @@ def register():
                 return "Email is already taken.", 400
 
             # Fields are valid, proceed to generate user
-            hashPwd = helpers.hash_password(password)
-            newUser = User(
+            hash_pwd = helpers.hash_password(password)
+            new_user = User(
                 name,
                 email,
-                hashPwd,
-                status=2,
-                roleId=2,
+                hash_pwd,
+                status=2, # Unverified
+                roleId=2, # User
                 mfaSecret=None,
                 sessionId=None,
                 sessionExpiry=None,
@@ -274,7 +274,7 @@ def register():
                 loginAttempts=0,
             )
 
-            session.add(newUser)
+            session.add(new_user)
             session.commit()
             helpers.send_onboarding_email(name, email)
             return "Created", 201
