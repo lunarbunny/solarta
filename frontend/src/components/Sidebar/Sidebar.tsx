@@ -68,7 +68,7 @@ const Sidebar = () => {
           }
         </SidebarGroup>
 
-        {user && (
+        {user && !user.admin && (
           <SidebarGroup title="PLAYLISTS" hasButton={true}>
             <Playlists />
           </SidebarGroup>
