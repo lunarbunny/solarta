@@ -38,7 +38,7 @@ const Register: React.FC<RegisterProps> = ({ onLoginClick }) => {
     if (passwordHasError) setPasswordHasError(false);
 
     if (!validateName(registerForm.name)) {
-      setError('Please enter a name that is 3-64 chars long.');
+      setError('Please enter a name that is 3-64 chars long. (Letters, numbers, and space only)');
       setNameHasError(true);
       return;
     }

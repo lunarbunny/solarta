@@ -72,7 +72,7 @@ const AccountPage: NextPage = () => {
     const formData = new FormData();
     if (form.name != user.name) {
       if (!validateName(form.name)) {
-        setError("Please enter a name that is 3-64 chars long.");
+        setError("Please enter a name that is 3-64 chars long. (Letters, numbers, and space only)");
         return;
       }
       formData.append("name", form.name);

@@ -30,7 +30,10 @@ export function formatDate(date: Date): string {
 
 // For song names, album names
 export function validateName(text: string): boolean {
-  return text.length >= 3 && text.length <= 64;
+  if (text.trim().length == 0) return false;
+  if (text.length < 3 || text.length > 64) return false;
+  const re = /^[a-zA-Z0-9 ]+$/; // Check alphanumeric and spaces only
+  return re.test(text);
 }
 
 // For album description, artist about
