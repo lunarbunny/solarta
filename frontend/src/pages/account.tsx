@@ -111,11 +111,19 @@ const AccountPage: NextPage = () => {
 
     const res = await postWithCsrfToken(`${API_URL}/user/update`, formData);
 
-    if (res.ok) {
-      router.reload();
-    } else {
-      alert("Error: Could not update profile.");
+    if (!res.ok) {
+      if (res.status == 400) {
+        let resText = await res.text();
+        setError(resText);
+      } else if (res.status == 401) {
+        setError("Incorrect password or OTP.");
+      } else {
+        setError("Error occured while updating profile.");
+      }
+      return;
     }
+
+    router.reload();
   };
 
   let hasChanges = user
