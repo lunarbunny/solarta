@@ -15,7 +15,7 @@ pipeline {
             steps {
                 script {
                     // Build Flask Application
-                    sh 'docker compose build --no-cache api'
+                    sh 'docker compose build api'
                 }
             }
         }
@@ -24,7 +24,7 @@ pipeline {
             steps {
                 script {
                     // Build Next Application
-                    sh 'docker compose build --no-cache web'
+                    sh 'docker compose build web'
                 }
             }
         }
